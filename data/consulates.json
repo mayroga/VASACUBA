@@ -1,0 +1,451 @@
+{
+"metadata": {
+"file": "consulates.json",
+"version": "1.0.0",
+"country": "Cuba",
+"language": "es",
+"description": "Repositorio de representaciones y reglas de verificación consular para trámites relacionados con Cuba.",
+"source_of_truth": "official_consular_authorities",
+"last_reviewed": "2026-09-24",
+"warning": "Las jurisdicciones, direcciones, teléfonos, correos, horarios, sistemas de citas y procedimientos pueden cambiar. La aplicación debe verificar la información operativa antes de mostrarla como vigente.",
+"app_role": "guidance_only",
+"does_not_replace_consulate": true,
+"does_not_book_appointments_automatically": true
+},
+"sources": [
+{
+"id": "SRC-CONS-MINREX",
+"name": "Ministerio de Relaciones Exteriores de Cuba",
+"type": "government",
+"url": "https://www.minrex.gob.cu/",
+"official": true
+},
+{
+"id": "SRC-CONS-MISIONES",
+"name": "Misiones de Cuba en el exterior",
+"type": "government_consular_directory",
+"url": "https://misiones.minrex.gob.cu/",
+"official": true
+},
+{
+"id": "SRC-CONS-US",
+"name": "Representación diplomática de Cuba en Estados Unidos",
+"type": "government",
+"url": "https://misiones.minrex.gob.cu/en/united-states-of-america",
+"official": true
+}
+],
+"jurisdiction_model": {
+"method": "country_or_region_based",
+"priority": [
+"official_consular_jurisdiction",
+"official_mission_directory",
+"direct_consular_confirmation"
+],
+"fallback_status": "VERIFY",
+"message": "Si no puede determinarse con seguridad la oficina competente, el usuario debe verificar directamente con la representación cubana correspondiente."
+},
+"rules": [
+{
+"id": "CONS-001",
+"category": "CONSULAR",
+"name": "Determinar país de residencia",
+"description": "La oficina consular debe determinarse principalmente a partir del país de residencia o de la jurisdicción oficialmente aplicable.",
+"condition": {
+"NOT": {
+"FIELD_EXISTS": "traveler.residence_country"
+}
+},
+"result": {
+"status": "UNKNOWN",
+"action": "REQUEST_RESIDENCE_COUNTRY",
+"message": "Indica el país donde resides."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-002",
+"category": "CONSULAR",
+"name": "Determinar región de residencia",
+"description": "Algunas representaciones pueden dividir su atención por regiones o jurisdicciones internas.",
+"condition": {
+"FIELD_EXISTS": "traveler.residence_region"
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_REGIONAL_JURISDICTION",
+"message": "Verifica que tu región de residencia corresponda a la jurisdicción de la oficina seleccionada."
+},
+"source_ids": [
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-003",
+"category": "CONSULAR",
+"name": "Estados Unidos",
+"description": "Los usuarios residentes en Estados Unidos deben utilizar la representación cubana cuya jurisdicción corresponda a su caso.",
+"condition": {
+"EQUALS": {
+"field": "traveler.residence_country",
+"value": "UNITED_STATES"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_US_CONSULAR_JURISDICTION",
+"message": "Verifica la jurisdicción consular cubana correspondiente a tu residencia en Estados Unidos."
+},
+"source_ids": [
+"SRC-CONS-US",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-004",
+"category": "CONSULAR",
+"name": "Miami",
+"description": "La aplicación puede reconocer Miami como ubicación de referencia, pero no debe asignar automáticamente una jurisdicción sin confirmar la cobertura vigente.",
+"condition": {
+"EQUALS": {
+"field": "traveler.residence_city",
+"value": "MIAMI"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_MIAMI_CONSULAR_JURISDICTION",
+"message": "Verifica la oficina consular cubana competente para tu lugar de residencia."
+},
+"source_ids": [
+"SRC-CONS-US"
+]
+},
+{
+"id": "CONS-005",
+"category": "CONSULAR",
+"name": "Washington",
+"description": "Washington puede corresponder a la representación diplomática y consular de Cuba en Estados Unidos según el servicio requerido y la jurisdicción aplicable.",
+"condition": {
+"EQUALS": {
+"field": "traveler.residence_city",
+"value": "WASHINGTON"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_WASHINGTON_CONSULAR_SERVICE",
+"message": "Verifica si la representación en Washington es la competente para tu trámite."
+},
+"source_ids": [
+"SRC-CONS-US",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-006",
+"category": "CONSULAR",
+"name": "Trámite de pasaporte",
+"description": "Los trámites relacionados con pasaporte deben dirigirse a la oficina consular competente.",
+"condition": {
+"EQUALS": {
+"field": "service",
+"value": "PASSPORT"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_PASSPORT_CONSULAR_OFFICE",
+"message": "Verifica qué oficina consular puede atender tu trámite de pasaporte."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-007",
+"category": "CONSULAR",
+"name": "Trámite para menor",
+"description": "Los trámites consulares relacionados con menores requieren verificar la oficina competente y los documentos específicos.",
+"condition": {
+"EQUALS": {
+"field": "traveler.is_minor",
+"value": true
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_MINOR_CONSULAR_OFFICE",
+"message": "Verifica la oficina consular competente y los requisitos específicos del menor."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-008",
+"category": "CONSULAR",
+"name": "Autorización relacionada con menor",
+"description": "Los servicios notariales relacionados con autorización de viaje de menores deben verificarse directamente con la oficina competente.",
+"condition": {
+"EQUALS": {
+"field": "service",
+"value": "MINOR_TRAVEL_AUTHORIZATION"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_MINOR_AUTHORIZATION_SERVICE",
+"message": "Consulta a la oficina consular competente para confirmar el procedimiento aplicable."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-009",
+"category": "CONSULAR",
+"name": "Visa",
+"description": "Los trámites de visa deben dirigirse a la autoridad consular competente o al sistema oficial que corresponda.",
+"condition": {
+"EQUALS": {
+"field": "service",
+"value": "VISA"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_VISA_CONSULAR_AUTHORITY",
+"message": "Verifica la autoridad competente para la visa correspondiente."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-010",
+"category": "CONSULAR",
+"name": "Documento notarial",
+"description": "Los documentos notariales deben verificarse según el servicio concreto y la autoridad competente.",
+"condition": {
+"EQUALS": {
+"field": "service_type",
+"value": "NOTARIAL"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_NOTARIAL_SERVICE",
+"message": "Verifica el procedimiento notarial específico antes de preparar documentos."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-011",
+"category": "CONSULAR",
+"name": "Registro civil",
+"description": "Los trámites de registro civil deben dirigirse a la oficina competente y seguir el procedimiento vigente.",
+"condition": {
+"EQUALS": {
+"field": "service_type",
+"value": "CIVIL_REGISTRY"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_CIVIL_REGISTRY_SERVICE",
+"message": "Verifica la oficina competente y los documentos exigidos para el trámite registral."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-012",
+"category": "CONSULAR",
+"name": "Residencia desconocida",
+"description": "No debe asignarse una oficina consular cuando el país de residencia no está disponible.",
+"condition": {
+"NOT": {
+"FIELD_EXISTS": "traveler.residence_country"
+}
+},
+"result": {
+"status": "UNKNOWN",
+"action": "REQUEST_RESIDENCE_COUNTRY",
+"message": "Indica tu país de residencia para buscar la representación correspondiente."
+},
+"source_ids": [
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-013",
+"category": "CONSULAR",
+"name": "Oficina no encontrada",
+"description": "Si la aplicación no tiene una oficina consular suficientemente verificada para el caso, no debe inventar una asignación.",
+"condition": {
+"EQUALS": {
+"field": "consular_office.found",
+"value": false
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "CONTACT_OFFICIAL_MISSION_DIRECTORY",
+"message": "No se pudo determinar automáticamente la oficina competente. Consulta el directorio oficial de misiones de Cuba."
+},
+"source_ids": [
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-014",
+"category": "CONSULAR",
+"name": "Cita consular",
+"description": "La aplicación no debe afirmar que una cita está disponible sin consultar el sistema oficial correspondiente.",
+"condition": {
+"FIELD_EXISTS": "appointment.requested"
+},
+"result": {
+"status": "VERIFY",
+"action": "USE_OFFICIAL_APPOINTMENT_SYSTEM",
+"message": "La disponibilidad de citas debe verificarse directamente con la oficina o sistema oficial."
+},
+"source_ids": [
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-015",
+"category": "CONSULAR",
+"name": "Horario",
+"description": "Los horarios de atención no deben considerarse permanentes.",
+"condition": {
+"FIELD_EXISTS": "consular_office.hours"
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_CURRENT_HOURS",
+"message": "Verifica el horario actual antes de acudir personalmente."
+},
+"source_ids": [
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-016",
+"category": "CONSULAR",
+"name": "Datos de contacto",
+"description": "Teléfono, correo y dirección deben mostrarse únicamente cuando estén respaldados por una fuente oficial vigente.",
+"condition": {
+"FIELD_EXISTS": "consular_office.contact"
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_CONTACT_INFORMATION",
+"message": "Confirma los datos de contacto en la fuente oficial antes de utilizarlos."
+},
+"source_ids": [
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-017",
+"category": "CONSULAR",
+"name": "No usar datos antiguos como actuales",
+"description": "Los datos históricos de una oficina no deben presentarse como información vigente.",
+"condition": {
+"EQUALS": {
+"field": "consular_office.source_is_historical",
+"value": true
+}
+},
+"result": {
+"status": "EXPIRED",
+"action": "DO_NOT_DISPLAY_AS_CURRENT",
+"message": "Esta información es histórica y no debe mostrarse como información consular vigente."
+},
+"source_ids": [
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-018",
+"category": "CONSULAR",
+"name": "Verificación antes de desplazarse",
+"description": "Antes de acudir físicamente a una oficina consular, el usuario debe verificar que la oficina, jurisdicción, servicio y horario continúan vigentes.",
+"condition": {
+"FIELD_EXISTS": "traveler.residence_country"
+},
+"result": {
+"status": "ACTIVE",
+"action": "FINAL_CONSULAR_VERIFICATION",
+"message": "Antes de acudir, confirma oficina, jurisdicción, servicio, horario y documentos directamente con la fuente oficial."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+},
+{
+"id": "CONS-019",
+"category": "CONSULAR",
+"name": "La aplicación no es el consulado",
+"description": "La aplicación proporciona orientación y preparación, pero no representa ni sustituye a una autoridad consular.",
+"condition": {
+"FIELD_EXISTS": "traveler.residence_country"
+},
+"result": {
+"status": "ACTIVE",
+"action": "DISPLAY_INFORMATIONAL_DISCLAIMER",
+"message": "Esta aplicación es informativa y no pertenece ni sustituye a una representación consular cubana."
+},
+"source_ids": [
+"SRC-CONS-MINREX",
+"SRC-CONS-MISIONES"
+]
+}
+],
+"consulates": [
+{
+"id": "CUBA-USA-WASHINGTON",
+"country": "UNITED_STATES",
+"city": "WASHINGTON",
+"name": "Representación diplomática de Cuba en Estados Unidos",
+"type": "EMBASSY_AND_CONSULAR",
+"jurisdiction": "VERIFY",
+"official_directory_url": "https://misiones.minrex.gob.cu/en/united-states-of-america",
+"address": null,
+"phone": null,
+"email": null,
+"hours": null,
+"appointment_url": null,
+"status": "VERIFY",
+"note": "No se almacenan datos operativos no verificados como vigentes."
+}
+],
+"lookup_behavior": {
+"when_country_is_missing": "UNKNOWN",
+"when_jurisdiction_is_uncertain": "VERIFY",
+"when_office_is_not_found": "VERIFY",
+"when_contact_data_is_old": "EXPIRED",
+"when_current_official_data_is_available": "ACTIVE",
+"never_invent_office": true,
+"never_invent_jurisdiction": true,
+"never_invent_appointment": true,
+"never_invent_hours": true,
+"never_invent_contact_information": true
+}
+}
