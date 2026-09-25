@@ -1,8 +1,6 @@
-```python
 from typing import Optional
 
 from pydantic import BaseModel, Field
-
 
 class PassportBase(BaseModel):
     passport_country: str = Field(default="")
@@ -12,7 +10,6 @@ class PassportBase(BaseModel):
     date_of_birth: str = Field(default="")
     passport_expiration: str = Field(default="")
 
-
 class VisaRequest(PassportBase):
     nationality: str = Field(default="")
     country_of_residence: str = Field(default="")
@@ -20,7 +17,6 @@ class VisaRequest(PassportBase):
     email: str = Field(default="")
     arrival_date: str = Field(default="")
     dual_nationality: bool = False
-
 
 class DViajerosRequest(PassportBase):
     nationality: str = Field(default="")
@@ -30,4 +26,3 @@ class DViajerosRequest(PassportBase):
     accommodation: str = Field(default="")
     health_information: Optional[str] = ""
     customs_information: Optional[str] = ""
-```
