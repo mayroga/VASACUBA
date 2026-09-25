@@ -1,1147 +1,1200 @@
-(function () {
+document.addEventListener("DOMContentLoaded", function () {
 "use strict";
 
-document.addEventListener("DOMContentLoaded", function () {
+var STORAGE_VISA = "cuba_auto_travel_visa_2026";
+var STORAGE_DV = "cuba_auto_travel_dviajeros_2026";
+var STORAGE_LANG = "cuba_auto_travel_language_2026";
 
-    var language = localStorage.getItem("cu_language") || "es";
+var OFFICIAL_VISA = "https://evisacuba.cu/";
+var OFFICIAL_DV = "https://dviajeros.mitrans.gob.cu/";
 
-    var visaStep = 0;
-    var dviajerosStep = 0;
+var language = localStorage.getItem(STORAGE_LANG) || "es";
+var passportRules = {};
+var visaStep = 0;
+var dvStep = 0;
 
-    var visaTotalSteps = 6;
-    var dviajerosTotalSteps = 8;
+var visaData = loadData(STORAGE_VISA);
+var dvData = loadData(STORAGE_DV);
 
-    var translations = {
+var translations = {
+    es: {
+        startVisa: "Preparar Visa / eVisa",
+        startDviajeros: "Preparar D'Viajeros",
+        backHome: "Volver al inicio",
+        previous: "Anterior",
+        next: "Continuar",
+        clear: "Borrar mis datos",
+        openOfficial: "Abrir portal oficial",
+        copy: "Copiar",
+        copied: "¡Copiado!",
+        ready: "LISTO",
+        review: "REVISA ESTO",
+        missing: "FALTA ESTE DATO",
+        complete: "MUY BIEN. YA PODEMOS CONTINUAR.",
+        passportReady: "Información del pasaporte preparada.",
+        passportMissing: "Ten tu pasaporte delante y completa todos los datos.",
+        passportReview: "Revisa un dato del pasaporte.",
+        passportExpired: "La fecha de vencimiento debe revisarse antes de continuar.",
+        officialNotice: "El portal oficial se abrirá en una nueva pestaña. Puedes volver aquí cuando quieras.",
+        noOfficial: "CUBA AUTO TRAVEL no realiza el trámite oficial.",
+        required: "Completa este dato para continuar.",
+        invalidEmail: "Escribe un correo electrónico válido.",
+        invalidDate: "Revisa la fecha indicada.",
+        expirationBeforeBirth: "La fecha de vencimiento no puede ser anterior a la fecha de nacimiento.",
+        expirationBeforeArrival: "El pasaporte debe tener una fecha de vencimiento posterior a la fecha prevista de llegada.",
+        passportNumberInvalid: "Revisa el número de pasaporte.",
+        healthNeedDetails: "Si respondes Sí, explica brevemente lo que corresponda.",
+        customsNeedDetails: "Si respondes Sí, prepara los datos que correspondan a la declaración.",
+        yes: "Sí",
+        no: "No",
+        saved: "Tus datos se guardan solamente en este navegador.",
+        language: "EN"
+    },
+    en: {
+        startVisa: "Prepare Visa / eVisa",
+        startDviajeros: "Prepare D'Viajeros",
+        backHome: "Back to home",
+        previous: "Previous",
+        next: "Continue",
+        clear: "Delete my data",
+        openOfficial: "Open official portal",
+        copy: "Copy",
+        copied: "Copied!",
+        ready: "READY",
+        review: "CHECK THIS",
+        missing: "THIS INFORMATION IS MISSING",
+        complete: "VERY GOOD. WE CAN CONTINUE.",
+        passportReady: "Passport information prepared.",
+        passportMissing: "Have your passport in front of you and complete all the information.",
+        passportReview: "Check one passport detail.",
+        passportExpired: "Check the passport expiration date before continuing.",
+        officialNotice: "The official portal will open in a new tab. You can return here whenever you want.",
+        noOfficial: "CUBA AUTO TRAVEL does not perform the official procedure.",
+        required: "Complete this information to continue.",
+        invalidEmail: "Enter a valid email address.",
+        invalidDate: "Check the date entered.",
+        expirationBeforeBirth: "The expiration date cannot be before the date of birth.",
+        expirationBeforeArrival: "The passport must expire after the planned arrival date.",
+        passportNumberInvalid: "Check the passport number.",
+        healthNeedDetails: "If you answer Yes, briefly explain what applies.",
+        customsNeedDetails: "If you answer Yes, prepare the information required for the declaration.",
+        yes: "Yes",
+        no: "No",
+        saved: "Your information is saved only in this browser.",
+        language: "ES"
+    }
+};
 
-        es: {
-            independent_badge: "APLICACIÓN INDEPENDIENTE",
-            hero_title: "Prepárate para viajar a Cuba sin miedo a perderte.",
-            hero_text: "CU CUBA AUTO TRAVEL 2026 te explica, te prepara y te acompaña paso a paso antes de entrar a los portales oficiales.",
-            visa_button: "Preparar Visa / eVisa",
-            dviajeros_button: "Preparar D'Viajeros",
-            official_kicker: "PORTALES OFICIALES",
-            official_title: "Tenlos siempre a mano",
-            official_text: "Se abrirán en una nueva pestaña. CU CUBA AUTO TRAVEL permanecerá abierta para que puedas mirar, copiar, volver y continuar.",
-            open_official_visa: "Abrir portal oficial de Visa",
-            open_official_dviajeros: "Abrir portal oficial de D'Viajeros",
-            how_kicker: "CÓMO FUNCIONA",
-            how_title: "Como tener un agente a tu lado",
-            how_1_title: "Entender",
-            how_1_text: "Te explicamos qué vas a hacer antes de comenzar.",
-            how_2_title: "Preparar",
-            how_2_text: "Organizas tus datos y tienes todo listo.",
-            how_3_title: "Simular",
-            how_3_text: "Practicas el camino antes de entrar al sitio oficial.",
-            how_4_title: "Continuar",
-            how_4_text: "Abres el portal oficial y vuelves aquí cuando necesites orientación.",
-            important_label: "IMPORTANTE",
-            disclaimer: "CU CUBA AUTO TRAVEL 2026 es independiente. No pertenece al Gobierno de Cuba ni a sus autoridades migratorias, consulares, sanitarias o aduanales. No emite visas, no presenta solicitudes oficiales y no genera QR oficiales.",
-            back: "Volver",
-            visa_title: "Visa cubana / eVisa",
-            visa_intro: "Vamos a prepararla juntos antes de abrir el portal oficial.",
-            agent_title: "Te voy guiando paso a paso.",
-            agent_text: "Primero entendemos el procedimiento. Después preparamos los datos, simulamos el recorrido y finalmente abrimos el sitio oficial.",
-            step_1: "PASO 1",
-            step_2: "PASO 2",
-            step_3: "PASO 3",
-            step_4: "PASO 4",
-            step_5: "PASO 5",
-            step_6: "PASO 6",
-            step_7: "PASO 7",
-            step_8: "PASO 8",
-            visa_step1_title: "¿Qué vas a hacer?",
-            visa_step1_text: "La eVisa es un procedimiento electrónico. CU CUBA AUTO TRAVEL no expide la visa: aquí preparas la información y después continúas directamente en el portal oficial.",
-            what_we_do: "Aquí hacemos",
-            visa_here: "Preparar, explicar, revisar y practicar.",
-            official_does: "En el portal oficial",
-            visa_official: "Presentas la solicitud y realizas el procedimiento oficial.",
-            visa_step2_title: "Prepara tus datos",
-            visa_step2_text: "Completa estos datos con la información real de tu pasaporte y de tu viaje. Los datos se guardan solamente en este navegador para que puedas continuar.",
-            nationality: "Nacionalidad",
-            residence: "País de residencia",
-            passport_country: "País que emitió tu pasaporte",
-            travel_purpose: "Motivo del viaje",
-            email: "Correo electrónico",
-            copy: "Copiar",
-            visa_step3_title: "Revisa tu pasaporte",
-            passport_available: "Tengo mi pasaporte disponible.",
-            passport_valid: "He revisado la vigencia de mi pasaporte.",
-            dual_nationality: "Tengo doble nacionalidad.",
-            tip: "CONSEJO",
-            passport_tip: "Si tienes dudas sobre tu nacionalidad aplicable o sobre un requisito específico, no adivines. Compruébalo en la información oficial antes de enviar la solicitud.",
-            visa_step4_title: "Así es el camino del trámite",
-            visa_sim1_title: "Detalles del trámite",
-            visa_sim1_text: "Introduces la información solicitada por el portal.",
-            visa_sim2_title: "Trámites adicionales",
-            visa_sim2_text: "Si el portal muestra procedimientos adicionales aplicables, los revisas antes de continuar.",
-            visa_sim3_title: "Pago",
-            visa_sim3_text: "El método de pago no debe suponerse. El portal muestra las opciones correspondientes al trámite y al consulado.",
-            visa_sim4_title: "Revisar y confirmar",
-            visa_sim4_text: "Compruebas los datos antes de confirmar y enviar.",
-            payment_attention: "ATENCIÓN AL PAGO",
-            payment_text: "No vamos a decirte que existe un único método de pago para todos. Las opciones pueden depender del consulado. Mira siempre lo que indique el portal oficial para tu trámite.",
-            visa_step5_title: "Haz una última revisión",
-            clear: "Borrar preparación",
-            visa_step6_title: "Ahora sí: abre el portal oficial",
-            portal_instruction1: "Pulsa el botón. El portal oficial se abrirá en otra pestaña.",
-            portal_instruction2: "Deja CU CUBA AUTO TRAVEL abierta.",
-            portal_instruction3: "Mira aquí, copia el dato que necesites, pégalo en el portal oficial y vuelve aquí cuando necesites continuar.",
-            open_visa_portal: "ABRIR eVISA OFICIAL ↗",
-            official_note: "Esta aplicación no presenta la solicitud ni emite la visa.",
-            previous: "Anterior",
-            next: "Siguiente",
-            dviajeros_intro: "Vamos a organizar la información para que el formulario oficial sea más fácil de completar.",
-            dviajeros_agent_title: "No tienes que recordar todo de golpe.",
-            dviajeros_agent_text: "Avanzaremos por partes: datos personales, viaje, alojamiento, salud, aduana y revisión.",
-            dv_step1_title: "Primero entendamos D'Viajeros",
-            dv_step1_text: "D'Viajeros reúne información que el viajero debe proporcionar antes de su entrada a Cuba. Aquí no generamos el QR oficial. Preparamos contigo la información para que después puedas completar y revisar el procedimiento en el sitio oficial.",
-            dv_personal: "Información personal",
-            dv_personal_text: "Quién eres y los datos de tu documento.",
-            dv_trip: "Información del viaje",
-            dv_trip_text: "Cuándo llegas, vuelo y aerolínea.",
-            dv_health: "Salud",
-            dv_health_text: "Respondes según tu situación real.",
-            dv_customs: "Aduana",
-            dv_customs_text: "Declaras lo que corresponda a tu caso.",
-            dv_step2_title: "Datos personales",
-            first_name: "Nombre",
-            last_name: "Apellidos",
-            birth_date: "Fecha de nacimiento",
-            where_to_find: "¿Dónde encontrar estos datos?",
-            personal_tip: "Utiliza tu pasaporte. Es mejor copiar exactamente cómo aparece allí que intentar recordarlo.",
-            dv_step3_title: "Pasaporte y viaje",
-            passport_number: "Número de pasaporte",
-            arrival_date: "Fecha de llegada",
-            flight_number: "Número de vuelo",
-            airline: "Aerolínea",
-            travel_tip_title: "Consejo del agente",
-            travel_tip: "Ten a mano tu boleto o confirmación de vuelo. Ahí normalmente encontrarás el número de vuelo y la aerolínea.",
-            dv_step4_title: "Alojamiento y otros datos",
-            accommodation: "Alojamiento",
-            address_cuba: "Dirección en Cuba",
-            trip_purpose: "Motivo del viaje",
-            extra_information: "¿Tienes algo más?",
-            extra_information_text: "Si el portal oficial te solicita un dato que no aparece aquí, no significa que estés perdido. Anótalo y podrás revisarlo nuevamente en esta aplicación.",
-            dv_step5_title: "Salud: responde según tu realidad",
-            dv_health_intro: "Esta parte no debe rellenarse por adivinación. CU CUBA AUTO TRAVEL te ayuda a organizar la respuesta, pero tú debes declarar la información verdadera que corresponda a tu situación.",
-            health_declaration: "Información de salud que deba declarar",
-            select_option: "Selecciona una opción",
-            no_information: "No tengo información adicional que declarar",
-            yes_information: "Sí, tengo información que debo declarar",
-            health_extra: "Información adicional",
-            health_placeholder: "Escribe aquí solamente información real que corresponda a tu caso.",
-            do_not_guess: "NO ADIVINES",
-            health_warning: "Si una pregunta oficial no está clara, léela exactamente en el portal oficial y utiliza esta sección para organizar tu respuesta.",
-            dv_step6_title: "Aduana: prepara lo que realmente corresponda",
-            dv_customs_intro: "No vamos a inventar cantidades, valores ni categorías. Esta sección sirve para que pienses y organices la información antes de responder en el portal oficial.",
-            customs_declaration: "¿Tienes información que debas declarar?",
-            nothing_to_declare: "No tengo información adicional que declarar",
-            something_to_declare: "Sí, tengo algo que declarar",
-            customs_extra: "Detalles que quieras preparar",
-            customs_placeholder: "Escribe aquí los detalles reales que necesites revisar.",
-            customs_tip_title: "Recuerda",
-            customs_tip: "Si tienes una mercancía, cantidad, valor o situación especial, utiliza la información oficial aplicable para determinar cómo debe declararse.",
-            dv_step7_title: "Revisión antes de abrir D'Viajeros",
-            dv_step8_title: "Ahora abre D'Viajeros",
-            dv_portal_instruction3: "Completa el formulario oficial y vuelve aquí cuando necesites consultar o revisar un dato.",
-            open_dviajeros_portal: "ABRIR D'VIAJEROS OFICIAL ↗",
-            qr_note: "El QR oficial lo genera el sistema oficial después de completar el procedimiento correspondiente.",
-            footer_text: "Aplicación independiente de preparación y acompañamiento."
-        },
+function byId(id) {
+    return document.getElementById(id);
+}
 
-        en: {
-            independent_badge: "INDEPENDENT APPLICATION",
-            hero_title: "Get ready to travel to Cuba without getting lost.",
-            hero_text: "CU CUBA AUTO TRAVEL 2026 explains, prepares and guides you step by step before you enter the official portals.",
-            visa_button: "Prepare Visa / eVisa",
-            dviajeros_button: "Prepare D'Viajeros",
-            official_kicker: "OFFICIAL PORTALS",
-            official_title: "Keep them within reach",
-            official_text: "They will open in a new tab. CU CUBA AUTO TRAVEL will remain open so you can look, copy, return and continue.",
-            open_official_visa: "Open official Visa portal",
-            open_official_dviajeros: "Open official D'Viajeros portal",
-            how_kicker: "HOW IT WORKS",
-            how_title: "Like having an agent beside you",
-            how_1_title: "Understand",
-            how_1_text: "We explain what you are going to do before you begin.",
-            how_2_title: "Prepare",
-            how_2_text: "Organize your information and get everything ready.",
-            how_3_title: "Practice",
-            how_3_text: "Practice the process before entering the official site.",
-            how_4_title: "Continue",
-            how_4_text: "Open the official portal and return here whenever you need guidance.",
-            important_label: "IMPORTANT",
-            disclaimer: "CU CUBA AUTO TRAVEL 2026 is independent. It is not part of the Government of Cuba or its migration, consular, health or customs authorities. It does not issue visas, submit official applications or generate official QR codes.",
-            back: "Back",
-            visa_title: "Cuban Visa / eVisa",
-            visa_intro: "Let's prepare it together before opening the official portal.",
-            agent_title: "I will guide you step by step.",
-            agent_text: "First we understand the process. Then we prepare the information, practice the path and finally open the official site.",
-            step_1: "STEP 1",
-            step_2: "STEP 2",
-            step_3: "STEP 3",
-            step_4: "STEP 4",
-            step_5: "STEP 5",
-            step_6: "STEP 6",
-            step_7: "STEP 7",
-            step_8: "STEP 8",
-            visa_step1_title: "What are you going to do?",
-            visa_step1_text: "The eVisa is an electronic procedure. CU CUBA AUTO TRAVEL does not issue the visa: here you prepare the information and then continue directly on the official portal.",
-            what_we_do: "What we do here",
-            visa_here: "Prepare, explain, review and practice.",
-            official_does: "On the official portal",
-            visa_official: "You submit the application and complete the official procedure.",
-            visa_step2_title: "Prepare your information",
-            visa_step2_text: "Enter the real information from your passport and trip. The information is stored only in this browser so you can continue.",
-            nationality: "Nationality",
-            residence: "Country of residence",
-            passport_country: "Country that issued your passport",
-            travel_purpose: "Purpose of travel",
-            email: "Email",
-            copy: "Copy",
-            visa_step3_title: "Check your passport",
-            passport_available: "I have my passport available.",
-            passport_valid: "I have checked my passport validity.",
-            dual_nationality: "I have dual nationality.",
-            tip: "TIP",
-            passport_tip: "If you are unsure about your applicable nationality or a specific requirement, do not guess. Check the official information before submitting.",
-            visa_step4_title: "This is the path of the procedure",
-            visa_sim1_title: "Application details",
-            visa_sim1_text: "Enter the information requested by the portal.",
-            visa_sim2_title: "Additional procedures",
-            visa_sim2_text: "If the portal shows additional procedures that apply to you, review them before continuing.",
-            visa_sim3_title: "Payment",
-            visa_sim3_text: "Do not assume one payment method. The portal shows the options applicable to the procedure and consulate.",
-            visa_sim4_title: "Review and confirm",
-            visa_sim4_text: "Check the information before confirming and submitting.",
-            payment_attention: "PAYMENT ATTENTION",
-            payment_text: "We will not tell you that there is one payment method for everyone. Options may depend on the consulate. Always follow what the official portal indicates for your procedure.",
-            visa_step5_title: "One final review",
-            clear: "Clear preparation",
-            visa_step6_title: "Now open the official portal",
-            portal_instruction1: "Press the button. The official portal will open in another tab.",
-            portal_instruction2: "Keep CU CUBA AUTO TRAVEL open.",
-            portal_instruction3: "Look here, copy the information you need, paste it into the official portal and return here whenever you need to continue.",
-            open_visa_portal: "OPEN OFFICIAL eVISA ↗",
-            official_note: "This application does not submit the application or issue the visa.",
-            previous: "Previous",
-            next: "Next",
-            dviajeros_intro: "Let's organize the information so the official form is easier to complete.",
-            dviajeros_agent_title: "You do not have to remember everything at once.",
-            dviajeros_agent_text: "We will go step by step: personal information, trip, accommodation, health, customs and review.",
-            dv_step1_title: "First, understand D'Viajeros",
-            dv_step1_text: "D'Viajeros collects information that travelers must provide before entering Cuba. We do not generate the official QR here. We prepare the information with you so you can complete and review the official procedure.",
-            dv_personal: "Personal information",
-            dv_personal_text: "Who you are and your document information.",
-            dv_trip: "Travel information",
-            dv_trip_text: "When you arrive, flight and airline.",
-            dv_health: "Health",
-            dv_health_text: "Answer according to your real situation.",
-            dv_customs: "Customs",
-            dv_customs_text: "Declare what applies to your situation.",
-            dv_step2_title: "Personal information",
-            first_name: "First name",
-            last_name: "Last name",
-            birth_date: "Date of birth",
-            where_to_find: "Where can you find this information?",
-            personal_tip: "Use your passport. It is better to copy it exactly as shown there than to rely on memory.",
-            dv_step3_title: "Passport and trip",
-            passport_number: "Passport number",
-            arrival_date: "Arrival date",
-            flight_number: "Flight number",
-            airline: "Airline",
-            travel_tip_title: "Agent tip",
-            travel_tip: "Keep your ticket or flight confirmation nearby. You will normally find the flight number and airline there.",
-            dv_step4_title: "Accommodation and other information",
-            accommodation: "Accommodation",
-            address_cuba: "Address in Cuba",
-            trip_purpose: "Purpose of travel",
-            extra_information: "Do you have anything else?",
-            extra_information_text: "If the official portal asks for information that is not shown here, you are not lost. Write it down and review it again in this application.",
-            dv_step5_title: "Health: answer according to your situation",
-            dv_health_intro: "Do not guess this section. CU CUBA AUTO TRAVEL helps you organize your answer, but you must declare the real information that applies to your situation.",
-            health_declaration: "Health information that you need to declare",
-            select_option: "Select an option",
-            no_information: "I have no additional information to declare",
-            yes_information: "Yes, I have information that I need to declare",
-            health_extra: "Additional information",
-            health_placeholder: "Write only real information that applies to your situation.",
-            do_not_guess: "DO NOT GUESS",
-            health_warning: "If an official question is unclear, read it exactly on the official portal and use this section to organize your answer.",
-            dv_step6_title: "Customs: prepare what actually applies",
-            dv_customs_intro: "We will not invent quantities, values or categories. This section helps you think about and organize your information before answering on the official portal.",
-            customs_declaration: "Do you have information that you need to declare?",
-            nothing_to_declare: "I have no additional information to declare",
-            something_to_declare: "Yes, I have something to declare",
-            customs_extra: "Details you want to prepare",
-            customs_placeholder: "Write the real details you need to review here.",
-            customs_tip_title: "Remember",
-            customs_tip: "If you have merchandise, a quantity, value or special situation, use the applicable official information to determine how it should be declared.",
-            dv_step7_title: "Review before opening D'Viajeros",
-            dv_step8_title: "Now open D'Viajeros",
-            dv_portal_instruction3: "Complete the official form and return here whenever you need to check or review information.",
-            open_dviajeros_portal: "OPEN OFFICIAL D'VIAJEROS ↗",
-            qr_note: "The official QR is generated by the official system after the applicable procedure is completed.",
-            footer_text: "Independent preparation and guidance application."
+function loadData(key) {
+    try {
+        var raw = localStorage.getItem(key);
+        if (!raw) return {};
+        var parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (error) {
+        return {};
+    }
+}
+
+function saveData(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+    }
+}
+
+function t(key) {
+    if (translations[language] && translations[language][key]) {
+        return translations[language][key];
+    }
+    return translations.es[key] || key;
+}
+
+function applyLanguage() {
+    var nodes = document.querySelectorAll("[data-i18n]");
+
+    for (var i = 0; i < nodes.length; i++) {
+        var key = nodes[i].getAttribute("data-i18n");
+        if (translations[language][key]) {
+            nodes[i].textContent = translations[language][key];
         }
+    }
+
+    var placeholders = document.querySelectorAll("[data-i18n-placeholder]");
+
+    for (var j = 0; j < placeholders.length; j++) {
+        var placeholderKey = placeholders[j].getAttribute("data-i18n-placeholder");
+        if (translations[language][placeholderKey]) {
+            placeholders[j].setAttribute(
+                "placeholder",
+                translations[language][placeholderKey]
+            );
+        }
+    }
+
+    var languageButton = byId("languageButton");
+    if (languageButton) {
+        languageButton.textContent = t("language");
+    }
+
+    refreshStatusMessages();
+}
+
+function setValue(id, value) {
+    var element = byId(id);
+    if (!element || value === undefined || value === null) return;
+
+    if (element.type === "checkbox") {
+        element.checked = Boolean(value);
+    } else {
+        element.value = value;
+    }
+}
+
+function getValue(id) {
+    var element = byId(id);
+    if (!element) return "";
+
+    if (element.type === "checkbox") {
+        return element.checked;
+    }
+
+    return String(element.value || "").trim();
+}
+
+function bindStorage(ids, storageKey, target) {
+    ids.forEach(function (id) {
+        var element = byId(id);
+        if (!element) return;
+
+        element.addEventListener("input", function () {
+            target[id] = getValue(id);
+            saveData(storageKey, target);
+            refreshCurrentModule();
+        });
+
+        element.addEventListener("change", function () {
+            target[id] = getValue(id);
+            saveData(storageKey, target);
+            refreshCurrentModule();
+        });
+    });
+}
+
+function restoreFields(ids, data) {
+    ids.forEach(function (id) {
+        if (Object.prototype.hasOwnProperty.call(data, id)) {
+            setValue(id, data[id]);
+        }
+    });
+}
+
+function validDate(value) {
+    if (!value) return false;
+
+    var date = new Date(value + "T00:00:00");
+    return !isNaN(date.getTime());
+}
+
+function passportNumberValid(value) {
+    var number = String(value || "").replace(/\s+/g, "");
+
+    if (!number) return false;
+    if (number.length < 5 || number.length > 20) return false;
+
+    return /^[A-Za-z0-9-]+$/.test(number);
+}
+
+function emailValid(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || ""));
+}
+
+function validatePassport(fields, travelDate) {
+    var country = getValue(fields.country);
+    var number = getValue(fields.number);
+    var firstName = getValue(fields.firstName);
+    var lastName = getValue(fields.lastName);
+    var birth = getValue(fields.birth);
+    var expiration = getValue(fields.expiration);
+
+    var result = {
+        valid: true,
+        missing: [],
+        review: [],
+        message: t("passportReady")
     };
 
-    function byId(id) {
-        return document.getElementById(id);
+    if (!country) {
+        result.valid = false;
+        result.missing.push(fields.country);
     }
 
-    function setLanguage(newLanguage) {
-
-        language = newLanguage === "en" ? "en" : "es";
-
-        localStorage.setItem("cu_language", language);
-
-        document.documentElement.lang = language;
-
-        var elements = document.querySelectorAll("[data-i18n]");
-        var dictionary = translations[language];
-
-        for (var i = 0; i < elements.length; i++) {
-
-            var key = elements[i].getAttribute("data-i18n");
-
-            if (dictionary[key] !== undefined) {
-                elements[i].textContent = dictionary[key];
-            }
-        }
-
-        var placeholders = document.querySelectorAll("[data-i18n-placeholder]");
-
-        for (var j = 0; j < placeholders.length; j++) {
-
-            var placeholderKey = placeholders[j].getAttribute("data-i18n-placeholder");
-
-            if (dictionary[placeholderKey] !== undefined) {
-                placeholders[j].setAttribute(
-                    "placeholder",
-                    dictionary[placeholderKey]
-                );
-            }
-        }
-
-        var languageButton = byId("languageButton");
-
-        if (languageButton) {
-            languageButton.textContent = language === "es" ? "EN" : "ES";
-        }
-
-        updateStepper("visa");
-        updateStepper("dviajeros");
-        updateNavigation("visa");
-        updateNavigation("dviajeros");
+    if (!number) {
+        result.valid = false;
+        result.missing.push(fields.number);
+    } else if (!passportNumberValid(number)) {
+        result.valid = false;
+        result.review.push(t("passportNumberInvalid"));
     }
 
-    function showScreen(screenId) {
+    if (!firstName) {
+        result.valid = false;
+        result.missing.push(fields.firstName);
+    }
 
-        var screens = document.querySelectorAll(".screen");
+    if (!lastName) {
+        result.valid = false;
+        result.missing.push(fields.lastName);
+    }
 
-        for (var i = 0; i < screens.length; i++) {
-            screens[i].classList.remove("active");
-        }
+    if (!birth) {
+        result.valid = false;
+        result.missing.push(fields.birth);
+    } else if (!validDate(birth)) {
+        result.valid = false;
+        result.review.push(t("invalidDate"));
+    }
 
-        var screen = byId(screenId);
+    if (!expiration) {
+        result.valid = false;
+        result.missing.push(fields.expiration);
+    } else if (!validDate(expiration)) {
+        result.valid = false;
+        result.review.push(t("invalidDate"));
+    }
 
-        if (screen) {
-            screen.classList.add("active");
-            window.scrollTo(0, 0);
+    if (birth && expiration && validDate(birth) && validDate(expiration)) {
+        if (expiration < birth) {
+            result.valid = false;
+            result.review.push(t("expirationBeforeBirth"));
         }
     }
 
-    function showModule(module) {
-
-        if (module === "visa") {
-            visaStep = 0;
-            showScreen("visaSection");
-            showStep("visa", visaStep);
-            return;
-        }
-
-        if (module === "dviajeros") {
-            dviajerosStep = 0;
-            showScreen("dviajerosSection");
-            showStep("dviajeros", dviajerosStep);
-        }
+    if (
+        travelDate &&
+        expiration &&
+        validDate(travelDate) &&
+        validDate(expiration) &&
+        expiration < travelDate
+    ) {
+        result.valid = false;
+        result.review.push(t("expirationBeforeArrival"));
     }
 
-    function showStep(module, step) {
-
-        var selector;
-        var panels;
-
-        if (module === "visa") {
-            selector = "[data-visa-step]";
-        } else {
-            selector = "[data-dviajeros-step]";
-        }
-
-        panels = document.querySelectorAll(selector);
-
-        for (var i = 0; i < panels.length; i++) {
-
-            var value;
-
-            if (module === "visa") {
-                value = Number(panels[i].getAttribute("data-visa-step"));
-            } else {
-                value = Number(panels[i].getAttribute("data-dviajeros-step"));
-            }
-
-            if (value === step) {
-                panels[i].classList.remove("hidden");
-            } else {
-                panels[i].classList.add("hidden");
-            }
-        }
-
-        if (module === "visa") {
-            visaStep = step;
-            updateStepper("visa");
-            updateNavigation("visa");
-            if (step === 4) {
-                buildVisaReview();
-            }
-        } else {
-            dviajerosStep = step;
-            updateStepper("dviajeros");
-            updateNavigation("dviajeros");
-            if (step === 6) {
-                buildDviajerosReview();
-            }
-        }
-
-        window.scrollTo(0, 0);
+    if (result.missing.length > 0) {
+        result.message = t("passportMissing");
+    } else if (result.review.length > 0) {
+        result.message = result.review[0];
     }
 
-    function updateStepper(module) {
+    return result;
+}
 
-        var container;
-        var current;
-        var total;
-        var text;
+function setStatus(elementId, status, message) {
+    var element = byId(elementId);
+    if (!element) return;
 
-        if (module === "visa") {
-            container = byId("visaStepper");
-            current = visaStep;
-            total = visaTotalSteps;
-        } else {
-            container = byId("dviajerosStepper");
-            current = dviajerosStep;
-            total = dviajerosTotalSteps;
-        }
+    var badge = element.querySelector(".status-badge");
 
-        if (!container) {
-            return;
-        }
-
-        container.textContent = "";
-
-        for (var i = 0; i < total; i++) {
-
-            var item = document.createElement("div");
-
-            item.className = "step-dot";
-
-            if (i === current) {
-                item.classList.add("active");
-            }
-
-            if (i < current) {
-                item.classList.add("completed");
-            }
-
-            item.textContent = String(i + 1);
-
-            container.appendChild(item);
-        }
+    if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "status-badge";
+        element.appendChild(badge);
     }
 
-    function updateNavigation(module) {
+    badge.className = "status-badge";
 
-        var previousButton;
-        var nextButton;
-        var current;
-        var total;
-
-        if (module === "visa") {
-            previousButton = byId("visaPreviousButton");
-            nextButton = byId("visaNextButton");
-            current = visaStep;
-            total = visaTotalSteps;
-        } else {
-            previousButton = byId("dviajerosPreviousButton");
-            nextButton = byId("dviajerosNextButton");
-            current = dviajerosStep;
-            total = dviajerosTotalSteps;
-        }
-
-        if (previousButton) {
-            previousButton.disabled = current === 0;
-        }
-
-        if (nextButton) {
-
-            if (current >= total - 1) {
-                nextButton.style.display = "none";
-            } else {
-                nextButton.style.display = "";
-            }
-        }
+    if (status === "REVIEW") {
+        badge.classList.add("review");
+        badge.textContent = t("review");
+    } else if (status === "MISSING") {
+        badge.classList.add("missing");
+        badge.textContent = t("missing");
+    } else {
+        badge.textContent = t("ready");
     }
 
-    function nextStep(module) {
+    var messageElement = element.querySelector(".status-message");
 
-        var current;
-        var total;
-
-        if (module === "visa") {
-            current = visaStep;
-            total = visaTotalSteps;
-        } else {
-            current = dviajerosStep;
-            total = dviajerosTotalSteps;
-        }
-
-        if (current < total - 1) {
-
-            if (module === "visa") {
-                visaStep += 1;
-                saveVisa();
-                showStep("visa", visaStep);
-            } else {
-                dviajerosStep += 1;
-                saveDviajeros();
-                showStep("dviajeros", dviajerosStep);
-            }
-        }
+    if (!messageElement) {
+        messageElement = document.createElement("div");
+        messageElement.className = "status-message";
+        element.appendChild(messageElement);
     }
 
-    function previousStep(module) {
+    messageElement.textContent = message || "";
+}
 
-        if (module === "visa") {
+function passportFieldsVisa() {
+    return {
+        country: "visaPassportCountry",
+        number: "visaPassportNumber",
+        firstName: "visaFirstName",
+        lastName: "visaLastName",
+        birth: "visaBirthDate",
+        expiration: "visaPassportExpiration"
+    };
+}
 
-            if (visaStep > 0) {
-                visaStep -= 1;
-                showStep("visa", visaStep);
-            }
+function passportFieldsDV() {
+    return {
+        country: "dvPassportCountry",
+        number: "dvPassportNumber",
+        firstName: "dvFirstName",
+        lastName: "dvLastName",
+        birth: "dvBirthDate",
+        expiration: "dvPassportExpiration"
+    };
+}
 
-        } else {
+function updateVisaPassportStatus() {
+    var result = validatePassport(
+        passportFieldsVisa(),
+        getValue("visaArrivalDate")
+    );
 
-            if (dviajerosStep > 0) {
-                dviajerosStep -= 1;
-                showStep("dviajeros", dviajerosStep);
-            }
-        }
+    if (result.missing.length > 0) {
+        setStatus("visaPassportStatus", "MISSING", result.message);
+    } else if (result.review.length > 0) {
+        setStatus("visaPassportStatus", "REVIEW", result.message);
+    } else {
+        setStatus("visaPassportStatus", "READY", result.message);
     }
 
-    function getValue(id) {
+    return result;
+}
 
-        var element = byId(id);
+function updateDVPassportStatus() {
+    var result = validatePassport(
+        passportFieldsDV(),
+        getValue("dvArrivalDate")
+    );
 
-        if (!element) {
-            return "";
-        }
-
-        return element.value || "";
+    if (result.missing.length > 0) {
+        setStatus("dvPassportStatus", "MISSING", result.message);
+    } else if (result.review.length > 0) {
+        setStatus("dvPassportStatus", "REVIEW", result.message);
+    } else {
+        setStatus("dvPassportStatus", "READY", result.message);
     }
 
-    function getChecked(id) {
+    return result;
+}
 
-        var element = byId(id);
+function visaStepValid(step) {
+    if (step === 0) return true;
 
-        if (!element) {
+    if (step === 1) {
+        return updateVisaPassportStatus().valid;
+    }
+
+    if (step === 2) {
+        if (!updateVisaPassportStatus().valid) return false;
+
+        if (!getValue("visaNationality")) return false;
+        if (!getValue("visaResidence")) return false;
+        if (!getValue("visaPurpose")) return false;
+        if (!getValue("visaEmail")) return false;
+
+        if (!emailValid(getValue("visaEmail"))) return false;
+
+        return true;
+    }
+
+    if (step === 3) {
+        return visaStepValid(2);
+    }
+
+    if (step === 4) {
+        return visaStepValid(2);
+    }
+
+    return true;
+}
+
+function dviajerosStepValid(step) {
+    if (step === 0) return true;
+
+    if (step === 1) {
+        return updateDVPassportStatus().valid;
+    }
+
+    if (step === 2) {
+        if (!dviajerosStepValid(1)) return false;
+
+        if (!getValue("dvArrivalDate")) return false;
+        if (!getValue("dvFlightNumber")) return false;
+        if (!getValue("dvAirline")) return false;
+
+        return true;
+    }
+
+    if (step === 3) {
+        if (!dviajerosStepValid(2)) return false;
+        if (!getValue("dvAccommodation")) return false;
+
+        return true;
+    }
+
+    if (step === 4) {
+        if (!dviajerosStepValid(3)) return false;
+
+        var health = getValue("dvHealthAnswer");
+
+        if (health !== "yes" && health !== "no") {
             return false;
         }
 
-        return Boolean(element.checked);
-    }
-
-    function setValue(id, value) {
-
-        var element = byId(id);
-
-        if (element) {
-            element.value = value || "";
-        }
-    }
-
-
-    function setChecked(id, value) {
-
-        var element = byId(id);
-
-        if (element) {
-            element.checked = Boolean(value);
-        }
-    }
-
-    function saveVisa() {
-
-        var data = {
-            nationality: getValue("visaNationality"),
-            residence: getValue("visaResidence"),
-            passportCountry: getValue("visaPassportCountry"),
-            purpose: getValue("visaPurpose"),
-            email: getValue("visaEmail"),
-            hasPassport: getChecked("visaHasPassport"),
-            passportValid: getChecked("visaPassportValid"),
-            dualNationality: getChecked("visaDualNationality")
-        };
-
-        localStorage.setItem(
-            "cu_visa_preparation",
-            JSON.stringify(data)
-        );
-    }
-
-    function loadVisa() {
-
-        var raw = localStorage.getItem("cu_visa_preparation");
-
-        if (!raw) {
-            return;
+        if (health === "yes" && !getValue("dvHealthExtra")) {
+            return false;
         }
 
-        try {
-
-            var data = JSON.parse(raw);
-
-            setValue("visaNationality", data.nationality);
-            setValue("visaResidence", data.residence);
-            setValue("visaPassportCountry", data.passportCountry);
-            setValue("visaPurpose", data.purpose);
-            setValue("visaEmail", data.email);
-
-            setChecked("visaHasPassport", data.hasPassport);
-            setChecked("visaPassportValid", data.passportValid);
-            setChecked("visaDualNationality", data.dualNationality);
-
-        } catch (error) {
-            localStorage.removeItem("cu_visa_preparation");
-        }
+        return true;
     }
 
-    function saveDviajeros() {
+    if (step === 5) {
+        if (!dviajerosStepValid(4)) return false;
 
-        var data = {
-            firstName: getValue("dvFirstName"),
-            lastName: getValue("dvLastName"),
-            nationality: getValue("dvNationality"),
-            birthDate: getValue("dvBirthDate"),
-            passportNumber: getValue("dvPassportNumber"),
-            passportCountry: getValue("dvPassportCountry"),
-            arrivalDate: getValue("dvArrivalDate"),
-            flightNumber: getValue("dvFlightNumber"),
-            airline: getValue("dvAirline"),
-            accommodation: getValue("dvAccommodation"),
-            addressCuba: getValue("dvAddressCuba"),
-            purpose: getValue("dvPurpose"),
-            healthAnswer: getValue("dvHealthAnswer"),
-            healthExtra: getValue("dvHealthExtra"),
-            customsAnswer: getValue("dvCustomsAnswer"),
-            customsExtra: getValue("dvCustomsExtra")
-        };
+        var customs = getValue("dvCustomsAnswer");
 
-        localStorage.setItem(
-            "cu_dviajeros_preparation",
-            JSON.stringify(data)
-        );
-    }
-
-    function loadDviajeros() {
-
-        var raw = localStorage.getItem("cu_dviajeros_preparation");
-
-        if (!raw) {
-            return;
+        if (customs !== "yes" && customs !== "no") {
+            return false;
         }
 
-        try {
-
-            var data = JSON.parse(raw);
-
-            setValue("dvFirstName", data.firstName);
-            setValue("dvLastName", data.lastName);
-            setValue("dvNationality", data.nationality);
-            setValue("dvBirthDate", data.birthDate);
-            setValue("dvPassportNumber", data.passportNumber);
-            setValue("dvPassportCountry", data.passportCountry);
-            setValue("dvArrivalDate", data.arrivalDate);
-            setValue("dvFlightNumber", data.flightNumber);
-            setValue("dvAirline", data.airline);
-            setValue("dvAccommodation", data.accommodation);
-            setValue("dvAddressCuba", data.addressCuba);
-            setValue("dvPurpose", data.purpose);
-            setValue("dvHealthAnswer", data.healthAnswer);
-            setValue("dvHealthExtra", data.healthExtra);
-            setValue("dvCustomsAnswer", data.customsAnswer);
-            setValue("dvCustomsExtra", data.customsExtra);
-
-        } catch (error) {
-            localStorage.removeItem("cu_dviajeros_preparation");
+        if (customs === "yes" && !getValue("dvCustomsExtra")) {
+            return false;
         }
+
+        return true;
     }
 
-    function buildReviewRow(container, label, value) {
+    if (step === 6) {
+        return dviajerosStepValid(5);
+    }
 
-        var row = document.createElement("div");
-        row.className = "review-row";
+    return true;
+}
 
-        var title = document.createElement("strong");
-        title.textContent = label;
+function showScreen(screenId) {
+    var screens = document.querySelectorAll(".screen");
 
-        var content = document.createElement("span");
+    for (var i = 0; i < screens.length; i++) {
+        screens[i].classList.remove("active");
+    }
 
-        if (String(value || "").trim()) {
-            content.textContent = value;
-            row.classList.add("ready");
+    var target = byId(screenId);
+
+    if (target) {
+        target.classList.add("active");
+    }
+}
+
+function showHome() {
+    showScreen("homeSection");
+    visaStep = 0;
+    dvStep = 0;
+}
+
+function updateStepper(containerId, currentStep) {
+    var container = byId(containerId);
+    if (!container) return;
+
+    var items = container.querySelectorAll(".stepper-item");
+
+    for (var i = 0; i < items.length; i++) {
+        items[i].classList.remove("active");
+        items[i].classList.remove("completed");
+
+        var itemStep = parseInt(items[i].getAttribute("data-step"), 10);
+
+        if (itemStep === currentStep) {
+            items[i].classList.add("active");
+        }
+
+        if (itemStep < currentStep) {
+            items[i].classList.add("completed");
+        }
+    }
+}
+
+function renderVisaStep() {
+    var container = byId("visaStepContainer");
+    if (!container) return;
+
+    var panels = container.querySelectorAll(".guide-panel");
+
+    for (var i = 0; i < panels.length; i++) {
+        var panelStep = parseInt(panels[i].getAttribute("data-step"), 10);
+        panels[i].classList.toggle("hidden", panelStep !== visaStep);
+    }
+
+    updateStepper("visaStepper", visaStep);
+
+    var previous = byId("visaPreviousButton");
+    var next = byId("visaNextButton");
+
+    if (previous) {
+        previous.disabled = visaStep === 0;
+    }
+
+    if (next) {
+        next.textContent =
+            visaStep === 5 ? t("openOfficial") : t("next");
+    }
+
+    updateVisaPassportStatus();
+    updateReview("visa");
+}
+
+function renderDVStep() {
+    var container = byId("dviajerosStepContainer");
+    if (!container) return;
+
+    var panels = container.querySelectorAll(".guide-panel");
+
+    for (var i = 0; i < panels.length; i++) {
+        var panelStep = parseInt(panels[i].getAttribute("data-step"), 10);
+        panels[i].classList.toggle("hidden", panelStep !== dvStep);
+    }
+
+    updateStepper("dviajerosStepper", dvStep);
+
+    var previous = byId("dviajerosPreviousButton");
+    var next = byId("dviajerosNextButton");
+
+    if (previous) {
+        previous.disabled = dvStep === 0;
+    }
+
+    if (next) {
+        next.textContent =
+            dvStep === 7 ? t("openOfficial") : t("next");
+    }
+
+    updateDVPassportStatus();
+    updateReview("dviajeros");
+}
+
+function showVisa() {
+    showScreen("visaSection");
+    visaStep = 0;
+    renderVisaStep();
+}
+
+function showDV() {
+    showScreen("dviajerosSection");
+    dvStep = 0;
+    renderDVStep();
+}
+
+function updateReview(module) {
+    var reviewContainer =
+        module === "visa" ? byId("visaReview") : byId("dviajerosReview");
+
+    if (!reviewContainer) return;
+
+    var fragment = document.createDocumentFragment();
+
+    function addItem(label, value, status) {
+        var item = document.createElement("div");
+        item.className = "review-item";
+
+        var main = document.createElement("div");
+        main.className = "review-item-main";
+
+        var labelElement = document.createElement("div");
+        labelElement.className = "review-item-label";
+        labelElement.textContent = label;
+
+        var valueElement = document.createElement("div");
+        valueElement.className = "review-item-value";
+        valueElement.textContent = value || "—";
+
+        var badge = document.createElement("span");
+        badge.className = "status-badge";
+
+        if (status === "ready") {
+            badge.textContent = t("ready");
+        } else if (status === "review") {
+            badge.classList.add("review");
+            badge.textContent = t("review");
         } else {
-            content.textContent = language === "es"
-                ? "FALTA INFORMACIÓN"
-                : "INFORMATION MISSING";
-
-            row.classList.add("missing");
+            badge.classList.add("missing");
+            badge.textContent = t("missing");
         }
 
-        row.appendChild(title);
-        row.appendChild(content);
-        container.appendChild(row);
+        main.appendChild(labelElement);
+        main.appendChild(valueElement);
+
+        item.appendChild(main);
+        item.appendChild(badge);
+
+        fragment.appendChild(item);
     }
 
-    function buildVisaReview() {
+    if (module === "visa") {
+        var passport = updateVisaPassportStatus();
 
-        var container = byId("visaReview");
-
-        if (!container) {
-            return;
-        }
-
-        container.textContent = "";
-
-        buildReviewRow(
-            container,
-            translations[language].nationality,
-            getValue("visaNationality")
+        addItem(
+            language === "es" ? "País del pasaporte" : "Passport country",
+            getValue("visaPassportCountry"),
+            passport.valid ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].residence,
-            getValue("visaResidence")
+        addItem(
+            language === "es" ? "Número de pasaporte" : "Passport number",
+            getValue("visaPassportNumber"),
+            passport.valid ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].passport_country,
-            getValue("visaPassportCountry")
+        addItem(
+            language === "es" ? "Nombre" : "First name",
+            getValue("visaFirstName"),
+            getValue("visaFirstName") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].travel_purpose,
-            getValue("visaPurpose")
+        addItem(
+            language === "es" ? "Apellidos" : "Last name",
+            getValue("visaLastName"),
+            getValue("visaLastName") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].email,
-            getValue("visaEmail")
+        addItem(
+            language === "es" ? "Nacionalidad" : "Nationality",
+            getValue("visaNationality"),
+            getValue("visaNationality") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            language === "es"
-                ? "Pasaporte disponible"
-                : "Passport available",
-            getChecked("visaHasPassport")
-                ? (language === "es" ? "LISTO" : "READY")
-                : ""
+        addItem(
+            language === "es" ? "País de residencia" : "Country of residence",
+            getValue("visaResidence"),
+            getValue("visaResidence") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            language === "es"
-                ? "Vigencia revisada"
-                : "Validity checked",
-            getChecked("visaPassportValid")
-                ? (language === "es" ? "LISTO" : "READY")
-                : ""
-        );
-    }
-
-    function buildDviajerosReview() {
-
-        var container = byId("dviajerosReview");
-
-        if (!container) {
-            return;
-        }
-
-        container.textContent = "";
-
-        buildReviewRow(
-            container,
-            translations[language].first_name,
-            getValue("dvFirstName")
+        addItem(
+            language === "es" ? "Motivo del viaje" : "Travel purpose",
+            getValue("visaPurpose"),
+            getValue("visaPurpose") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].last_name,
-            getValue("dvLastName")
+        addItem(
+            language === "es" ? "Correo electrónico" : "Email",
+            getValue("visaEmail"),
+            emailValid(getValue("visaEmail")) ? "ready" : "missing"
+        );
+    } else {
+        var dvPassport = updateDVPassportStatus();
+
+        addItem(
+            language === "es" ? "Nombre" : "First name",
+            getValue("dvFirstName"),
+            getValue("dvFirstName") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].nationality,
-            getValue("dvNationality")
+        addItem(
+            language === "es" ? "Apellidos" : "Last name",
+            getValue("dvLastName"),
+            getValue("dvLastName") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].birth_date,
-            getValue("dvBirthDate")
+        addItem(
+            language === "es" ? "Nacionalidad" : "Nationality",
+            getValue("dvNationality"),
+            getValue("dvNationality") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].passport_number,
-            getValue("dvPassportNumber")
+        addItem(
+            language === "es" ? "Número de pasaporte" : "Passport number",
+            getValue("dvPassportNumber"),
+            dvPassport.valid ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].passport_country,
-            getValue("dvPassportCountry")
+        addItem(
+            language === "es" ? "Fecha de llegada" : "Arrival date",
+            getValue("dvArrivalDate"),
+            getValue("dvArrivalDate") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].arrival_date,
-            getValue("dvArrivalDate")
+        addItem(
+            language === "es" ? "Número de vuelo" : "Flight number",
+            getValue("dvFlightNumber"),
+            getValue("dvFlightNumber") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].flight_number,
-            getValue("dvFlightNumber")
+        addItem(
+            language === "es" ? "Aerolínea" : "Airline",
+            getValue("dvAirline"),
+            getValue("dvAirline") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].airline,
-            getValue("dvAirline")
+        addItem(
+            language === "es" ? "Alojamiento" : "Accommodation",
+            getValue("dvAccommodation"),
+            getValue("dvAccommodation") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].accommodation,
-            getValue("dvAccommodation")
+        addItem(
+            language === "es" ? "Salud" : "Health",
+            getValue("dvHealthAnswer"),
+            getValue("dvHealthAnswer") ? "ready" : "missing"
         );
 
-        buildReviewRow(
-            container,
-            translations[language].address_cuba,
-            getValue("dvAddressCuba")
+        addItem(
+            language === "es" ? "Aduana" : "Customs",
+            getValue("dvCustomsAnswer"),
+            getValue("dvCustomsAnswer") ? "ready" : "missing"
         );
     }
 
-    function copyFromField(id, button) {
+    reviewContainer.replaceChildren(fragment);
+}
 
-        var element = byId(id);
+function showValidationMessage(message) {
+    var existing = document.querySelector(".temporary-validation");
 
-        if (!element) {
-            return;
-        }
-
-        var value = element.value || "";
-
-        if (!value) {
-            return;
-        }
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-
-            navigator.clipboard.writeText(value)
-                .then(function () {
-                    showCopyFeedback(button);
-                })
-                .catch(function () {
-                    fallbackCopy(element, button);
-                });
-
-        } else {
-            fallbackCopy(element, button);
-        }
+    if (existing) {
+        existing.remove();
     }
 
-    function fallbackCopy(element, button) {
+    var messageBox = document.createElement("div");
+    messageBox.className = "temporary-validation";
+    messageBox.textContent = message || t("required");
 
-        element.focus();
-        element.select();
+    document.body.appendChild(messageBox);
 
-        try {
-            document.execCommand("copy");
-            showCopyFeedback(button);
-        } catch (error) {
-            return;
+    setTimeout(function () {
+        if (messageBox.parentNode) {
+            messageBox.remove();
         }
-    }
+    }, 2500);
+}
 
-    function showCopyFeedback(button) {
+function getFirstInvalidMessage(module, step) {
+    if (module === "visa") {
+        if (step === 1) {
+            var visaPassport = updateVisaPassportStatus();
 
-        if (!button) {
-            return;
-        }
-
-        var original = button.getAttribute("data-original-text");
-
-        if (!original) {
-            original = button.textContent;
-            button.setAttribute("data-original-text", original);
-        }
-
-        button.textContent = language === "es"
-            ? "¡Copiado!"
-            : "Copied!";
-
-        window.setTimeout(function () {
-
-            var saved = button.getAttribute("data-original-text");
-
-            if (saved) {
-                button.textContent = saved;
+            if (visaPassport.review.length > 0) {
+                return visaPassport.review[0];
             }
 
+            return t("passportMissing");
+        }
+
+        if (step === 2) {
+            if (!getValue("visaNationality")) return t("required");
+            if (!getValue("visaResidence")) return t("required");
+            if (!getValue("visaPurpose")) return t("required");
+            if (!getValue("visaEmail")) return t("required");
+            if (!emailValid(getValue("visaEmail"))) return t("invalidEmail");
+        }
+    }
+
+    if (module === "dviajeros") {
+        if (step === 1) {
+            var dvPassport = updateDVPassportStatus();
+
+            if (dvPassport.review.length > 0) {
+                return dvPassport.review[0];
+            }
+
+            return t("passportMissing");
+        }
+
+        if (step === 2) {
+            return t("required");
+        }
+
+        if (step === 3) {
+            return t("required");
+        }
+
+        if (step === 4 && getValue("dvHealthAnswer") === "yes" && !getValue("dvHealthExtra")) {
+            return t("healthNeedDetails");
+        }
+
+        if (step === 5 && getValue("dvCustomsAnswer") === "yes" && !getValue("dvCustomsExtra")) {
+            return t("customsNeedDetails");
+        }
+
+        return t("required");
+    }
+
+    return t("required");
+}
+
+function nextVisa() {
+    if (visaStep === 5) {
+        window.open(OFFICIAL_VISA, "_blank", "noopener,noreferrer");
+        return;
+    }
+
+    if (!visaStepValid(visaStep)) {
+        showValidationMessage(getFirstInvalidMessage("visa", visaStep));
+        return;
+    }
+
+    if (visaStep < 5) {
+        visaStep += 1;
+        renderVisaStep();
+    }
+}
+
+function previousVisa() {
+    if (visaStep > 0) {
+        visaStep -= 1;
+        renderVisaStep();
+    }
+}
+
+function nextDV() {
+    if (dvStep === 7) {
+        window.open(OFFICIAL_DV, "_blank", "noopener,noreferrer");
+        return;
+    }
+
+    if (!dviajerosStepValid(dvStep)) {
+        showValidationMessage(getFirstInvalidMessage("dviajeros", dvStep));
+        return;
+    }
+
+    if (dvStep < 7) {
+        dvStep += 1;
+        renderDVStep();
+    }
+}
+
+function previousDV() {
+    if (dvStep > 0) {
+        dvStep -= 1;
+        renderDVStep();
+    }
+}
+
+function copyText(value, button) {
+    if (!value) {
+        showValidationMessage(t("required"));
+        return;
+    }
+
+    function copied() {
+        if (!button) return;
+
+        var original = button.textContent;
+        button.textContent = t("copied");
+
+        setTimeout(function () {
+            button.textContent = original || t("copy");
         }, 1200);
     }
 
-    function attachInputSaving() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(copied).catch(function () {
+            fallbackCopy(value, copied);
+        });
+    } else {
+        fallbackCopy(value, copied);
+    }
+}
 
-        var inputs = document.querySelectorAll(
-            "input, textarea, select"
-        );
+function fallbackCopy(value, callback) {
+    var textarea = document.createElement("textarea");
+    textarea.value = value;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
 
-        for (var i = 0; i < inputs.length; i++) {
+    document.body.appendChild(textarea);
+    textarea.select();
 
-            inputs[i].addEventListener(
-                "input",
-                function () {
-                    saveVisa();
-                    saveDviajeros();
-                }
-            );
+    try {
+        document.execCommand("copy");
+    } catch (error) {
+    }
 
-            inputs[i].addEventListener(
-                "change",
-                function () {
-                    saveVisa();
-                    saveDviajeros();
-                }
-            );
+    textarea.remove();
+
+    if (callback) callback();
+}
+
+function setupCopyButtons() {
+    var buttons = document.querySelectorAll("[data-copy-target]");
+
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", function () {
+            var targetId = this.getAttribute("data-copy-target");
+            var value = getValue(targetId);
+            copyText(value, this);
+        });
+    }
+}
+
+function setupAnswerFields() {
+    var healthAnswer = byId("dvHealthAnswer");
+    var healthExtra = byId("dvHealthExtra");
+    var customsAnswer = byId("dvCustomsAnswer");
+    var customsExtra = byId("dvCustomsExtra");
+
+    function refreshHealth() {
+        if (!healthExtra || !healthAnswer) return;
+
+        var show = healthAnswer.value === "yes";
+        healthExtra.classList.toggle("hidden", !show);
+
+        if (!show) {
+            healthExtra.value = "";
+            dvData.dvHealthExtra = "";
+            saveData(STORAGE_DV, dvData);
         }
     }
 
-    function attachCopyButtons() {
+    function refreshCustoms() {
+        if (!customsExtra || !customsAnswer) return;
 
-        var buttons = document.querySelectorAll(
-            "[data-copy-target]"
-        );
+        var show = customsAnswer.value === "yes";
+        customsExtra.classList.toggle("hidden", !show);
 
-        for (var i = 0; i < buttons.length; i++) {
-
-            buttons[i].addEventListener(
-                "click",
-                function () {
-
-                    var target = this.getAttribute(
-                        "data-copy-target"
-                    );
-
-                    copyFromField(target, this);
-                }
-            );
+        if (!show) {
+            customsExtra.value = "";
+            dvData.dvCustomsExtra = "";
+            saveData(STORAGE_DV, dvData);
         }
     }
 
-    function attachEvents() {
-
-        var languageButton = byId("languageButton");
-
-        if (languageButton) {
-
-            languageButton.addEventListener(
-                "click",
-                function () {
-
-                    if (language === "es") {
-                        setLanguage("en");
-                    } else {
-                        setLanguage("es");
-                    }
-                }
-            );
-        }
-
-        var visaButton = byId("startVisaButton");
-
-        if (visaButton) {
-
-            visaButton.addEventListener(
-                "click",
-                function () {
-                    showModule("visa");
-                }
-            );
-        }
-
-        var dviajerosButton = byId("startDviajerosButton");
-
-        if (dviajerosButton) {
-
-            dviajerosButton.addEventListener(
-                "click",
-                function () {
-                    showModule("dviajeros");
-                }
-            );
-        }
-
-        var backButtons = document.querySelectorAll(
-            "[data-back-home]"
-        );
-
-        for (var i = 0; i < backButtons.length; i++) {
-
-            backButtons[i].addEventListener(
-                "click",
-                function () {
-                    showScreen("homeSection");
-                }
-            );
-        }
-
-        var visaPrevious = byId("visaPreviousButton");
-
-        if (visaPrevious) {
-
-            visaPrevious.addEventListener(
-                "click",
-                function () {
-                    previousStep("visa");
-                }
-            );
-        }
-
-        var visaNext = byId("visaNextButton");
-
-        if (visaNext) {
-
-            visaNext.addEventListener(
-                "click",
-                function () {
-                    nextStep("visa");
-                }
-            );
-        }
-
-        var dvPrevious = byId("dviajerosPreviousButton");
-
-        if (dvPrevious) {
-
-            dvPrevious.addEventListener(
-                "click",
-                function () {
-                    previousStep("dviajeros");
-                }
-            );
-        }
-
-        var dvNext = byId("dviajerosNextButton");
-
-        if (dvNext) {
-
-            dvNext.addEventListener(
-                "click",
-                function () {
-                    nextStep("dviajeros");
-                }
-            );
-        }
-
-        var clearVisa = byId("clearVisaButton");
-
-        if (clearVisa) {
-
-            clearVisa.addEventListener(
-                "click",
-                function () {
-
-                    localStorage.removeItem(
-                        "cu_visa_preparation"
-                    );
-
-                    var visaInputs = document.querySelectorAll(
-                        "#visaSection input, #visaSection textarea, #visaSection select"
-                    );
-
-                    for (var j = 0; j < visaInputs.length; j++) {
-
-                        if (visaInputs[j].type === "checkbox") {
-                            visaInputs[j].checked = false;
-                        } else {
-                            visaInputs[j].value = "";
-                        }
-                    }
-
-                    buildVisaReview();
-                }
-            );
-        }
-
-        var clearDviajeros = byId("clearDviajerosButton");
-
-        if (clearDviajeros) {
-
-            clearDviajeros.addEventListener(
-                "click",
-                function () {
-
-                    localStorage.removeItem(
-                        "cu_dviajeros_preparation"
-                    );
-
-                    var dvInputs = document.querySelectorAll(
-                        "#dviajerosSection input, #dviajerosSection textarea, #dviajerosSection select"
-                    );
-
-                    for (var k = 0; k < dvInputs.length; k++) {
-                        dvInputs[k].value = "";
-                    }
-
-                    buildDviajerosReview();
-                }
-            );
-        }
-
-        attachCopyButtons();
-        attachInputSaving();
+    if (healthAnswer) {
+        healthAnswer.addEventListener("change", function () {
+            dvData.dvHealthAnswer = healthAnswer.value;
+            saveData(STORAGE_DV, dvData);
+            refreshHealth();
+            renderDVStep();
+        });
     }
 
-    loadVisa();
-    loadDviajeros();
+    if (customsAnswer) {
+        customsAnswer.addEventListener("change", function () {
+            dvData.dvCustomsAnswer = customsAnswer.value;
+            saveData(STORAGE_DV, dvData);
+            refreshCustoms();
+            renderDVStep();
+        });
+    }
 
-    attachEvents();
+    if (healthExtra) {
+        healthExtra.addEventListener("input", function () {
+            dvData.dvHealthExtra = healthExtra.value;
+            saveData(STORAGE_DV, dvData);
+        });
+    }
 
-    setLanguage(language);
+    if (customsExtra) {
+        customsExtra.addEventListener("input", function () {
+            dvData.dvCustomsExtra = customsExtra.value;
+            saveData(STORAGE_DV, dvData);
+        });
+    }
 
-    showScreen("homeSection");
+    refreshHealth();
+    refreshCustoms();
+}
 
-    console.log("CU CUBA AUTO TRAVEL 2026 - APP.JS CARGADO");
+function setupNavigation() {
+    var startVisa = byId("startVisaButton");
+    var startDV = byId("startDviajerosButton");
+    var visaPrevious = byId("visaPreviousButton");
+    var visaNext = byId("visaNextButton");
+    var dvPrevious = byId("dviajerosPreviousButton");
+    var dvNext = byId("dviajerosNextButton");
+    var languageButton = byId("languageButton");
+
+    if (startVisa) {
+        startVisa.addEventListener("click", showVisa);
+    }
+
+    if (startDV) {
+        startDV.addEventListener("click", showDV);
+    }
+
+    if (visaPrevious) {
+        visaPrevious.addEventListener("click", previousVisa);
+    }
+
+    if (visaNext) {
+        visaNext.addEventListener("click", nextVisa);
+    }
+
+    if (dvPrevious) {
+        dvPrevious.addEventListener("click", previousDV);
+    }
+
+    if (dvNext) {
+        dvNext.addEventListener("click", nextDV);
+    }
+
+    if (languageButton) {
+        languageButton.addEventListener("click", function () {
+            language = language === "es" ? "en" : "es";
+            localStorage.setItem(STORAGE_LANG, language);
+            applyLanguage();
+            renderVisaStep();
+            renderDVStep();
+        });
+    }
+
+    var backButtons = document.querySelectorAll("[data-back-home]");
+
+    for (var i = 0; i < backButtons.length; i++) {
+        backButtons[i].addEventListener("click", showHome);
+    }
+}
+
+function setupClearButtons() {
+    var clearVisa = byId("clearVisaButton");
+    var clearDV = byId("clearDviajerosButton");
+
+    if (clearVisa) {
+        clearVisa.addEventListener("click", function () {
+            localStorage.removeItem(STORAGE_VISA);
+            visaData = {};
+            location.reload();
+        });
+    }
+
+    if (clearDV) {
+        clearDV.addEventListener("click", function () {
+            localStorage.removeItem(STORAGE_DV);
+            dvData = {};
+            location.reload();
+        });
+    }
+}
+
+function setupFields() {
+    var visaIds = [
+        "visaPassportCountry",
+        "visaPassportNumber",
+        "visaFirstName",
+        "visaLastName",
+        "visaBirthDate",
+        "visaPassportExpiration",
+        "visaNationality",
+        "visaResidence",
+        "visaPurpose",
+        "visaArrivalDate",
+        "visaEmail"
+    ];
+
+    var dvIds = [
+        "dvFirstName",
+        "dvLastName",
+        "dvNationality",
+        "dvBirthDate",
+        "dvPassportNumber",
+        "dvPassportCountry",
+        "dvPassportExpiration",
+        "dvArrivalDate",
+        "dvFlightNumber",
+        "dvAirline",
+        "dvAccommodation",
+        "dvAddressCuba",
+        "dvPurpose",
+        "dvHealthAnswer",
+        "dvHealthExtra",
+        "dvCustomsAnswer",
+        "dvCustomsExtra"
+    ];
+
+    restoreFields(visaIds, visaData);
+    restoreFields(dvIds, dvData);
+
+    bindStorage(visaIds, STORAGE_VISA, visaData);
+    bindStorage(dvIds, STORAGE_DV, dvData);
+
+    var visaBirth = byId("visaBirthDate");
+    var visaExpiration = byId("visaPassportExpiration");
+    var visaArrival = byId("visaArrivalDate");
+
+    if (visaBirth) {
+        visaBirth.addEventListener("change", updateVisaPassportStatus);
+    }
+
+    if (visaExpiration) {
+        visaExpiration.addEventListener("change", updateVisaPassportStatus);
+    }
+
+    if (visaArrival) {
+        visaArrival.addEventListener("change", updateVisaPassportStatus);
+    }
+
+    var dvBirth = byId("dvBirthDate");
+    var dvExpiration = byId("dvPassportExpiration");
+    var dvArrival = byId("dvArrivalDate");
+
+    if (dvBirth) {
+        dvBirth.addEventListener("change", updateDVPassportStatus);
+    }
+
+    if (dvExpiration) {
+        dvExpiration.addEventListener("change", updateDVPassportStatus);
+    }
+
+    if (dvArrival) {
+        dvArrival.addEventListener("change", updateDVPassportStatus);
+    }
+}
+
+function refreshStatusMessages() {
+    updateVisaPassportStatus();
+    updateDVPassportStatus();
+}
+
+function refreshCurrentModule() {
+    if (byId("visaSection") && byId("visaSection").classList.contains("active")) {
+        renderVisaStep();
+    }
+
+    if (
+        byId("dviajerosSection") &&
+        byId("dviajerosSection").classList.contains("active")
+    ) {
+        renderDVStep();
+    }
+}
+
+function loadPassportRules() {
+    fetch("/api/passports", {
+        method: "GET",
+        headers: {
+            Accept: "application/json"
+        }
+    })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error("passport data unavailable");
+            }
+
+            return response.json();
+        })
+        .then(function (payload) {
+            passportRules = payload && payload.data ? payload.data : {};
+        })
+        .catch(function () {
+            passportRules = {};
+        });
+}
+
+setupFields();
+setupNavigation();
+setupCopyButtons();
+setupAnswerFields();
+setupClearButtons();
+
+showHome();
+applyLanguage();
+loadPassportRules();
+refreshStatusMessages();
+
 });
-
-}());
