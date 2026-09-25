@@ -1,1 +1,269 @@
-{"module":"visa","version":"2026.4","name":"Visa cubana / eVisa","purpose":"Simulador de práctica para preparar, guardar y revisar la información que el viajero deberá transcribir posteriormente en el proceso oficial de eVisa Cuba.","official_portal":"https://evisacuba.cu/","status_policy":{"CONFIRMED":"Información que puede utilizarse directamente en la práctica.","VERIFY":"Debe comprobarse en el portal oficial antes de utilizarla.","INCOMPLETE":"Falta información necesaria para continuar con la práctica."},"app_scope":{"can_explain":true,"can_simulate":true,"can_save_practice":true,"can_review_practice":true,"can_show_examples":true,"can_submit_official_application":false,"can_process_official_payment":false,"can_issue_visa":false,"can_approve_visa":false,"can_modify_official_application":false},"what_is_it":{"title":"¿Qué es la eVisa?","description":"La eVisa es el proceso electrónico de solicitud de visa de turismo para Cuba cuando corresponde al viajero. CUBA AUTO TRAVEL 2026 permite practicar y preparar la información antes de realizar el trámite oficial.","important":"La práctica no es una solicitud oficial y no produce una visa."},"practice_method":{"title":"Practica antes de solicitarla oficialmente","description":"El usuario completa una simulación guiada, revisa sus respuestas y conserva la preparación para transcribirla posteriormente en el portal oficial.","steps":["Leer qué información se encontrará en cada etapa.","Preparar pasaporte y demás datos necesarios.","Completar la práctica paso a paso.","Guardar las respuestas de la práctica.","Regresar y corregir cualquier respuesta.","Revisar toda la solicitud antes de terminar.","Abrir el portal oficial eVisa Cuba.","Transcribir la información preparada en el trámite oficial.","Completar cualquier dato que el portal oficial solicite y que no forme parte de la práctica.","Realizar el pago únicamente en el proceso oficial cuando corresponda.","Enviar la solicitud únicamente en el portal oficial."],"warning":"CUBA AUTO TRAVEL 2026 no envía la solicitud, no procesa el pago y no emite la visa."},"official_process":{"source":"Manual oficial de eVisa Cuba","stages":[{"id":"application_details","order":1,"title":"Detalles del trámite","status":"CONFIRMED","explanation":"Primera etapa del formulario oficial. Aquí se preparan los datos correspondientes a la solicitud."},{"id":"extra_application_details","order":2,"title":"Detalles de trámites Extras","status":"CONFIRMED","explanation":"Segunda etapa del formulario oficial. La información exacta que aparezca debe revisarse directamente en el portal oficial durante la solicitud."},{"id":"payment_details","order":3,"title":"Detalles del Pago","status":"CONFIRMED","explanation":"Tercera etapa del proceso oficial. La aplicación permite preparar la información, pero no procesa ni recibe el pago oficial."},{"id":"review_confirm","order":4,"title":"Revisar y confirmar solicitud","status":"CONFIRMED","explanation":"Cuarta etapa. El solicitante revisa la información, confirma su responsabilidad sobre los datos proporcionados y completa el proceso oficial cuando corresponda."}],"correction":"El proceso oficial permite regresar a pasos anteriores para corregir datos antes de enviar la solicitud.","captcha":"El proceso oficial puede requerir CAPTCHA antes del envío. CUBA AUTO TRAVEL 2026 no genera ni resuelve el CAPTCHA oficial."},"screens":[{"id":"intro","order":1,"title":"Antes de comenzar","status":"CONFIRMED","explanation":"Antes de practicar prepara tu pasaporte y la información que utilizarás en la solicitud oficial.","prepare":["Pasaporte","Datos personales exactamente como aparecen en el pasaporte","Nacionalidad","País de residencia","Información de contacto","Información relacionada con el viaje","Correo electrónico que puedas consultar"],"warning":"Los requisitos concretos pueden variar según nacionalidad y circunstancias. Comprueba siempre el portal oficial."},{"id":"application_details","order":2,"title":"1. Detalles del trámite","status":"CONFIRMED","explanation":"Practica la primera etapa del proceso oficial de solicitud.","fields":[{"name":"nationality","label":"Nacionalidad","status":"CONFIRMED","required":true,"example":"ESTADOS UNIDOS","help":"Prepara tu nacionalidad según corresponda en el formulario oficial."},{"name":"country_of_residence","label":"País de residencia","status":"VERIFY","required":true,"example":"ESTADOS UNIDOS","help":"Comprueba la opción exacta que presente el portal oficial."},{"name":"passport_country","label":"País emisor del pasaporte","status":"CONFIRMED","required":true,"example":"ESTADOS UNIDOS","help":"Utiliza el país que emitió el pasaporte."},{"name":"passport_number","label":"Número de pasaporte","status":"CONFIRMED","required":true,"example":"A1234567","help":"Copia exactamente el número que aparece en el pasaporte."},{"name":"first_name","label":"Nombre","status":"CONFIRMED","required":true,"example":"JUAN","help":"Copia el nombre de acuerdo con el documento."},{"name":"second_name","label":"Segundo nombre","status":"CONFIRMED","required":false,"example":"CARLOS","help":"Solo prepara este dato si corresponde a tu documento y al formulario."},{"name":"first_surname","label":"Primer apellido","status":"CONFIRMED","required":true,"example":"PÉREZ","help":"Copia el apellido según el documento."},{"name":"second_surname","label":"Segundo apellido","status":"CONFIRMED","required":false,"example":"GÓMEZ","help":"Solo cuando corresponda."},{"name":"date_of_birth","label":"Fecha de nacimiento","status":"CONFIRMED","required":true,"example":"15/08/1985","help":"Comprueba la fecha directamente con el pasaporte."},{"name":"email","label":"Correo electrónico","status":"CONFIRMED","required":true,"example":"ejemplo@email.com","help":"Utiliza un correo al que tengas acceso."},{"name":"gender","label":"Sexo/Género","status":"VERIFY","required":false,"example":"Ejemplo únicamente","help":"La opción exacta debe comprobarse en el formulario oficial."},{"name":"phone","label":"Teléfono","status":"VERIFY","required":false,"example":"+1 305 555 0000","help":"Comprueba si el campo y formato corresponden al formulario oficial."},{"name":"travel_purpose","label":"Propósito del viaje","status":"VERIFY","required":false,"example":"Turismo","help":"Selecciona únicamente una opción realmente disponible en el formulario oficial."},{"name":"entry_type","label":"Tipo de entrada","status":"VERIFY","required":false,"example":"Ejemplo únicamente","help":"No se debe asumir una opción sin verificarla en el portal oficial."}],"review":"Compara nombres, apellidos, fecha de nacimiento, pasaporte y correo antes de pasar a la siguiente etapa."},{"id":"extra_application_details","order":3,"title":"2. Detalles de trámites Extras","status":"CONFIRMED","explanation":"Esta es la segunda etapa documentada del proceso oficial. La práctica puede ayudarte a prepararte para las opciones que aparezcan, pero no inventa campos que no hayan sido verificados.","fields":[{"name":"extra_details","label":"Datos adicionales del trámite","status":"VERIFY","required":false,"example":"Completa aquí solamente la información que el portal oficial muestre para tu caso.","help":"La información exacta debe verificarse durante la solicitud oficial."}],"warning":"No se deben asumir trámites extras, requisitos, cantidades, tarifas u opciones sin comprobarlos en el portal oficial."},{"id":"payment_details","order":4,"title":"3. Detalles del Pago","status":"CONFIRMED","explanation":"La tercera etapa corresponde a los detalles del pago dentro del proceso oficial.","fields":[{"name":"payment_information","label":"Información de pago","status":"VERIFY","required":false,"example":"El pago se realiza únicamente dentro del proceso oficial cuando corresponda.","help":"CUBA AUTO TRAVEL 2026 no solicita ni almacena los datos de pago oficiales."}],"important":"Nunca introduzcas datos de tarjeta en CUBA AUTO TRAVEL 2026. El pago oficial debe realizarse exclusivamente en el portal oficial y según las opciones que allí aparezcan."},{"id":"review_confirm","order":5,"title":"4. Revisar y confirmar solicitud","status":"CONFIRMED","explanation":"Esta etapa permite revisar la información preparada antes de enviar la solicitud oficial.","review_items":["Nacionalidad","País de residencia","Pasaporte","Nombre y apellidos","Fecha de nacimiento","Correo electrónico","Información del viaje","Cualquier dato adicional solicitado oficialmente"],"actions":["Revisar","Corregir","Volver a una etapa anterior","Confirmar que los datos son correctos en el portal oficial"],"captcha":"El portal oficial puede requerir CAPTCHA antes del envío.","important":"La revisión dentro de CUBA AUTO TRAVEL 2026 no confirma ni envía la solicitud oficial."},{"id":"official_submission","order":6,"title":"Envío oficial","status":"CONFIRMED","explanation":"El envío real se realiza exclusivamente en el portal oficial después de revisar la solicitud.","steps":["Comprobar nuevamente todos los datos.","Completar CAPTCHA si el portal lo solicita.","Confirmar la información y el monto correspondiente cuando proceda.","Enviar la solicitud desde el portal oficial.","Conservar el correo de confirmación."],"official_submission_by_app":false},{"id":"after_submission","order":7,"title":"Después de enviar","status":"CONFIRMED","explanation":"El proceso oficial contempla comunicaciones posteriores relacionadas con la solicitud.","steps":["Revisar el correo utilizado durante el trámite.","Conservar la confirmación de la solicitud.","Esperar la comunicación correspondiente del proceso oficial.","Cuando corresponda, consultar la información de la visa mediante el mecanismo oficial."],"important":"CUBA AUTO TRAVEL 2026 no puede aprobar, rechazar, acelerar ni modificar una solicitud oficial."},{"id":"visa_verification","order":8,"title":"Verificar visa","status":"CONFIRMED","explanation":"El portal oficial dispone de un proceso para consultar el estado y vigencia del visado.","fields":[{"name":"email","label":"Correo electrónico utilizado en el trámite","status":"CONFIRMED","required":true,"example":"ejemplo@email.com","help":"Debe corresponder al utilizado en el proceso oficial."}],"important":"La comprobación se realiza en el portal oficial. CUBA AUTO TRAVEL 2026 no determina si una visa está aprobada o vigente."}],"saved_practice":{"enabled":true,"storage":"local_session","purpose":"Conservar temporalmente las respuestas de la práctica para que el usuario pueda regresar, corregirlas y revisar la preparación completa antes de utilizar el portal oficial.","allow_edit":true,"allow_review":true,"official_submission":false,"official_payment":false,"official_visa":false},"example_policy":{"title":"Ejemplos de práctica","rules":["Todos los ejemplos son ficticios.","Los ejemplos sirven para mostrar cómo preparar una respuesta.","Nunca deben presentarse como datos reales del usuario.","Los ejemplos no constituyen requisitos adicionales.","No se deben inventar preguntas, opciones, tarifas o respuestas oficiales.","Cuando un campo no esté confirmado, debe aparecer como VERIFY."],"example_person":"JUAN PÉREZ GÓMEZ","example_passport":"A1234567","example_birth_date":"15/08/1985","example_email":"ejemplo@email.com","example_country":"ESTADOS UNIDOS","warning":"Los datos anteriores son completamente ficticios y solamente sirven para practicar."},"final_checklist":["Pasaporte a mano","Nacionalidad revisada","País de residencia revisado","País emisor del pasaporte revisado","Número de pasaporte revisado","Nombre y apellidos revisados","Fecha de nacimiento revisada","Correo electrónico revisado","Información del viaje revisada","Datos adicionales revisados cuando correspondan","Toda la práctica revisada","Portal oficial abierto para realizar el trámite real"],"official_after_practice":{"title":"Ahora sí: trámite oficial","steps":["Abrir https://evisacuba.cu/","Repetir la información preparada durante la práctica.","Comprobar cada respuesta antes de continuar.","Completar los campos que el portal oficial solicite y que no estén en la práctica.","Realizar el pago solamente en el proceso oficial cuando corresponda.","Revisar y confirmar la solicitud.","Enviar la solicitud oficialmente.","Conservar los correos y datos del trámite."],"important":"La práctica y el trámite oficial son procesos separados."},"visa_validity":{"status":"VERIFY","description":"La vigencia y condiciones de una visa deben comprobarse en la fuente oficial aplicable al caso del viajero. La aplicación no debe convertir una regla general en una garantía de admisión."},"nationality_rules":{"status":"VERIFY","description":"La necesidad de visa y las condiciones aplicables dependen de la nacionalidad y circunstancias del viajero y deben verificarse oficialmente."},"dual_nationality":{"status":"VERIFY","description":"Los viajeros con doble nacionalidad deben comprobar las condiciones aplicables a su caso en la fuente oficial."},"passport_check":{"status":"VERIFY","description":"La aplicación puede revisar que los datos estén completos y sean coherentes, pero no determina por sí sola la validez oficial del pasaporte ni la admisión a Cuba."},"official_sources":[{"name":"Portal oficial eVisa Cuba","url":"https://evisacuba.cu/"},{"name":"Manual oficial eVisa Cuba","url":"https://evisacuba.cu/doc/es/info.pdf"}],"source_note":"La estructura de las cuatro etapas del proceso oficial se basa en el manual oficial de eVisa Cuba: Detalles del trámite, Detalles de trámites Extras, Detalles del Pago y Revisar y confirmar solicitud. El manual también indica que el solicitante puede regresar a pasos anteriores para corregir información y que, después del envío, recibe comunicaciones por correo relacionadas con la solicitud. :contentReference[oaicite:0]{index=0}","disclaimer":"CUBA AUTO TRAVEL 2026 es una herramienta independiente de preparación y práctica. No pertenece al Gobierno de Cuba, MINREX, autoridad migratoria ni autoridad consular. No emite, aprueba, modifica ni valida visas. No envía solicitudes al portal oficial, no procesa pagos oficiales y no sustituye las instrucciones, requisitos o decisiones de las autoridades correspondientes."}
+{
+  "app":"CUBA AUTO TRAVEL 2026",
+  "updated":"2026-09-25",
+  "title":"Visa para viajar a Cuba",
+  "description":"Información de orientación sobre los requisitos de visa de entrada a Cuba. Verifica siempre la información oficial antes de viajar.",
+  "official_sources":[
+    {
+      "name":"Cuba Travel",
+      "url":"https://www.cuba.travel/informacion-util/regulaciones-y-tramites"
+    },
+    {
+      "name":"eVisa Cuba",
+      "url":"https://evisacuba.cu/"
+    },
+    {
+      "name":"D'Viajeros",
+      "url":"https://www.dviajeros.mitrans.gob.cu/"
+    }
+  ],
+  "general_rule":{
+    "title":"Regla general",
+    "text":"Los viajeros que no tengan residencia cubana deben cumplir los requisitos de entrada correspondientes. Para turismo, Cuba establece el uso de visa de turismo y actualmente dispone del sistema eVisa.",
+    "passport_required":true,
+    "tourist_visa_required":true,
+    "insurance_required":true,
+    "dviajeros_required":true,
+    "round_trip_ticket_required":true
+  },
+  "passport":{
+    "required":true,
+    "minimum_validity":"6 meses desde la fecha de entrada",
+    "text":"El pasaporte debe estar vigente y, según la información publicada por Cuba Travel, tener una validez de 6 meses a partir de la fecha de entrada a Cuba.",
+    "notes":[
+      "El viajero debe conservar el pasaporte hasta su salida de Cuba.",
+      "Si el pasaporte se pierde durante la estancia, debe acudirse a una oficina de inmigración para obtener un duplicado conforme a los procedimientos aplicables."
+    ]
+  },
+  "tourist_visa":{
+    "name":"Visa de Turismo",
+    "electronic_name":"eVisaCuba",
+    "purpose":"Turismo",
+    "entries":1,
+    "maximum_initial_stay_days":90,
+    "extension_possible":true,
+    "extension_days":90,
+    "extension_note":"La estancia turística puede ser prorrogada por otros 90 días conforme a las reglas aplicables.",
+    "current_system":"eVisa",
+    "replaces_tourist_card":true,
+    "text":"La visa de turismo permite una entrada a Cuba para fines turísticos. El sistema eVisa sustituye progresivamente la Tarjeta de Turista.",
+    "important":"La visa de turismo no sustituye otros requisitos de entrada."
+  },
+  "evisa":{
+    "available":true,
+    "name":"eVisaCuba",
+    "url":"https://evisacuba.cu/",
+    "purpose":"Visa electrónica de turismo",
+    "application_methods":[
+      "Internet",
+      "Consulado cubano",
+      "Agencia de viajes"
+    ],
+    "online_service":"Disponible para gestionar la visa electrónica por Internet según las condiciones del sistema.",
+    "confirmation":"El viajero recibe por correo electrónico el código de visa y los comprobantes correspondientes.",
+    "dviajeros_connection":"El código de la visa debe utilizarse en D'Viajeros cuando corresponda.",
+    "important":[
+      "Comprueba que los datos del pasaporte coincidan con la solicitud.",
+      "Conserva el código y la documentación recibida.",
+      "No viajes suponiendo que una solicitud de visa equivale a una visa aprobada.",
+      "Verifica las instrucciones vigentes directamente en evisacuba.cu."
+    ]
+  },
+  "visa_application":{
+    "steps":[
+      {
+        "step":1,
+        "title":"Verifica tu situación",
+        "description":"Determina si necesitas visa y qué tipo de visa corresponde al propósito real de tu viaje."
+      },
+      {
+        "step":2,
+        "title":"Prepara tu pasaporte",
+        "description":"Utiliza los datos exactamente como aparecen en tu documento de viaje."
+      },
+      {
+        "step":3,
+        "title":"Solicita la visa",
+        "description":"Utiliza eVisaCuba, un consulado cubano o una agencia de viajes según corresponda."
+      },
+      {
+        "step":4,
+        "title":"Conserva el código",
+        "description":"Guarda el código de visa y la confirmación recibida."
+      },
+      {
+        "step":5,
+        "title":"Completa D'Viajeros",
+        "description":"Completa el formulario digital de entrada y conserva el código QR generado."
+      },
+      {
+        "step":6,
+        "title":"Viaja con tus documentos",
+        "description":"Lleva pasaporte, visa, seguro médico, boleto correspondiente y el código QR de D'Viajeros."
+      }
+    ]
+  },
+  "entry_requirements":{
+    "items":[
+      {
+        "id":"passport",
+        "name":"Pasaporte vigente",
+        "required":true,
+        "description":"Documento de viaje válido conforme a los requisitos de entrada."
+      },
+      {
+        "id":"tourist_visa",
+        "name":"Visa de turismo",
+        "required":true,
+        "description":"Visa correspondiente al viaje turístico, salvo las excepciones aplicables."
+      },
+      {
+        "id":"travel_insurance",
+        "name":"Seguro de viaje con cobertura médica",
+        "required":true,
+        "description":"Cuba Travel indica que el seguro con cobertura médica es requisito de entrada."
+      },
+      {
+        "id":"health_declaration",
+        "name":"Declaración de Sanidad del Viajero",
+        "required":true,
+        "description":"Declaración sanitaria correspondiente al ingreso."
+      },
+      {
+        "id":"round_trip_ticket",
+        "name":"Boleto de ida y vuelta",
+        "required":true,
+        "description":"Debe existir un boleto que cubra la entrada y salida previstas."
+      },
+      {
+        "id":"dviajeros_qr",
+        "name":"Código QR de D'Viajeros",
+        "required":true,
+        "description":"Formulario digital de entrada que genera un código QR para presentar al ingreso."
+      }
+    ]
+  },
+  "visa_categories":{
+    "tourism":{
+      "name":"Turismo",
+      "description":"Para viajes cuyo propósito sea turismo.",
+      "visa":"tourist_visa"
+    },
+    "business":{
+      "name":"Negocios",
+      "description":"Los viajes de negocios pueden requerir un visado distinto al turístico.",
+      "visa":"special_visa",
+      "instruction":"Consulta con un consulado cubano antes de viajar."
+    },
+    "study":{
+      "name":"Estudios",
+      "description":"Los viajes por estudios pueden requerir un visado distinto al turístico.",
+      "visa":"special_visa",
+      "instruction":"Consulta con un consulado cubano antes de viajar."
+    },
+    "work":{
+      "name":"Trabajo",
+      "description":"Los viajes por trabajo pueden requerir un visado distinto al turístico.",
+      "visa":"special_visa",
+      "instruction":"Consulta con un consulado cubano antes de viajar."
+    },
+    "journalism":{
+      "name":"Periodismo",
+      "description":"Los viajes por motivos periodísticos pueden requerir un visado específico.",
+      "visa":"special_visa",
+      "instruction":"Consulta con un consulado cubano antes de viajar."
+    },
+    "long_stay":{
+      "name":"Estancia prolongada",
+      "description":"Una estancia superior al período turístico permitido puede requerir otro tipo de visado o autorización.",
+      "visa":"long_term_visa",
+      "instruction":"Consulta con el consulado o embajada cubana correspondiente."
+    }
+  },
+  "exceptions":{
+    "general":"Existen países y situaciones con acuerdos o reglas especiales de entrada.",
+    "china":{
+      "nationality":"China",
+      "ordinary_passport":true,
+      "visa_exempt_for_entry":true,
+      "description":"Cuba Travel indica que los ciudadanos chinos están exentos del requisito de visa para ingresar con pasaporte común.",
+      "warning":"La exención indicada se refiere al requisito de visa cubana y no elimina necesariamente otros requisitos de entrada."
+    },
+    "cuban_residents":{
+      "description":"Las personas con residencia cubana pueden estar sujetas a reglas diferentes a las aplicables a turistas extranjeros.",
+      "instruction":"Verifica la documentación cubana correspondiente antes del viaje."
+    },
+    "visa_free_agreements":{
+      "description":"Los países con acuerdos de libre visado con Cuba pueden estar exceptuados del requisito general de visa.",
+      "instruction":"La aplicación no debe asumir una exención únicamente por nacionalidad sin verificar la información vigente."
+    }
+  },
+  "us_travelers":{
+    "title":"Viajeros desde Estados Unidos",
+    "important":true,
+    "description":"La visa cubana y las reglas de Estados Unidos son asuntos diferentes. Tener una visa válida para entrar a Cuba no determina por sí solo si una persona sujeta a la jurisdicción de Estados Unidos puede viajar legalmente a Cuba bajo las normas estadounidenses.",
+    "instruction":"Las personas sujetas a las normas estadounidenses deben revisar las reglas vigentes de OFAC y determinar la categoría de viaje autorizada que corresponda a su situación.",
+    "us_rules_are_separate":true,
+    "do_not_assume_tourism_authorized":true,
+    "note":"Esta aplicación no determina la elegibilidad de una persona bajo la normativa estadounidense ni sustituye asesoría legal."
+  },
+  "insurance":{
+    "required":true,
+    "name":"Seguro de viaje con cobertura médica",
+    "description":"La información oficial de Cuba Travel señala que el seguro de viaje con cobertura médica es requisito para entrar a Cuba.",
+    "recommendation":"Conserva la póliza y la información de asistencia durante el viaje."
+  },
+  "dviajeros":{
+    "required":true,
+    "name":"D'Viajeros",
+    "url":"https://www.dviajeros.mitrans.gob.cu/",
+    "description":"Formulario digital de entrada a Cuba. Después de completarlo se genera un código QR que debe presentarse al ingreso.",
+    "visa_code":"Cuando corresponda, el código de la visa se incorpora al proceso de D'Viajeros.",
+    "timing":"La información oficial consultada indica que el formulario puede completarse dentro de los días previos al viaje. Verifica el plazo vigente en el portal antes de completarlo.",
+    "important":"No confundas D'Viajeros con la visa. Son procesos distintos."
+  },
+  "before_travel_checklist":[
+    "Pasaporte vigente",
+    "Comprobar la validez requerida del pasaporte",
+    "Determinar si necesitas visa",
+    "Solicitar la eVisa si corresponde",
+    "Guardar el código de visa",
+    "Contratar o llevar seguro de viaje con cobertura médica",
+    "Completar D'Viajeros",
+    "Guardar el código QR",
+    "Comprobar el boleto de ida y vuelta",
+    "Revisar las reglas sanitarias vigentes",
+    "Revisar las reglas aduaneras vigentes",
+    "Si viajas desde Estados Unidos, revisar además las normas estadounidenses aplicables"
+  ],
+  "decision_messages":{
+    "tourist":{
+      "title":"Viaje de turismo",
+      "message":"Si tu viaje es turístico, revisa el requisito de visa de turismo/eVisa, pasaporte, seguro médico, D'Viajeros y demás requisitos de entrada."
+    },
+    "non_tourist":{
+      "title":"Tu viaje no es turismo",
+      "message":"No asumas que la visa turística corresponde. Negocios, estudios, trabajo, periodismo y otros propósitos pueden requerir una categoría de visa diferente."
+    },
+    "unknown":{
+      "title":"Necesitamos más información",
+      "message":"La nacionalidad, residencia y propósito del viaje pueden cambiar los requisitos. Verifica tu situación antes de comprar el boleto o viajar."
+    }
+  },
+  "warnings":[
+    "Los requisitos migratorios pueden cambiar.",
+    "Una visa aprobada no sustituye el pasaporte ni los demás requisitos de entrada.",
+    "La información de esta aplicación es orientativa.",
+    "No introduzcas información falsa en formularios oficiales.",
+    "Comprueba siempre la información directamente en las fuentes oficiales.",
+    "Las reglas de Estados Unidos para viajar a Cuba son independientes de los requisitos cubanos de entrada."
+  ],
+  "status_labels":{
+    "required":"Requerido",
+    "not_required":"No requerido",
+    "verify":"Verificar",
+    "special":"Requisito especial",
+    "unknown":"No determinado"
+  }
+}
+
