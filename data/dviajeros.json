@@ -1,141 +1,234 @@
 {
-  "module": "dviajeros",
-  "name": "D'Viajeros",
-  "version": "2026.2",
-  "purpose": "Preparar la información del viajero antes y durante el uso del portal oficial.",
-  "official_portal": {
-    "name": "D'Viajeros",
-    "url": "https://dviajeros.mitrans.gob.cu/"
-  },
-  "workflow": [
-    {
-      "order": 1,
-      "id": "personal_information",
-      "title": "Información personal",
-      "description": "Prepara los datos básicos del viajero."
-    },
-    {
-      "order": 2,
-      "id": "migration",
-      "title": "Información del viaje",
-      "description": "Prepara pasaporte, llegada, vuelo y aerolínea."
-    },
-    {
-      "order": 3,
-      "id": "health",
-      "title": "Salud",
-      "description": "Revisa y completa solamente lo que solicite el formulario oficial."
-    },
-    {
-      "order": 4,
-      "id": "customs",
-      "title": "Aduana",
-      "description": "Revisa y declara la información que solicite el formulario oficial."
-    },
-    {
-      "order": 5,
-      "id": "review",
-      "title": "Revisión final",
-      "description": "Comprueba que tengas todo preparado antes de continuar."
-    }
-  ],
-  "fields": [
-    {
-      "id": "first_name",
-      "label": "Nombre",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "last_name",
-      "label": "Apellidos",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "nationality",
-      "label": "Nacionalidad",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "date_of_birth",
-      "label": "Fecha de nacimiento",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "passport_number",
-      "label": "Número de pasaporte",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "passport_country",
-      "label": "País que emitió tu pasaporte",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "arrival_date",
-      "label": "Fecha de llegada",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "flight_number",
-      "label": "Número de vuelo",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "airline",
-      "label": "Aerolínea",
-      "required": true,
-      "copyable": true
-    },
-    {
-      "id": "accommodation",
-      "label": "Alojamiento",
-      "required": false,
-      "copyable": true
-    },
-    {
-      "id": "address_in_cuba",
-      "label": "Dirección en Cuba",
-      "required": false,
-      "copyable": true
-    },
-    {
-      "id": "purpose_of_trip",
-      "label": "Motivo del viaje",
-      "required": false,
-      "copyable": true
-    }
-  ],
-  "declarations": [
-    {
-      "id": "health_information",
-      "title": "Información de salud",
-      "description": "Utiliza este espacio como preparación personal. Declara en el portal oficial exactamente la información que corresponda."
-    },
-    {
-      "id": "customs_information",
-      "title": "Información de aduana",
-      "description": "Utiliza este espacio para organizar lo que necesites declarar. No inventes cantidades, valores o categorías."
-    }
-  ],
-  "important": [
-    "La aplicación no presenta el formulario oficial.",
-    "La aplicación no genera el QR oficial.",
-    "La aplicación no confirma una autorización migratoria.",
-    "La aplicación no confirma una autorización sanitaria.",
-    "La aplicación no confirma una autorización aduanal.",
-    "La información final debe introducirse y verificarse en el portal oficial."
-  ],
-  "companion_mode": {
-    "enabled": true,
-    "description": "El usuario puede mantener CUBA AUTO TRAVEL abierta en una pestaña y el portal oficial en otra. Puede volver a esta aplicación para consultar, copiar y revisar información."
-  },
-  "disclaimer": "CUBA AUTO TRAVEL 2026 es una aplicación independiente de preparación y acompañamiento. El trámite oficial se realiza directamente en D'Viajeros."
+"module":"dviajeros",
+"name":"D'Viajeros",
+"version":"2026.3",
+"purpose":"Preparar y acompañar al viajero antes y durante el uso del portal oficial.",
+"official_portal":{
+"name":"D'Viajeros",
+"url":"https://dviajeros.mitrans.gob.cu/"
+},
+"workflow":[
+{
+"order":1,
+"id":"passport",
+"title":"Pasaporte",
+"description":"Prepara los datos de tu pasaporte antes de comenzar."
+},
+{
+"order":2,
+"id":"trip",
+"title":"Información del viaje",
+"description":"Prepara tu llegada, vuelo y aerolínea."
+},
+{
+"order":3,
+"id":"accommodation",
+"title":"Alojamiento",
+"description":"Prepara la información del lugar donde te alojarás en Cuba."
+},
+{
+"order":4,
+"id":"health",
+"title":"Salud",
+"description":"Revisa las preguntas de salud que aparezcan en el formulario oficial."
+},
+{
+"order":5,
+"id":"customs",
+"title":"Aduana",
+"description":"Prepara la información que corresponda declarar."
+},
+{
+"order":6,
+"id":"review",
+"title":"Revisión final",
+"description":"Comprueba toda la información antes de continuar."
+},
+{
+"order":7,
+"id":"official",
+"title":"Continuar al portal oficial",
+"description":"Abre D'Viajeros en una nueva pestaña y utiliza CUBA AUTO TRAVEL como acompañamiento."
+}
+],
+"passport":{
+"required":true,
+"fields":[
+{
+"id":"first_name",
+"label":"Nombre",
+"required":true,
+"copyable":true
+},
+{
+"id":"last_name",
+"label":"Apellidos",
+"required":true,
+"copyable":true
+},
+{
+"id":"nationality",
+"label":"Nacionalidad",
+"required":true,
+"copyable":true
+},
+{
+"id":"date_of_birth",
+"label":"Fecha de nacimiento",
+"required":true,
+"copyable":true
+},
+{
+"id":"passport_number",
+"label":"Número de pasaporte",
+"required":true,
+"copyable":true
+},
+{
+"id":"passport_country",
+"label":"País que emitió tu pasaporte",
+"required":true,
+"copyable":true
+},
+{
+"id":"passport_expiration",
+"label":"Fecha de vencimiento",
+"required":true,
+"copyable":true
+}
+],
+"instructions":[
+"Ten tu pasaporte delante.",
+"Busca la página donde aparecen tu foto y tus datos.",
+"Escribe los datos exactamente como aparecen.",
+"Revisa cada dato antes de continuar."
+],
+"ready_message":"Información del pasaporte preparada."
+},
+"trip":{
+"fields":[
+{
+"id":"arrival_date",
+"label":"Fecha de llegada a Cuba",
+"required":true,
+"copyable":true
+},
+{
+"id":"flight_number",
+"label":"Número de vuelo",
+"required":true,
+"copyable":true
+},
+{
+"id":"airline",
+"label":"Aerolínea",
+"required":true,
+"copyable":true
+}
+],
+"instructions":[
+"Busca tu boleto o confirmación de vuelo.",
+"Copia el número de vuelo exactamente como aparece.",
+"Confirma la fecha de llegada antes de continuar."
+]
+},
+"accommodation":{
+"fields":[
+{
+"id":"accommodation",
+"label":"Lugar donde te alojarás",
+"required":false,
+"copyable":true
+},
+{
+"id":"address_in_cuba",
+"label":"Dirección en Cuba",
+"required":false,
+"copyable":true
+},
+{
+"id":"purpose_of_trip",
+"label":"Motivo del viaje",
+"required":false,
+"copyable":true
+}
+],
+"instructions":[
+"Ten disponible la información de tu alojamiento.",
+"Si corresponde, prepara la dirección completa.",
+"Utiliza la información real de tu reserva o alojamiento."
+]
+},
+"health":{
+"id":"health_information",
+"title":"Información de salud",
+"questions":[
+{
+"id":"health_1",
+"label":"Revisa las preguntas de salud que aparezcan en el formulario oficial.",
+"type":"review"
+}
+],
+"instructions":[
+"Lee cada pregunta del formulario oficial.",
+"Responde según tu situación real.",
+"No inventes información.",
+"Si una pregunta no corresponde, sigue las instrucciones que muestre el formulario oficial."
+]
+},
+"customs":{
+"id":"customs_information",
+"title":"Información de aduana",
+"questions":[
+{
+"id":"customs_1",
+"label":"Revisa las declaraciones que aparezcan en el formulario oficial.",
+"type":"review"
+}
+],
+"instructions":[
+"Lee cada declaración cuidadosamente.",
+"Declara la información que corresponda a tu viaje.",
+"No inventes cantidades, valores ni categorías.",
+"Si tienes mercancías o artículos que debas declarar, ten la información disponible antes de comenzar."
+]
+},
+"review":{
+"required_sections":[
+"passport",
+"trip",
+"accommodation",
+"health",
+"customs"
+],
+"ready_message":"MUY BIEN. YA PODEMOS CONTINUAR.",
+"instruction":"Revisa nuevamente los datos antes de abrir D'Viajeros."
+},
+"companion_mode":{
+"enabled":true,
+"description":"Puedes mantener CUBA AUTO TRAVEL abierta en una pestaña y D'Viajeros en otra. Vuelve aquí para consultar la guía, copiar información y continuar.",
+"sequence":[
+"MIRAR",
+"COPIAR",
+"PEGAR",
+"VOLVER",
+"REVISAR",
+"CONTINUAR"
+]
+},
+"statuses":{
+"ready":"LISTO",
+"review":"REVISA ESTO",
+"missing":"FALTA ESTE DATO",
+"complete":"MUY BIEN. YA PODEMOS CONTINUAR."
+},
+"important":[
+"CUBA AUTO TRAVEL no presenta el formulario oficial.",
+"CUBA AUTO TRAVEL no genera el QR oficial.",
+"CUBA AUTO TRAVEL no confirma una autorización migratoria.",
+"CUBA AUTO TRAVEL no confirma una autorización sanitaria.",
+"CUBA AUTO TRAVEL no confirma una autorización aduanal.",
+"La información final debe introducirse y verificarse en el portal oficial."
+],
+"disclaimer":"CUBA AUTO TRAVEL 2026 es una aplicación independiente de preparación y acompañamiento. No pertenece al Gobierno de Cuba, MINREX, autoridades migratorias, sanitarias o aduanales. El trámite oficial se realiza directamente en D'Viajeros."
 }
