@@ -1,582 +1,661 @@
 # services/document_service.py
 # Cuba Travel & Consular Assistant
-# Servicio de documentos del viajero.
-#
-# IMPORTANTE:
-# - No contiene requisitos oficiales hardcodeados.
-# - Las reglas oficiales permanecen en rules_engine.py y data/*.json.
-# - VERIFY / UNKNOWN nunca se convierten artificialmente en confirmados.
-# - Este servicio organiza, revisa y completa información documental.
-# - NO emite documentos oficiales ni certifica cumplimiento legal.
+# Servicio de documentos.
+# No inventa requisitos oficiales.
+# VERIFY / UNKNOWN se conservan como estados de verificación.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from rules_engine import (
     RuleCategory,
     RuleStatus,
     evaluate_category,
+    build_checklist as engine_build_checklist,
 )
 
 
-def _status_value(value: Any) -> str:
-    """Convierte Enum u otros valores de estado a texto."""
+def _value(value: Any) -> str:
     if value is None:
-        return RuleStatus.UNKNOWN.value
-
-    if isinstance(value, RuleStatus):
-        return value.value
-
-    return str(getattr(value, "value", value)).lower()
+        return ""
+    return str(getattr(value, "value", value)).lower().strip()
 
 
 def _serialize(value: Any) -> Any:
-    """Serialización defensiva para respuestas JSON."""
-    if value is None:
-        return None
-
-    if isinstance(value, (str, int, float, bool)):
+    if value is None or isinstance(value, (str, int, float, bool)):
         return value
-
     if isinstance(value, dict):
         return {str(k): _serialize(v) for k, v in value.items()}
-
     if isinstance(value, (list, tuple, set)):
         return [_serialize(v) for v in value]
-
     if hasattr(value, "model_dump"):
         return _serialize(value.model_dump())
-
     if hasattr(value, "to_dict"):
         return _serialize(value.to_dict())
-
-    if hasattr(value, "__dataclass_fields__"):
-        from dataclasses import asdict
-
-        return _serialize(asdict(value))
-
     if hasattr(value, "__dict__"):
         return {
             str(k): _serialize(v)
             for k, v in vars(value).items()
             if not str(k).startswith("_")
         }
-
     return str(value)
 
 
-def _profile_dict(profile: Any) -> Dict[str, Any]:
-    """Normaliza dict, Pydantic, dataclass u objeto compatible."""
+def _profile(profile: Any) -> Dict[str, Any]:
     if profile is None:
         return {}
-
     if isinstance(profile, dict):
         return dict(profile)
-
     if hasattr(profile, "model_dump"):
         return profile.model_dump(exclude_none=True)
-
     if hasattr(profile, "to_dict"):
-        value = profile.to_dict()
-        return value if isinstance(value, dict) else {}
-
+        data = profile.to_dict()
+        return data if isinstance(data, dict) else {}
     if hasattr(profile, "__dict__"):
         return {
-            key: value
-            for key, value in vars(profile).items()
-            if not key.startswith("_")
+            k: v for k, v in vars(profile).items()
+            if not str(k).startswith("_")
         }
-
     return {}
 
 
-def _result_status(result: Any) -> str:
-    if isinstance(result, dict):
-        return _status_value(result.get("status"))
+def _status(value: Any) -> str:
+    raw = _value(value)
 
-    return _status_value(getattr(result, "status", None))
+    if raw == RuleStatus.ACTIVE.value:
+        return "CONFIRMED"
+
+    if raw in {
+        RuleStatus.CONDITIONAL.value,
+        RuleStatus.VERIFY.value,
+        RuleStatus.EXPIRED.value,
+    }:
+        return "VERIFY"
+
+    return "UNKNOWN"
 
 
-def _result_source(result: Any) -> Any:
-    if isinstance(result, dict):
-        return result.get("source") or result.get("sources")
-
-    return getattr(result, "source", None) or getattr(result, "sources", None)
-
-
-def _result_id(result: Any, fallback: str) -> str:
-    if isinstance(result, dict):
-        value = result.get("rule_id") or result.get("id")
+def _item_id(item: Any, fallback: str) -> str:
+    if isinstance(item, dict):
+        value = (
+            item.get("id")
+            or item.get("rule_id")
+            or item.get("key")
+        )
     else:
-        value = getattr(result, "rule_id", None) or getattr(result, "id", None)
-
+        value = (
+            getattr(item, "id", None)
+            or getattr(item, "rule_id", None)
+            or getattr(item, "key", None)
+        )
     return str(value or fallback)
 
 
-def _result_title(result: Any) -> str:
-    if isinstance(result, dict):
-        value = (
-            result.get("title")
-            or result.get("name")
-            or result.get("description")
+def _title(item: Any) -> str:
+    if isinstance(item, dict):
+        return str(
+            item.get("title")
+            or item.get("name")
+            or item.get("description")
             or "Document"
         )
-    else:
-        value = (
-            getattr(result, "title", None)
-            or getattr(result, "name", None)
-            or getattr(result, "description", None)
-            or "Document"
+    return str(
+        getattr(item, "title", None)
+        or getattr(item, "name", None)
+        or getattr(item, "description", None)
+        or "Document"
+    )
+
+
+def _description(item: Any) -> str:
+    if isinstance(item, dict):
+        return str(
+            item.get("description")
+            or item.get("message")
+            or item.get("title")
+            or ""
         )
-
-    return str(value)
-
-
-def _result_description(result: Any) -> str:
-    if isinstance(result, dict):
-        value = (
-            result.get("message")
-            or result.get("description")
-            or result.get("title")
-            or "Review this document requirement."
-        )
-    else:
-        value = (
-            getattr(result, "message", None)
-            or getattr(result, "description", None)
-            or getattr(result, "title", None)
-            or "Review this document requirement."
-        )
-
-    return str(value)
+    return str(
+        getattr(item, "description", None)
+        or getattr(item, "message", None)
+        or getattr(item, "title", None)
+        or ""
+    )
 
 
-def _evaluate_category(
-    profile: Dict[str, Any],
-    category: Any,
-) -> List[Any]:
-    """Evalúa una categoría del motor central."""
-    try:
-        results = evaluate_category(profile, category)
-    except TypeError:
-        results = evaluate_category(
-            profile=profile,
-            category=category,
-        )
+def _source(item: Any) -> Any:
+    if isinstance(item, dict):
+        return item.get("source") or item.get("sources")
+    return (
+        getattr(item, "source", None)
+        or getattr(item, "sources", None)
+    )
 
-    if results is None:
+
+def _normalize_items(
+    raw: Any,
+    category: Any = None,
+) -> List[Dict[str, Any]]:
+    if raw is None:
         return []
 
-    if isinstance(results, (list, tuple)):
-        return list(results)
+    if isinstance(raw, dict):
+        if isinstance(raw.get("items"), list):
+            raw = raw["items"]
+        elif isinstance(raw.get("documents"), list):
+            raw = raw["documents"]
+        elif isinstance(raw.get("checklist"), list):
+            raw = raw["checklist"]
+        elif isinstance(raw.get("results"), list):
+            raw = raw["results"]
+        else:
+            raw = [raw]
 
-    return [results]
+    elif not isinstance(raw, (list, tuple)):
+        raw = [raw]
 
+    result: List[Dict[str, Any]] = []
 
-def _document_categories() -> List[Any]:
-    """
-    Obtiene las categorías documentales disponibles en el motor.
-
-    Se mantienen defensivamente para que el servicio funcione incluso
-    si una versión del Enum no contiene una categoría opcional.
-    """
-    categories: List[Any] = []
-
-    for name in (
-        "DOCUMENTS",
-        "PASSPORT",
-        "VISA",
-        "EVISA",
-        "DVIAJEROS",
-        "MINOR",
-        "CONSULAR",
-        "TRAVEL",
-        "US_CUBA",
-    ):
-        category = getattr(RuleCategory, name, None)
-
-        if category is not None and category not in categories:
-            categories.append(category)
-
-    return categories
-
-
-def evaluate_documents(profile: Any) -> Dict[str, Any]:
-    """
-    Evalúa las reglas relacionadas con documentación.
-
-    Las reglas específicas permanecen en los archivos JSON.
-    """
-    profile_data = _profile_dict(profile)
-
-    all_results: List[Any] = []
-    category_results: Dict[str, List[Any]] = {}
-
-    for category in _document_categories():
-        results = _evaluate_category(profile_data, category)
-
-        category_name = (
-            category.value
-            if hasattr(category, "value")
-            else str(category)
-        )
-
-        category_results[category_name] = [
-            _serialize(result)
-            for result in results
-        ]
-
-        all_results.extend(results)
-
-    confirmed: List[Any] = []
-    conditional: List[Any] = []
-    verify: List[Any] = []
-    unknown: List[Any] = []
-    expired: List[Any] = []
-
-    seen = set()
-
-    for result in all_results:
-        serialized = _serialize(result)
-
-        # Evita duplicar exactamente la misma regla si aparece
-        # en más de una categoría.
-        if isinstance(serialized, dict):
-            identity = (
-                serialized.get("rule_id")
-                or serialized.get("id")
-                or repr(serialized)
+    for index, item in enumerate(raw, 1):
+        if isinstance(item, dict):
+            source_status = (
+                item.get("status")
+                or item.get("rule_status")
             )
-        else:
-            identity = repr(serialized)
 
-        if identity in seen:
-            continue
+            status = item.get("document_status")
 
-        seen.add(identity)
+            if not status:
+                status = (
+                    _status(source_status)
+                    if source_status is not None
+                    else "VERIFY"
+                )
 
-        status = _result_status(result)
+            document_id = (
+                item.get("id")
+                or item.get("document_id")
+                or item.get("rule_id")
+                or f"document-{index}"
+            )
 
-        if status == RuleStatus.ACTIVE.value:
-            confirmed.append(serialized)
+            title = (
+                item.get("title")
+                or item.get("name")
+                or item.get("document")
+                or item.get("description")
+                or "Document"
+            )
 
-        elif status == RuleStatus.CONDITIONAL.value:
-            conditional.append(serialized)
+            description = (
+                item.get("description")
+                or item.get("message")
+                or title
+            )
 
-        elif status == RuleStatus.VERIFY.value:
-            verify.append(serialized)
+            source = (
+                item.get("source")
+                or item.get("sources")
+            )
 
-        elif status == RuleStatus.EXPIRED.value:
-            expired.append(serialized)
+            required = bool(
+                item.get(
+                    "required",
+                    item.get("mandatory", False),
+                )
+            )
 
-        else:
-            unknown.append(serialized)
-
-    if unknown:
-        overall_status = RuleStatus.UNKNOWN.value
-    elif verify or conditional:
-        overall_status = RuleStatus.VERIFY.value
-    elif expired:
-        overall_status = RuleStatus.VERIFY.value
-    else:
-        overall_status = RuleStatus.ACTIVE.value
-
-    return {
-        "status": overall_status,
-        "profile": profile_data,
-        "results": [
-            _serialize(result)
-            for result in all_results
-        ],
-        "categories": category_results,
-        "confirmed": confirmed,
-        "conditional": conditional,
-        "verify": verify,
-        "unknown": unknown,
-        "expired": expired,
-        "requires_verification": bool(
-            verify or conditional or unknown or expired
-        ),
-        "can_continue": not bool(unknown),
-        "service_scope": [
-            "document_review",
-            "document_checklist",
-            "document_inventory",
-        ],
-        "does_not_issue_documents": True,
-        "does_not_certify_legal_compliance": True,
-    }
-
-
-def check_documents(profile: Any) -> Dict[str, Any]:
-    """Alias de compatibilidad para la API."""
-    return evaluate_documents(profile)
-
-
-def evaluate(profile: Any) -> Dict[str, Any]:
-    """Alias corto para consumidores internos."""
-    return evaluate_documents(profile)
-
-
-def build_document_checklist(profile: Any) -> Dict[str, Any]:
-    """
-    Construye una checklist documental a partir de las reglas evaluadas.
-    """
-    result = evaluate_documents(profile)
-
-    items: List[Dict[str, Any]] = []
-    seen = set()
-
-    for index, rule in enumerate(result["results"], start=1):
-        if not isinstance(rule, dict):
-            continue
-
-        rule_id = str(
-            rule.get("rule_id")
-            or rule.get("id")
-            or f"document-{index}"
-        )
-
-        if rule_id in seen:
-            continue
-
-        seen.add(rule_id)
-
-        status = _status_value(rule.get("status"))
-
-        if status == RuleStatus.ACTIVE.value:
-            item_status = "CONFIRMED"
-
-        elif status in {
-            RuleStatus.CONDITIONAL.value,
-            RuleStatus.VERIFY.value,
-            RuleStatus.EXPIRED.value,
-        }:
-            item_status = "VERIFY"
+            completed = bool(item.get("completed", False))
 
         else:
-            item_status = "UNKNOWN"
+            source_status = getattr(item, "status", None)
+            status = _status(source_status)
+            document_id = _item_id(
+                item,
+                f"document-{index}",
+            )
+            title = _title(item)
+            description = _description(item)
+            source = _source(item)
+            required = bool(
+                getattr(
+                    item,
+                    "required",
+                    getattr(item, "mandatory", False),
+                )
+            )
+            completed = bool(
+                getattr(item, "completed", False)
+            )
 
-        items.append(
+        if status != "CONFIRMED":
+            completed = False
+
+        result.append(
             {
-                "id": rule_id,
-                "title": _result_title(rule),
-                "description": _result_description(rule),
-                "status": item_status,
-                "completed": False,
-                "source": _serialize(
-                    rule.get("source") or rule.get("sources")
+                "id": str(document_id),
+                "title": str(title),
+                "description": str(description),
+                "status": str(status),
+                "required": required,
+                "completed": completed,
+                "source": _serialize(source),
+                "category": (
+                    _value(category)
+                    if category is not None
+                    else None
                 ),
             }
         )
 
-    return {
-        "status": result["status"],
-        "items": items,
-        "total": len(items),
-        "confirmed": sum(
-            1
-            for item in items
-            if item["status"] == "CONFIRMED"
-        ),
-        "requires_verification": sum(
-            1
-            for item in items
-            if item["status"] in {"VERIFY", "UNKNOWN"}
-        ),
-        "does_not_issue_documents": True,
-    }
+    return result
 
 
-def get_document_inventory(profile: Any) -> Dict[str, Any]:
-    """
-    Devuelve un inventario organizado de las reglas documentales
-    encontradas para el perfil.
-    """
-    result = evaluate_documents(profile)
-
-    inventory: List[Dict[str, Any]] = []
-    seen = set()
-
-    for index, rule in enumerate(result["results"], start=1):
-        if not isinstance(rule, dict):
-            continue
-
-        rule_id = str(
-            rule.get("rule_id")
-            or rule.get("id")
-            or f"document-{index}"
+def _category_items(
+    profile: Dict[str, Any],
+    category: Any,
+) -> List[Dict[str, Any]]:
+    try:
+        raw = evaluate_category(
+            profile,
+            category,
         )
+    except TypeError:
+        try:
+            raw = evaluate_category(
+                profile=profile,
+                category=category,
+            )
+        except Exception:
+            raw = []
 
-        if rule_id in seen:
-            continue
-
-        seen.add(rule_id)
-
-        inventory.append(
-            {
-                "id": rule_id,
-                "title": _result_title(rule),
-                "status": _status_value(rule.get("status")),
-                "description": _result_description(rule),
-                "source": _serialize(
-                    rule.get("source") or rule.get("sources")
-                ),
-            }
-        )
-
-    return {
-        "status": result["status"],
-        "count": len(inventory),
-        "documents": inventory,
-        "requires_verification": result["requires_verification"],
-    }
+    return _normalize_items(
+        raw,
+        category,
+    )
 
 
-def complete_document_checklist(
+def evaluate_documents(
     profile: Any,
-    completed: Optional[Any] = None,
+    category: Any = None,
+) -> Dict[str, Any]:
+    data = _profile(profile)
+
+    if category is not None:
+        items = _category_items(data, category)
+    else:
+        items = []
+
+        for category_item in RuleCategory:
+            items.extend(
+                _category_items(
+                    data,
+                    category_item,
+                )
+            )
+
+    return _finalize(
+        items,
+        data,
+        category,
+    )
+
+
+def evaluate_complete_travel_documents(
+    profile: Any,
 ) -> Dict[str, Any]:
     """
-    Aplica el estado de completado proporcionado por el usuario
-    a la checklist generada por las reglas.
+    Compatibilidad utilizada por main.py.
 
-    No convierte VERIFY/UNKNOWN en confirmado.
+    Evalúa los documentos relacionados con el viaje
+    utilizando las categorías existentes en rules_engine.py.
+    No crea requisitos ni convierte VERIFY/UNKNOWN en confirmados.
     """
-    checklist = build_document_checklist(profile)
+    return evaluate_documents(profile)
+
+
+def evaluate_travel_documents(
+    profile: Any,
+) -> Dict[str, Any]:
+    return evaluate_complete_travel_documents(profile)
+
+
+def get_documents(
+    profile: Any,
+    category: Any = None,
+) -> Dict[str, Any]:
+    return evaluate_documents(profile, category)
+
+
+def build_document_checklist(
+    profile: Any,
+    category: Any = None,
+) -> Dict[str, Any]:
+    data = _profile(profile)
+
+    try:
+        raw = (
+            engine_build_checklist(data)
+            if category is None
+            else engine_build_checklist(
+                data,
+                category,
+            )
+        )
+        items = _normalize_items(
+            raw,
+            category,
+        )
+
+        if items:
+            return _finalize(
+                items,
+                data,
+                category,
+            )
+    except (TypeError, AttributeError):
+        pass
+
+    return evaluate_documents(
+        data,
+        category,
+    )
+
+
+def get_document_checklist(
+    profile: Any,
+    category: Any = None,
+) -> Dict[str, Any]:
+    return build_document_checklist(
+        profile,
+        category,
+    )
+
+
+def document_categories() -> List[str]:
+    return [
+        _value(category)
+        for category in RuleCategory
+    ]
+
+
+def get_document_categories() -> List[str]:
+    return document_categories()
+
+
+def _finalize(
+    items: List[Dict[str, Any]],
+    profile: Dict[str, Any],
+    category: Any = None,
+) -> Dict[str, Any]:
+    unique: List[Dict[str, Any]] = []
+    seen = set()
+
+    for item in items:
+        item_id = str(item.get("id", ""))
+
+        if item_id in seen:
+            continue
+
+        seen.add(item_id)
+        unique.append(item)
+
+    confirmed = sum(
+        item["status"] == "CONFIRMED"
+        for item in unique
+    )
+
+    verification = sum(
+        item["status"] == "VERIFY"
+        for item in unique
+    )
+
+    unknown = sum(
+        item["status"] == "UNKNOWN"
+        for item in unique
+    )
+
+    required = sum(
+        bool(item.get("required"))
+        for item in unique
+    )
+
+    completed = sum(
+        bool(item.get("completed"))
+        for item in unique
+    )
+
+    if unknown:
+        status = RuleStatus.UNKNOWN.value
+    elif verification:
+        status = RuleStatus.VERIFY.value
+    else:
+        status = RuleStatus.ACTIVE.value
+
+    return {
+        "status": status,
+        "category": (
+            _value(category)
+            if category is not None
+            else None
+        ),
+        "profile": profile,
+        "documents": unique,
+        "items": unique,
+        "total": len(unique),
+        "required": required,
+        "confirmed": confirmed,
+        "verification": verification,
+        "unknown": unknown,
+        "completed": completed,
+        "pending": len(unique) - completed,
+        "requires_verification": bool(
+            verification or unknown
+        ),
+        "ready": (
+            len(unique) > 0
+            and completed == len(unique)
+            and verification == 0
+            and unknown == 0
+        ),
+    }
+
+
+def update_documents(
+    documents: Any,
+    completed: Any = None,
+) -> Dict[str, Any]:
+    if isinstance(documents, dict):
+        result = dict(documents)
+        items = list(
+            result.get("documents")
+            or result.get("items")
+            or []
+        )
+    elif isinstance(documents, list):
+        result = {}
+        items = list(documents)
+    else:
+        result = {}
+        items = []
 
     if completed is None:
         completed = []
 
     if isinstance(completed, dict):
         completed_ids = {
-            str(key)
-            for key, value in completed.items()
-            if bool(value)
+            str(k)
+            for k, v in completed.items()
+            if bool(v)
         }
     elif isinstance(completed, (list, tuple, set)):
-        completed_ids = {str(value) for value in completed}
+        completed_ids = {
+            str(v) for v in completed
+        }
     else:
         completed_ids = set()
 
-    for item in checklist["items"]:
-        item["completed"] = (
-            item["id"] in completed_ids
-            and item["status"] == "CONFIRMED"
+    normalized: List[Dict[str, Any]] = []
+
+    for index, item in enumerate(items, 1):
+        if not isinstance(item, dict):
+            continue
+
+        item = dict(item)
+
+        item_id = str(
+            item.get("id")
+            or item.get("document_id")
+            or f"document-{index}"
         )
 
-    checklist["completed"] = sum(
+        status = str(
+            item.get("status")
+            or "UNKNOWN"
+        ).upper()
+
+        item["id"] = item_id
+        item["status"] = status
+        item["completed"] = (
+            item_id in completed_ids
+            and status == "CONFIRMED"
+        )
+
+        normalized.append(item)
+
+    return _finalize(
+        normalized,
+        result.get("profile") or {},
+        result.get("category"),
+    )
+
+
+def reset_documents(
+    documents: Any,
+) -> Dict[str, Any]:
+    if isinstance(documents, dict):
+        result = dict(documents)
+        items = list(
+            result.get("documents")
+            or result.get("items")
+            or []
+        )
+    elif isinstance(documents, list):
+        result = {}
+        items = list(documents)
+    else:
+        result = {}
+        items = []
+
+    for item in items:
+        if isinstance(item, dict):
+            item["completed"] = False
+
+    return _finalize(
+        [
+            item for item in items
+            if isinstance(item, dict)
+        ],
+        result.get("profile") or {},
+        result.get("category"),
+    )
+
+
+def document_progress(
+    documents: Any,
+) -> Dict[str, Any]:
+    if isinstance(documents, dict):
+        items = (
+            documents.get("documents")
+            or documents.get("items")
+            or []
+        )
+    elif isinstance(documents, list):
+        items = documents
+    else:
+        items = []
+
+    total = len(items)
+
+    completed = sum(
         1
-        for item in checklist["items"]
-        if item["completed"]
+        for item in items
+        if isinstance(item, dict)
+        and bool(item.get("completed"))
     )
 
-    checklist["pending"] = checklist["total"] - checklist["completed"]
-
-    checklist["ready"] = (
-        checklist["pending"] == 0
-        and not checklist["requires_verification"]
+    verification = sum(
+        1
+        for item in items
+        if isinstance(item, dict)
+        and str(
+            item.get("status", "")
+        ).upper() == "VERIFY"
     )
 
-    return checklist
-
-
-def validate_document_input(profile: Any) -> Dict[str, Any]:
-    """
-    Validación mínima del perfil para poder ejecutar la revisión
-    documental. No sustituye la evaluación de reglas.
-    """
-    data = _profile_dict(profile)
-    missing: List[str] = []
-
-    if not data:
-        missing.append("profile")
-
-    if not data.get("nationality"):
-        missing.append("nationality")
-
-    if data.get("age") is None:
-        missing.append("age")
+    unknown = sum(
+        1
+        for item in items
+        if isinstance(item, dict)
+        and str(
+            item.get("status", "")
+        ).upper() == "UNKNOWN"
+    )
 
     return {
-        "valid": not missing,
-        "missing": missing,
-        "status": (
-            RuleStatus.UNKNOWN.value
-            if missing
-            else RuleStatus.ACTIVE.value
+        "total": total,
+        "completed": completed,
+        "pending": total - completed,
+        "verification": verification,
+        "unknown": unknown,
+        "percentage": (
+            round(
+                completed / total * 100,
+                2,
+            )
+            if total
+            else 0
+        ),
+        "ready": (
+            total > 0
+            and completed == total
+            and verification == 0
+            and unknown == 0
         ),
     }
 
 
-def get_document_sources(profile: Any = None) -> List[Any]:
-    """
-    Extrae las fuentes asociadas a las reglas documentales.
-    """
-    result = evaluate_documents(profile or {})
+def documents_summary(
+    documents: Any,
+) -> Dict[str, Any]:
+    progress = document_progress(
+        documents
+    )
 
-    sources: List[Any] = []
-    seen = set()
+    status = None
 
-    for rule in result["results"]:
-        if not isinstance(rule, dict):
-            continue
-
-        source = rule.get("source") or rule.get("sources")
-
-        if source is None:
-            continue
-
-        values = source if isinstance(source, list) else [source]
-
-        for value in values:
-            serialized = _serialize(value)
-
-            if isinstance(serialized, dict):
-                key = (
-                    serialized.get("url")
-                    or serialized.get("id")
-                    or serialized.get("name")
-                    or repr(serialized)
-                )
-            else:
-                key = str(serialized)
-
-            if key in seen:
-                continue
-
-            seen.add(key)
-            sources.append(serialized)
-
-    return sources
-
-
-def documents_summary(profile: Any) -> Dict[str, Any]:
-    """Resumen compacto para frontend/API."""
-    result = evaluate_documents(profile)
+    if isinstance(documents, dict):
+        status = documents.get("status")
 
     return {
-        "status": result["status"],
-        "requires_verification": result["requires_verification"],
-        "can_continue": result["can_continue"],
-        "confirmed_count": len(result["confirmed"]),
-        "verification_count": len(result["verify"]),
-        "unknown_count": len(result["unknown"]),
-        "conditional_count": len(result["conditional"]),
-        "expired_count": len(result["expired"]),
-        "category_count": len(result["categories"]),
+        "status": status,
+        **progress,
     }
 
 
 __all__ = [
     "evaluate_documents",
-    "check_documents",
-    "evaluate",
+    "evaluate_complete_travel_documents",
+    "evaluate_travel_documents",
+    "get_documents",
     "build_document_checklist",
-    "get_document_inventory",
-    "complete_document_checklist",
-    "validate_document_input",
-    "get_document_sources",
+    "get_document_checklist",
+    "document_categories",
+    "get_document_categories",
+    "update_documents",
+    "reset_documents",
+    "document_progress",
     "documents_summary",
 ]
+
