@@ -1,219 +1,141 @@
 {
   "module": "dviajeros",
   "name": "D'Viajeros",
-  "version": "2026.1",
-  "country": "Cuba",
-
-  "description": "Información y preparación del formulario D'Viajeros para personas que viajan a Cuba. La aplicación ayuda a organizar la información, pero no sustituye el portal oficial ni genera una declaración oficial.",
-
+  "version": "2026.2",
+  "purpose": "Preparar la información del viajero antes y durante el uso del portal oficial.",
   "official_portal": {
     "name": "D'Viajeros",
     "url": "https://dviajeros.mitrans.gob.cu/"
   },
-
-  "status_policy": {
-    "READY": "La información disponible está suficientemente completa para continuar con la preparación.",
-    "INCOMPLETE": "Faltan datos necesarios.",
-    "VERIFY": "La información requiere verificación oficial.",
-    "UNKNOWN": "No existe información suficiente para realizar una determinación segura.",
-    "COMPLETED": "El usuario terminó la preparación dentro de la aplicación. Esto no significa que haya completado el trámite oficial."
-  },
-
-  "application_scope": {
-    "can_prepare": true,
-    "can_validate_user_data": true,
-    "can_show_modules": true,
-    "can_show_missing_fields": true,
-    "can_link_official_portal": true,
-    "can_submit_official_form": false,
-    "can_generate_official_qr": false,
-    "can_generate_official_declaration": false,
-    "can_confirm_migration_clearance": false,
-    "can_confirm_customs_clearance": false,
-    "can_confirm_health_clearance": false
-  },
-
   "workflow": [
     {
+      "order": 1,
       "id": "personal_information",
       "title": "Información personal",
-      "order": 1,
-      "status": "CONFIRMED",
-      "description": "Preparación de los datos personales necesarios para completar el proceso oficial."
+      "description": "Prepara los datos básicos del viajero."
     },
     {
-      "id": "migration",
-      "title": "Migración",
       "order": 2,
-      "status": "CONFIRMED",
-      "description": "Preparación de la información relacionada con el viajero y su entrada al país."
+      "id": "migration",
+      "title": "Información del viaje",
+      "description": "Prepara pasaporte, llegada, vuelo y aerolínea."
     },
     {
+      "order": 3,
       "id": "health",
       "title": "Salud",
-      "order": 3,
-      "status": "CONFIRMED",
-      "description": "Preparación de la información correspondiente al módulo de salud."
+      "description": "Revisa y completa solamente lo que solicite el formulario oficial."
     },
     {
+      "order": 4,
       "id": "customs",
       "title": "Aduana",
-      "order": 4,
-      "status": "CONFIRMED",
-      "description": "Preparación de la información correspondiente al módulo de aduanas."
+      "description": "Revisa y declara la información que solicite el formulario oficial."
     },
     {
-      "id": "review",
-      "title": "Revisión",
       "order": 5,
-      "status": "CONFIRMED",
-      "description": "Revisión de la información antes de continuar al procedimiento oficial."
+      "id": "review",
+      "title": "Revisión final",
+      "description": "Comprueba que tengas todo preparado antes de continuar."
     }
   ],
-
-  "personal_information": {
-    "status": "CONFIRMED",
-    "fields": [
-      {
-        "id": "first_name",
-        "label": "Nombre",
-        "required": true
-      },
-      {
-        "id": "last_name",
-        "label": "Apellidos",
-        "required": true
-      },
-      {
-        "id": "nationality",
-        "label": "Nacionalidad",
-        "required": true
-      },
-      {
-        "id": "date_of_birth",
-        "label": "Fecha de nacimiento",
-        "required": true
-      }
-    ]
-  },
-
-  "migration": {
-    "status": "CONFIRMED",
-    "fields": [
-      {
-        "id": "passport_number",
-        "label": "Número de pasaporte",
-        "required": true
-      },
-      {
-        "id": "passport_country",
-        "label": "País emisor del pasaporte",
-        "required": true
-      },
-      {
-        "id": "arrival_date",
-        "label": "Fecha de llegada",
-        "required": true
-      },
-      {
-        "id": "flight_number",
-        "label": "Número de vuelo",
-        "required": true
-      },
-      {
-        "id": "airline",
-        "label": "Aerolínea",
-        "required": true
-      }
-    ]
-  },
-
-  "health": {
-    "status": "VERIFY",
-    "description": "La información específica que deba declararse debe verificarse directamente en el formulario oficial y según las instrucciones vigentes.",
-    "automatic_health_clearance": false,
-    "medical_decision_by_app": false
-  },
-
-  "customs": {
-    "status": "VERIFY",
-    "description": "La información aduanal debe declararse según las instrucciones oficiales vigentes. La aplicación no presume cantidades, valores, artículos permitidos o prohibidos.",
-    "automatic_customs_clearance": false,
-    "automatic_quantity_calculation": false,
-    "automatic_duty_calculation": false
-  },
-
-  "travel_information": {
-    "status": "VERIFY",
-    "fields": [
-      {
-        "id": "accommodation",
-        "label": "Alojamiento",
-        "required": false
-      },
-      {
-        "id": "address_in_cuba",
-        "label": "Dirección en Cuba",
-        "required": false
-      },
-      {
-        "id": "purpose_of_trip",
-        "label": "Motivo del viaje",
-        "required": false
-      }
-    ]
-  },
-
-  "air_travel": {
-    "status": "VERIFY",
-    "description": "Para viajes aéreos, el usuario debe comprobar los datos del vuelo y cualquier información adicional solicitada por el procedimiento oficial.",
-    "flight_number_required_for_preparation": true,
-    "airline_required_for_preparation": true
-  },
-
-  "maritime_travel": {
-    "status": "VERIFY",
-    "description": "Las situaciones de entrada por vía marítima deben verificarse directamente con las autoridades y fuentes oficiales aplicables.",
-    "automatic_equivalence_to_air_travel": false
-  },
-
-  "official_submission": {
-    "status": "VERIFY",
-    "description": "La aplicación prepara la información. La presentación oficial debe realizarse mediante el procedimiento y portal oficial correspondiente.",
-    "official_portal": "https://dviajeros.mitrans.gob.cu/",
-    "submitted_by_app": false
-  },
-
-  "qr_code": {
-    "status": "CONFIRMED",
-    "description": "La aplicación no genera ni presenta como oficial ningún código QR creado internamente.",
-    "generated_by_app": false,
-    "official_qr_claim": false
-  },
-
-  "covid_information": {
-    "status": "VERIFY",
-    "description": "No se incorporan automáticamente requisitos sanitarios históricos. Cualquier requisito vigente debe verificarse con las autoridades oficiales."
-  },
-
-  "official_verification": {
-    "required": true,
-    "message": "Antes del viaje, el usuario debe verificar la información vigente directamente en el portal oficial de D'Viajeros y con las autoridades correspondientes."
-  },
-
-  "sources": [
+  "fields": [
     {
-      "id": "dviajeros_official",
-      "name": "D'Viajeros",
-      "type": "official",
-      "url": "https://dviajeros.mitrans.gob.cu/",
-      "status": "CONFIRMED"
+      "id": "first_name",
+      "label": "Nombre",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "last_name",
+      "label": "Apellidos",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "nationality",
+      "label": "Nacionalidad",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "date_of_birth",
+      "label": "Fecha de nacimiento",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "passport_number",
+      "label": "Número de pasaporte",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "passport_country",
+      "label": "País que emitió tu pasaporte",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "arrival_date",
+      "label": "Fecha de llegada",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "flight_number",
+      "label": "Número de vuelo",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "airline",
+      "label": "Aerolínea",
+      "required": true,
+      "copyable": true
+    },
+    {
+      "id": "accommodation",
+      "label": "Alojamiento",
+      "required": false,
+      "copyable": true
+    },
+    {
+      "id": "address_in_cuba",
+      "label": "Dirección en Cuba",
+      "required": false,
+      "copyable": true
+    },
+    {
+      "id": "purpose_of_trip",
+      "label": "Motivo del viaje",
+      "required": false,
+      "copyable": true
     }
   ],
-
-  "disclaimer": {
-    "status": "CONFIRMED",
-    "text": "CUBA AUTO TRAVEL 2026 es una aplicación informativa y de preparación. No pertenece al Gobierno de Cuba ni a sus autoridades migratorias, sanitarias o aduanales. No presenta formularios oficiales, no genera códigos QR oficiales y no confirma que un trámite haya sido presentado o aprobado."
-  }
+  "declarations": [
+    {
+      "id": "health_information",
+      "title": "Información de salud",
+      "description": "Utiliza este espacio como preparación personal. Declara en el portal oficial exactamente la información que corresponda."
+    },
+    {
+      "id": "customs_information",
+      "title": "Información de aduana",
+      "description": "Utiliza este espacio para organizar lo que necesites declarar. No inventes cantidades, valores o categorías."
+    }
+  ],
+  "important": [
+    "La aplicación no presenta el formulario oficial.",
+    "La aplicación no genera el QR oficial.",
+    "La aplicación no confirma una autorización migratoria.",
+    "La aplicación no confirma una autorización sanitaria.",
+    "La aplicación no confirma una autorización aduanal.",
+    "La información final debe introducirse y verificarse en el portal oficial."
+  ],
+  "companion_mode": {
+    "enabled": true,
+    "description": "El usuario puede mantener CUBA AUTO TRAVEL abierta en una pestaña y el portal oficial en otra. Puede volver a esta aplicación para consultar, copiar y revisar información."
+  },
+  "disclaimer": "CUBA AUTO TRAVEL 2026 es una aplicación independiente de preparación y acompañamiento. El trámite oficial se realiza directamente en D'Viajeros."
 }
-
