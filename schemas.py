@@ -1,204 +1,139 @@
-from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, ConfigDict, Field
+import os,json
+from pathlib import Path
+from typing import Any,Dict,Optional
+from fastapi import FastAPI,HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from schemas import VisaRequest,DViajerosRequest,PassportRequest
 
-class BaseSchema(BaseModel):
-    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
+BASE_DIR=Path(__file__).resolve().parent
+DATA_DIR=BASE_DIR/"data"
+STATIC_DIR=BASE_DIR/"static"
 
-class PracticeField(BaseSchema):
-    name: str
-    label: str
-    status: str = "VERIFY"
-    required: bool = False
-    example: Optional[Any] = None
-    help: Optional[str] = None
-    type: Optional[str] = None
-    input_type: Optional[str] = None
-    placeholder: Optional[str] = None
-    multiline: bool = False
-    options: List = Field(default_factory=list)
-    choices: List = Field(default_factory=list)
-    values: List = Field(default_factory=list)
+def load_json(filename:str,default:Any=None)->Any:
+    path=DATA_DIR/filename
+    try:
+        with path.open("r",encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        if default is not None:
+            return default
+        raise
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"JSON inválido: {filename}: {e}")
 
-class PracticeScreen(BaseSchema):
-    id: str
-    order: int = 0
-    title: str
-    status: str = "VERIFY"
-    explanation: Optional[str] = None
-    question: Optional[str] = None
-    badge: Optional[str] = None
-    image: Optional[str] = None
-    image_url: Optional[str] = None
-    image_alt: Optional[str] = None
-    illustration: Optional[str] = None
-    screenshot: Optional[str] = None
-    images: List = Field(default_factory=list)
-    fields: List = Field(default_factory=list)
-    prepare: List = Field(default_factory=list)
-    review: Optional[str] = None
-    warning: Optional[str] = None
-    important: Optional[str] = None
-    portal_note: Optional[str] = None
+CUBA_VISA=load_json("cuba_visa.json",{})
+D_VIAJEROS=load_json("dviajeros.json",{})
+PASSPORTS=load_json("passports.json",{})
 
-class PracticeAnswer(BaseSchema):
-    screen_id: str
-    answers: Dict = Field(default_factory=dict)
+app=FastAPI(
+    title="CUBA AUTO TRAVEL 2026",
+    description="Guía informativa para viajeros a Cuba.",
+    version="1.0.0"
+)
 
-class PracticeSession(BaseSchema):
-    module: str
-    current_screen: int = 1
-    answers: Dict = Field(default_factory=dict)
-    completed: bool = False
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
-class VisaRequest(BaseSchema):
-    nationality: str = ""
-    country_of_residence: str = ""
-    passport_country: str = ""
-    passport_number: str = ""
-    first_name: str = ""
-    second_name: str = ""
-    first_surname: str = ""
-    second_surname: str = ""
-    date_of_birth: str = ""
-    gender: str = ""
-    phone: str = ""
-    travel_purpose: str = ""
-    entry_type: str = ""
-    has_passport: bool = False
-    passport_valid: bool = False
-    email: str = ""
-    dual_nationality: bool = False
-    extra_details: Dict = Field(default_factory=dict)
+def normalize(value:Optional[str])->str:
+    if value is None:
+        return ""
+    return " ".join(str(value).strip().lower().split())
 
-class VisaPracticeRequest(BaseSchema):
-    session: PracticeSession
-    screen_id: str = ""
-    answers: Dict = Field(default_factory=dict)
+def search_data(data:Any,request:Any)->Dict[str,Any]:
+    if isinstance(data,dict):
+        result=dict(data)
+    else:
+        result={"data":data}
 
-class VisaCheck(BaseSchema):
-    id: str
-    status: str
-    message: str
+    result["request"]=request.model_dump()
+    return result
 
-class VisaResponse(BaseSchema):
-    module: str
-    status: str
-    missing_fields: List = Field(default_factory=list)
-    checks: List = Field(default_factory=list)
-    official_portal: str
-    official_document_issued: bool = False
-    app_issues_visa: bool = False
-    source_data_loaded: bool = False
-    practice_completed: bool = False
+@app.get("/health")
+def health():
+    return {
+        "status":"ok",
+        "app":"CUBA AUTO TRAVEL 2026",
+        "version":"1.0.0"
+    }
 
-class VisaInformation(BaseSchema):
-    module: str
-    name: str
-    official_portal: str
-    data: Dict = Field(default_factory=dict)
+@app.get("/api")
+def api_info():
+    return {
+        "name":"CUBA AUTO TRAVEL 2026",
+        "status":"ok",
+        "endpoints":[
+            "/api/visa",
+            "/api/dviajeros",
+            "/api/passports",
+            "/api/data"
+        ]
+    }
 
-class HealthInformation(BaseSchema):
-    information: Dict = Field(default_factory=dict)
+@app.get("/api/data")
+def get_data():
+    return {
+        "cuba_visa":CUBA_VISA,
+        "dviajeros":D_VIAJEROS,
+        "passports":PASSPORTS
+    }
 
-class CustomsInformation(BaseSchema):
-    information: Dict = Field(default_factory=dict)
+@app.get("/api/visa")
+def get_visa():
+    return CUBA_VISA
 
-class DViajerosRequest(BaseSchema):
-    first_name: str = ""
-    last_name: str = ""
-    nationality: str = ""
-    date_of_birth: str = ""
-    passport_number: str = ""
-    passport_country: str = ""
-    arrival_date: str = ""
-    flight_number: str = ""
-    airline: str = ""
-    accommodation: str = ""
-    address_in_cuba: str = ""
-    purpose_of_trip: str = ""
-    health_information: Dict = Field(default_factory=dict)
-    customs_information: Dict = Field(default_factory=dict)
+@app.post("/api/visa/check")
+def check_visa(request:VisaRequest):
+    return search_data(CUBA_VISA,request)
 
-class DViajerosPracticeRequest(BaseSchema):
-    session: PracticeSession
-    screen_id: str = ""
-    answers: Dict = Field(default_factory=dict)
+@app.get("/api/dviajeros")
+def get_dviajeros():
+    return D_VIAJEROS
 
-class DViajerosModule(BaseSchema):
-    id: str
-    title: str
-    status: str
+@app.post("/api/dviajeros/check")
+def check_dviajeros(request:DViajerosRequest):
+    return search_data(D_VIAJEROS,request)
 
-class DViajerosResponse(BaseSchema):
-    module: str
-    status: str
-    missing_fields: List = Field(default_factory=list)
-    modules: List = Field(default_factory=list)
-    submission_status: str
-    official_portal: str
-    official_qr_generated: bool = False
-    official_submission_completed: bool = False
-    source_data_loaded: bool = False
-    practice_completed: bool = False
+@app.get("/api/passports")
+def get_passports():
+    return PASSPORTS
 
-class DViajerosInformation(BaseSchema):
-    module: str
-    name: str
-    official_portal: str
-    data: Dict = Field(default_factory=dict)
+@app.post("/api/passports/check")
+def check_passport(request:PassportRequest):
+    return search_data(PASSPORTS,request)
 
-class PassportRequest(BaseSchema):
-    first_name: str = ""
-    second_name: str = ""
-    first_surname: str = ""
-    second_surname: str = ""
-    date_of_birth: str = ""
-    passport_number: str = ""
-    passport_country: str = ""
-    expiration_date: str = ""
-    travel_date: str = ""
+@app.get("/api/reload")
+def reload_data():
+    global CUBA_VISA,D_VIAJEROS,PASSPORTS
+    CUBA_VISA=load_json("cuba_visa.json",{})
+    D_VIAJEROS=load_json("dviajeros.json",{})
+    PASSPORTS=load_json("passports.json",{})
+    return {
+        "status":"ok",
+        "message":"Datos recargados"
+    }
 
-class PassportCheck(BaseSchema):
-    id: str
-    status: str
-    message: str
+if STATIC_DIR.exists():
+    app.mount("/static",StaticFiles(directory=str(STATIC_DIR)),name="static")
 
-class PassportResponse(BaseSchema):
-    module: str
-    status: str
-    missing_fields: List = Field(default_factory=list)
-    checks: List = Field(default_factory=list)
-    source_data_loaded: bool = False
+@app.get("/{path:path}")
+def frontend(path:str):
+    if path.startswith("api/"):
+        raise HTTPException(status_code=404,detail="API endpoint not found")
 
-class OfficialSource(BaseSchema):
-    name: str
-    url: str
+    index=STATIC_DIR/"index.html"
+    if index.exists():
+        return FileResponse(index)
 
-class SourcesResponse(BaseSchema):
-    visa: OfficialSource
-    dviajeros: OfficialSource
+    raise HTTPException(status_code=404,detail="Aplicación no encontrada")
 
-class ModuleStatus(BaseSchema):
-    module: str
-    status: str
-
-class APIInfoResponse(BaseSchema):
-    app: str
-    version: str
-    modules: Dict
-    official_portals: Dict
-
-class HealthResponse(BaseSchema):
-    status: str
-    app: str
-    version: str
-
-class DisclaimerResponse(BaseSchema):
-    text: str
-
-class MissingFieldsResponse(BaseSchema):
-    missing_fields: List = Field(default_factory=list)
-
-class GenericStatusResponse(BaseSchema):
-    status: str
-    message: Optional[str] = None
+if __name__=="__main__":
+    import uvicorn
+    port=int(os.environ.get("PORT","8000"))
+    uvicorn.run("main:app",host="0.0.0.0",port=port)
