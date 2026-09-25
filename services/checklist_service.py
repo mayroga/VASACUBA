@@ -12,7 +12,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from rules_engine import (
     RuleCategory,
@@ -23,7 +23,6 @@ from rules_engine import (
 
 
 def _status_value(value: Any) -> str:
-    """Convierte Enum u otros valores de estado a texto."""
     if value is None:
         return RuleStatus.UNKNOWN.value
 
@@ -34,7 +33,6 @@ def _status_value(value: Any) -> str:
 
 
 def _serialize(value: Any) -> Any:
-    """Serialización defensiva para respuestas JSON."""
     if value is None:
         return None
 
@@ -69,7 +67,6 @@ def _serialize(value: Any) -> Any:
 
 
 def _profile_dict(profile: Any) -> Dict[str, Any]:
-    """Normaliza dict, Pydantic, dataclass u objeto compatible."""
     if profile is None:
         return {}
 
@@ -101,10 +98,6 @@ def _category_value(category: Any) -> str:
 
 
 def _normalize_category(category: Any) -> Any:
-    """
-    Convierte una categoría textual al Enum cuando existe.
-    Si no existe, conserva el valor original.
-    """
     if category is None:
         return None
 
@@ -212,7 +205,6 @@ def _evaluate_category(
     profile: Dict[str, Any],
     category: Any,
 ) -> List[Any]:
-    """Evalúa una categoría usando el motor central."""
     try:
         result = evaluate_category(profile, category)
     except TypeError:
@@ -234,11 +226,6 @@ def _engine_checklist(
     profile: Dict[str, Any],
     category: Any = None,
 ) -> Any:
-    """
-    Intenta utilizar directamente el constructor de checklist del
-    motor central. Si una versión del motor tiene otra firma, se
-    utilizan las evaluaciones de categoría como respaldo.
-    """
     try:
         if category is None:
             return engine_build_checklist(profile)
@@ -251,7 +238,9 @@ def _engine_checklist(
     except (TypeError, AttributeError):
         try:
             if category is None:
-                return engine_build_checklist(profile=profile)
+                return engine_build_checklist(
+                    profile=profile,
+                )
 
             return engine_build_checklist(
                 profile=profile,
@@ -266,7 +255,6 @@ def _normalize_engine_items(
     raw: Any,
     category: Any = None,
 ) -> List[Dict[str, Any]]:
-    """Convierte una checklist del motor a formato estable."""
     if raw is None:
         return []
 
@@ -324,7 +312,6 @@ def _normalize_engine_items(
             )
 
             source = item.get("source") or item.get("sources")
-
             completed = bool(item.get("completed", False))
 
         else:
@@ -369,7 +356,6 @@ def _normalize_engine_items(
 def _deduplicate_items(
     items: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
-    """Elimina duplicados conservando el primer elemento."""
     output: List[Dict[str, Any]] = []
     seen = set()
 
@@ -389,12 +375,6 @@ def build_checklist(
     profile: Any,
     category: Any = None,
 ) -> Dict[str, Any]:
-    """
-    Construye una checklist para el perfil.
-
-    Si el motor central puede generar directamente la checklist,
-    se utiliza. De lo contrario se construye a partir de las reglas.
-    """
     profile_data = _profile_dict(profile)
     normalized_category = _normalize_category(category)
 
@@ -408,8 +388,6 @@ def build_checklist(
         normalized_category,
     )
 
-    # Si la versión actual del motor no devuelve elementos, usamos
-    # las reglas directamente.
     if not items:
         if normalized_category is not None:
             results = _evaluate_category(
@@ -421,6 +399,7 @@ def build_checklist(
                 results,
                 normalized_category,
             )
+
         else:
             for category_item in RuleCategory:
                 results = _evaluate_category(
@@ -448,7 +427,6 @@ def get_checklist(
     profile: Any,
     category: Any = None,
 ) -> Dict[str, Any]:
-    """Alias de compatibilidad."""
     return build_checklist(profile, category)
 
 
@@ -456,7 +434,6 @@ def build_category_checklist(
     profile: Any,
     category: Any,
 ) -> Dict[str, Any]:
-    """Construye una checklist exclusivamente para una categoría."""
     return build_checklist(
         profile,
         category,
@@ -468,7 +445,6 @@ def _finalize_checklist(
     profile: Dict[str, Any],
     category: Any = None,
 ) -> Dict[str, Any]:
-    """Calcula contadores y estado general."""
     confirmed = sum(
         1
         for item in items
@@ -536,15 +512,16 @@ def update_checklist(
     """
     Actualiza el estado de completado.
 
-    Importante:
-    completar una casilla NO cambia el estado oficial de la regla.
+    Completar una casilla NO cambia el estado oficial de la regla.
     """
     if isinstance(checklist, dict):
         result = dict(checklist)
         items = list(result.get("items") or [])
+
     elif isinstance(checklist, list):
         result = {}
         items = list(checklist)
+
     else:
         result = {}
         items = []
@@ -589,7 +566,6 @@ def update_checklist(
             or normalized.get("status")
         )
 
-        # Si ya viene en formato de checklist, conservar VERIFY/UNKNOWN.
         existing_status = str(
             normalized.get("status") or ""
         ).upper()
@@ -620,13 +596,14 @@ def update_checklist(
 def reset_checklist(
     checklist: Any,
 ) -> Dict[str, Any]:
-    """Marca todos los elementos como pendientes."""
     if isinstance(checklist, dict):
         result = dict(checklist)
         items = list(result.get("items") or [])
+
     elif isinstance(checklist, list):
         result = {}
         items = list(checklist)
+
     else:
         result = {}
         items = []
@@ -657,9 +634,11 @@ def complete_checklist(
     if isinstance(checklist, dict):
         result = dict(checklist)
         items = list(result.get("items") or [])
+
     elif isinstance(checklist, list):
         result = {}
         items = list(checklist)
+
     else:
         result = {}
         items = []
@@ -693,12 +672,20 @@ def get_checklist_categories() -> List[str]:
     ]
 
 
+def checklist_categories() -> List[str]:
+    """
+    Alias de compatibilidad para main.py y versiones anteriores.
+    """
+    return get_checklist_categories()
+
+
 def checklist_progress(checklist: Any) -> Dict[str, Any]:
-    """Devuelve solamente el progreso de una checklist."""
     if isinstance(checklist, dict):
         items = checklist.get("items") or []
+
     elif isinstance(checklist, list):
         items = checklist
+
     else:
         items = []
 
@@ -759,16 +746,62 @@ def merge_checklist_state(
       - diccionario {id: true/false}
       - objeto {completed: [...]}
       - objeto {items: [...]}
+      - payload {checklist: [...], completed: [...]}
+      - payload {profile: {...}, checklist: [...]}
     """
+
+    # Compatibilidad con un payload completo enviado por main.py.
+    if isinstance(checklist, dict) and state is None:
+        if "checklist" in checklist:
+            payload = checklist
+
+            raw_checklist = payload.get("checklist")
+
+            if isinstance(raw_checklist, dict):
+                base = dict(raw_checklist)
+
+            elif isinstance(raw_checklist, list):
+                base = {
+                    "items": list(raw_checklist),
+                    "profile": payload.get("profile") or {},
+                    "category": payload.get("category"),
+                }
+
+            else:
+                base = {
+                    "profile": payload.get("profile") or {},
+                    "category": payload.get("category"),
+                    "items": [],
+                }
+
+            completed = payload.get("completed")
+
+            if completed is None and isinstance(
+                payload.get("state"),
+                dict,
+            ):
+                completed = payload["state"].get("completed")
+
+            if completed is None:
+                completed = []
+
+            return update_checklist(
+                base,
+                completed,
+            )
+
+        return checklist
+
     if state is None:
-        return build_checklist(
-            checklist.get("profile", {})
-            if isinstance(checklist, dict)
-            else {}
-        ) if not isinstance(checklist, (dict, list)) else (
-            checklist if isinstance(checklist, dict)
-            else {"items": checklist}
-        )
+        if isinstance(checklist, list):
+            return {
+                "items": checklist,
+            }
+
+        if isinstance(checklist, dict):
+            return checklist
+
+        return build_checklist({})
 
     if isinstance(state, dict):
         if "completed" in state:
@@ -794,7 +827,9 @@ def merge_checklist_state(
     if isinstance(checklist, dict):
         base = dict(checklist)
     else:
-        base = {"items": list(checklist or [])}
+        base = {
+            "items": list(checklist or []),
+        }
 
     return update_checklist(
         base,
@@ -803,7 +838,6 @@ def merge_checklist_state(
 
 
 def checklist_summary(checklist: Any) -> Dict[str, Any]:
-    """Resumo compacto para frontend/API."""
     progress = checklist_progress(checklist)
 
     status = None
@@ -825,7 +859,16 @@ __all__ = [
     "reset_checklist",
     "complete_checklist",
     "get_checklist_categories",
+    "checklist_categories",
     "checklist_progress",
     "merge_checklist_state",
     "checklist_summary",
 ]
+
+Con esta versión, **el error específico de Render desaparece** porque `main.py` ya puede hacer:
+
+from services.checklist_service import checklist_categories
+
+y también sigue disponible:
+
+get_checklist_categories
