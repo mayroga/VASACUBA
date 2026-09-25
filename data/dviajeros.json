@@ -1,180 +1,141 @@
 {
   "app":"CUBA AUTO TRAVEL 2026",
-  "updated":"2026-09-25",
-  "title":"D'Viajeros",
-  "description":"Formulario digital obligatorio para los viajeros que ingresan a Cuba.",
-  "official_source":{
+  "title_es":"D'Viajeros paso a paso",
+  "title_en":"D'Viajeros step by step",
+  "intro_es":"D'Viajeros es el formulario digital para viajeros que entran a Cuba. Hazlo con calma, revisa cada dato y conserva el código QR al terminar.",
+  "intro_en":"D'Viajeros is the digital form for travelers entering Cuba. Take your time, check every detail and keep your QR code when finished.",
+  "official":{
     "name":"D'Viajeros",
     "url":"https://www.dviajeros.mitrans.gob.cu/"
   },
-  "purpose":"Permitir al viajero proporcionar por adelantado la información requerida para su entrada a Cuba y obtener el código QR correspondiente.",
-  "required":true,
-  "applies_to":"Viajeros que ingresan a Cuba, conforme a las reglas vigentes.",
-  "when_to_complete":{
-    "description":"El formulario debe completarse antes del viaje dentro del período establecido por las autoridades cubanas.",
-    "instruction":"Consulta el portal oficial antes de completar el formulario para confirmar el plazo vigente."
-  },
-  "result":{
-    "name":"Código QR",
-    "description":"Al finalizar correctamente el formulario se genera un código QR que debe conservarse para presentarlo durante el proceso de entrada.",
-    "keep_copy":true,
-    "recommended_copies":[
-      "Teléfono móvil",
-      "Correo electrónico",
-      "Copia descargada o impresa"
+  "important_es":[
+    "Utiliza el sitio oficial de D'Viajeros.",
+    "Escribe los datos exactamente como aparecen en tus documentos.",
+    "Ten preparada la información de tu vuelo.",
+    "Revisa todo antes de finalizar.",
+    "Después de completar el formulario, conserva el comprobante y el código QR."
+  ],
+  "important_en":[
+    "Use the official D'Viajeros website.",
+    "Enter your information exactly as it appears on your documents.",
+    "Have your flight information ready.",
+    "Review everything before finishing.",
+    "After completing the form, keep the confirmation and QR code."
+  ],
+  "steps":{
+    "es":[
+      {
+        "number":1,
+        "title":"Entra a D'Viajeros",
+        "text":"Abre el sitio oficial de D'Viajeros desde el botón de esta aplicación."
+      },
+      {
+        "number":2,
+        "title":"Selecciona el idioma",
+        "text":"Escoge el idioma que prefieras para completar el formulario."
+      },
+      {
+        "number":3,
+        "title":"Completa tus datos",
+        "text":"Introduce tus datos personales exactamente como aparecen en tu pasaporte y demás documentos."
+      },
+      {
+        "number":4,
+        "title":"Completa los datos del viaje",
+        "text":"Introduce la información solicitada sobre tu viaje y vuelo."
+      },
+      {
+        "number":5,
+        "title":"Revisa todo",
+        "text":"Antes de terminar, revisa cuidadosamente nombres, apellidos, documento, vuelo y demás información introducida."
+      },
+      {
+        "number":6,
+        "title":"Finaliza el formulario",
+        "text":"Cuando hayas comprobado que la información es correcta, finaliza el formulario."
+      },
+      {
+        "number":7,
+        "title":"Guarda el QR",
+        "text":"Conserva el comprobante y el código QR generado para tenerlos disponibles durante tu viaje."
+      }
+    ],
+    "en":[
+      {
+        "number":1,
+        "title":"Open D'Viajeros",
+        "text":"Open the official D'Viajeros website using the button in this application."
+      },
+      {
+        "number":2,
+        "title":"Choose your language",
+        "text":"Select the language you prefer for completing the form."
+      },
+      {
+        "number":3,
+        "title":"Enter your information",
+        "text":"Enter your personal information exactly as it appears on your passport and other documents."
+      },
+      {
+        "number":4,
+        "title":"Enter trip information",
+        "text":"Enter the requested information about your trip and flight."
+      },
+      {
+        "number":5,
+        "title":"Review everything",
+        "text":"Before finishing, carefully review names, surname, document, flight and other information you entered."
+      },
+      {
+        "number":6,
+        "title":"Finish the form",
+        "text":"After checking that the information is correct, complete the form."
+      },
+      {
+        "number":7,
+        "title":"Save the QR code",
+        "text":"Keep the confirmation and QR code available for your trip."
+      }
     ]
   },
-  "information_required":{
-    "traveler":{
-      "title":"Datos del viajero",
-      "fields":[
-        "Nombre",
-        "Apellidos",
-        "Fecha de nacimiento",
-        "Sexo",
-        "Nacionalidad",
-        "País de nacimiento"
-      ]
+  "check_before_submit":{
+    "es":[
+      "Nombre correcto",
+      "Apellidos correctos",
+      "Datos del documento correctos",
+      "Datos del vuelo correctos",
+      "Fecha del viaje correcta",
+      "Información revisada antes de finalizar"
+    ],
+    "en":[
+      "Correct first name",
+      "Correct surname",
+      "Correct document information",
+      "Correct flight information",
+      "Correct travel date",
+      "Information reviewed before finishing"
+    ]
+  },
+  "buttons":{
+    "es":{
+      "official":"ABRIR D'VIAJEROS",
+      "guide":"¿CÓMO SE HACE?"
     },
-    "passport":{
-      "title":"Datos del documento de viaje",
-      "fields":[
-        "Número de pasaporte",
-        "País emisor",
-        "Fecha de emisión",
-        "Fecha de vencimiento"
-      ]
-    },
-    "travel":{
-      "title":"Datos del viaje",
-      "fields":[
-        "Fecha de llegada",
-        "Vuelo",
-        "Aeropuerto de entrada",
-        "País de procedencia"
-      ]
-    },
-    "accommodation":{
-      "title":"Alojamiento",
-      "description":"Cuando corresponda, se proporciona la información del lugar donde se hospedará el viajero.",
-      "possible_information":[
-        "Dirección del alojamiento",
-        "Provincia",
-        "Municipio",
-        "Hotel o casa particular"
-      ]
-    },
-    "health":{
-      "title":"Información sanitaria",
-      "description":"El formulario puede solicitar información relacionada con la declaración sanitaria requerida para el ingreso.",
-      "instruction":"Responde las preguntas sanitarias exactamente según tu situación."
-    },
-    "customs":{
-      "title":"Información aduanera",
-      "description":"El proceso puede incluir información necesaria para las autoridades aduaneras.",
-      "instruction":"Declara correctamente los bienes y artículos cuando el formulario lo solicite."
-    },
-    "immigration":{
-      "title":"Información migratoria",
-      "description":"La información migratoria forma parte del proceso de entrada."
+    "en":{
+      "official":"OPEN D'VIAJEROS",
+      "guide":"HOW DO I DO IT?"
     }
   },
-  "visa":{
-    "related":true,
-    "description":"Cuando el viajero necesita visa, debe disponer de la información de visa correspondiente durante el proceso.",
-    "visa_code":"Puede solicitarse el código correspondiente a la visa.",
-    "important":"D'Viajeros no sustituye la visa."
-  },
-  "steps":[
+  "notice_es":"CUBA AUTO TRAVEL 2026 es una guía informativa independiente. No pertenece al Gobierno de Cuba ni al sistema oficial D'Viajeros. Verifica siempre la información directamente en el sitio oficial.",
+  "notice_en":"CUBA AUTO TRAVEL 2026 is an independent informational guide. It is not part of the Cuban Government or the official D'Viajeros system. Always verify information directly on the official website.",
+  "sources":[
     {
-      "number":1,
-      "title":"Entra al portal",
-      "description":"Accede al sitio oficial de D'Viajeros."
-    },
-    {
-      "number":2,
-      "title":"Selecciona el formulario",
-      "description":"Inicia el proceso correspondiente a tu entrada a Cuba."
-    },
-    {
-      "number":3,
-      "title":"Completa tus datos",
-      "description":"Introduce tus datos personales y los datos de tu documento de viaje."
-    },
-    {
-      "number":4,
-      "title":"Completa los datos del viaje",
-      "description":"Introduce la información del vuelo, procedencia y entrada a Cuba."
-    },
-    {
-      "number":5,
-      "title":"Completa las declaraciones",
-      "description":"Responde las secciones sanitaria, migratoria y aduanera que correspondan."
-    },
-    {
-      "number":6,
-      "title":"Revisa",
-      "description":"Comprueba que los datos coincidan exactamente con tus documentos."
-    },
-    {
-      "number":7,
-      "title":"Envía",
-      "description":"Finaliza el formulario."
-    },
-    {
-      "number":8,
-      "title":"Guarda el QR",
-      "description":"Conserva el código QR generado para presentarlo durante tu entrada."
-    }
-  ],
-  "before_start":[
-    "Pasaporte",
-    "Datos personales",
-    "Información del vuelo",
-    "Datos de procedencia",
-    "Información del alojamiento",
-    "Información de visa cuando corresponda",
-    "Información sanitaria requerida",
-    "Información aduanera requerida"
-  ],
-  "common_errors":[
-    {
-      "error":"Número de pasaporte incorrecto",
-      "solution":"Escribe el número exactamente como aparece en el pasaporte."
-    },
-    {
-      "error":"Nombre diferente al pasaporte",
-      "solution":"Utiliza exactamente los datos del documento de viaje."
-    },
-    {
-      "error":"Fecha incorrecta",
-      "solution":"Comprueba día, mes y año antes de enviar."
-    },
-    {
-      "error":"Datos del vuelo incorrectos",
-      "solution":"Comprueba la información directamente con tu reserva o boleto."
-    },
-    {
-      "error":"No guardar el QR",
-      "solution":"Guarda una copia en el teléfono y, si es posible, otra copia adicional."
-    }
-  ],
-  "important":[
-    "D'Viajeros no es una visa.",
-    "Completar D'Viajeros no sustituye los requisitos migratorios.",
-    "Completar D'Viajeros no sustituye el pasaporte.",
-    "Completar D'Viajeros no sustituye el seguro médico requerido.",
-    "La información debe coincidir con los documentos del viajero.",
-    "No introduzcas información falsa.",
-    "Los requisitos y el funcionamiento del sistema pueden cambiar.",
-    "Utiliza el portal oficial para realizar el trámite."
-  ],
-  "official_links":[
-    {
-      "title":"Portal oficial D'Viajeros",
+      "name":"D'Viajeros",
       "url":"https://www.dviajeros.mitrans.gob.cu/"
+    },
+    {
+      "name":"Cuba Travel - Regulaciones y trámites",
+      "url":"https://www.cuba.travel/informacion-util/regulaciones-y-tramites"
     }
-  ],
-  "app_notice":"CUBA AUTO TRAVEL 2026 ofrece orientación. El formulario oficial y la decisión de las autoridades corresponden exclusivamente a las autoridades cubanas."
+  ]
 }
-
