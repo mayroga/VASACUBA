@@ -1,1 +1,146 @@
-{"module":"passports","version":"2026.3","purpose":"Datos internos para apoyar la preparación y revisión básica de la información del pasaporte dentro de CUBA AUTO TRAVEL 2026.","status_policy":{"CONFIRMED":"Dato o control que puede utilizarse directamente dentro de la preparación.","VERIFY":"Debe verificarse con la autoridad o formulario oficial.","INCOMPLETE":"Falta información necesaria para continuar con la preparación."},"default":{"min_number_length":5,"max_number_length":20,"allow_letters":true,"allow_numbers":true,"allow_hyphen":true,"require_expiration":true},"countries":[{"code":"CU","name":"Cuba"},{"code":"US","name":"Estados Unidos"},{"code":"ES","name":"España"},{"code":"CA","name":"Canadá"},{"code":"MX","name":"México"},{"code":"IT","name":"Italia"},{"code":"FR","name":"Francia"},{"code":"DE","name":"Alemania"},{"code":"GB","name":"Reino Unido"},{"code":"VE","name":"Venezuela"},{"code":"CO","name":"Colombia"},{"code":"AR","name":"Argentina"},{"code":"CL","name":"Chile"},{"code":"BR","name":"Brasil"}],"traveler_information":{"fields":[{"name":"first_name","label":"Nombre","status":"CONFIRMED","required":true},{"name":"second_name","label":"Segundo nombre","status":"CONFIRMED","required":false},{"name":"first_surname","label":"Primer apellido","status":"CONFIRMED","required":true},{"name":"second_surname","label":"Segundo apellido","status":"CONFIRMED","required":false},{"name":"date_of_birth","label":"Fecha de nacimiento","status":"CONFIRMED","required":true},{"name":"passport_number","label":"Número de pasaporte","status":"CONFIRMED","required":true},{"name":"passport_country","label":"País emisor del pasaporte","status":"CONFIRMED","required":true},{"name":"expiration_date","label":"Fecha de vencimiento","status":"CONFIRMED","required":true}]},"internal_checks":["country_present","number_present","number_length_reasonable","first_name_present","last_name_present","date_of_birth_present","expiration_date_present","expiration_after_birth","expiration_not_before_travel"],"preparation_steps":["reunir_pasaporte","copiar_datos_exactamente","revisar_nombres_y_apellidos","revisar_numero_pasaporte","revisar_fecha_nacimiento","revisar_fecha_vencimiento","comparar_con_pasaporte_fisico"],"review_rules":{"number":"El número debe copiarse exactamente como aparece en el pasaporte.","names":"Los nombres y apellidos deben prepararse siguiendo la información del pasaporte, sin inventar ni modificar datos.","date_of_birth":"La fecha de nacimiento debe coincidir con el pasaporte.","expiration_date":"La fecha de vencimiento debe revisarse antes del viaje.","travel_validity":"La aplicación puede señalar que debe revisarse la vigencia, pero no determina por sí sola si el pasaporte cumple el requisito oficial de entrada a Cuba."},"user_message":{"ready":"Información del pasaporte preparada para continuar.","missing":"Falta un dato necesario del pasaporte.","review":"Revisa los datos del pasaporte antes de continuar.","expired":"La fecha de vencimiento debe revisarse antes de continuar.","copy_exactly":"Copia los datos exactamente como aparecen en el pasaporte.","official_check":"La revisión de esta aplicación no sustituye la comprobación oficial de los requisitos de viaje."},"important":"Estos datos solamente apoyan la preparación y revisión básica dentro de CUBA AUTO TRAVEL 2026. No determinan la validez oficial del pasaporte, no confirman por sí solos la admisión a Cuba, no sustituyen los controles de inmigración ni los requisitos de la autoridad correspondiente y no deben utilizarse como una lista oficial de requisitos de ningún país.","disclaimer":"CUBA AUTO TRAVEL 2026 es una herramienta independiente de preparación informativa. No pertenece al Gobierno de Cuba ni a sus autoridades migratorias o consulares y no emite, valida, modifica ni aprueba pasaportes, visas, eVisas, permisos o documentos oficiales."}
+```json
+{
+  "app":"CUBA AUTO TRAVEL 2026",
+  "updated":"2026-09-25",
+  "title":"Pasaporte para viajar a Cuba",
+  "description":"Información de orientación sobre el pasaporte y el documento de viaje necesario para entrar a Cuba.",
+  "official_source":{
+    "name":"Cuba Travel",
+    "url":"https://www.cuba.travel/informacion-util/regulaciones-y-tramites"
+  },
+  "general_rule":{
+    "required":true,
+    "title":"Pasaporte válido",
+    "description":"Los viajeros extranjeros deben presentar un documento de viaje válido para entrar a Cuba.",
+    "document":"Pasaporte",
+    "keep_until_departure":true
+  },
+  "validity":{
+    "minimum_months":6,
+    "description":"La información publicada por Cuba Travel establece que el pasaporte debe tener una validez mínima de 6 meses a partir de la fecha de entrada a Cuba.",
+    "calculation":"La validez se cuenta desde la fecha prevista de entrada.",
+    "warning":"Comprueba la fecha de vencimiento antes de comprar o iniciar el viaje."
+  },
+  "passport_data":{
+    "important_fields":[
+      "Nombre",
+      "Apellidos",
+      "Número de pasaporte",
+      "Nacionalidad",
+      "Fecha de nacimiento",
+      "Fecha de emisión",
+      "Fecha de vencimiento",
+      "País emisor"
+    ],
+    "accuracy":"Los datos utilizados para la visa, D'Viajeros, boletos y demás documentos deben coincidir con el pasaporte."
+  },
+  "before_travel":[
+    {
+      "step":1,
+      "title":"Revisa la fecha de vencimiento",
+      "description":"Comprueba que el pasaporte cumpla el período de validez exigido desde la fecha prevista de entrada."
+    },
+    {
+      "step":2,
+      "title":"Revisa tus datos",
+      "description":"Comprueba nombres, apellidos, número de pasaporte y nacionalidad."
+    },
+    {
+      "step":3,
+      "title":"Compara con la visa",
+      "description":"Si necesitas visa, comprueba que los datos utilizados para solicitarla correspondan al mismo pasaporte."
+    },
+    {
+      "step":4,
+      "title":"Compara con D'Viajeros",
+      "description":"Introduce los datos del pasaporte exactamente como aparecen en el documento."
+    },
+    {
+      "step":5,
+      "title":"Lleva el pasaporte",
+      "description":"Debes viajar con el documento de viaje utilizado para realizar los trámites correspondientes."
+    }
+  ],
+  "expiration":{
+    "less_than_6_months":{
+      "status":"verify",
+      "title":"Revisa tu pasaporte antes de viajar",
+      "description":"Si al momento de entrar a Cuba quedan menos de 6 meses de validez, verifica la situación antes de viajar porque no cumplirías la regla general de validez publicada."
+    },
+    "6_months_or_more":{
+      "status":"meets_general_rule",
+      "title":"Cumple la regla general de validez",
+      "description":"El pasaporte tiene al menos 6 meses de validez desde la fecha de entrada indicada."
+    },
+    "expired":{
+      "status":"not_valid",
+      "title":"Pasaporte vencido",
+      "description":"Un pasaporte vencido no cumple el requisito general de documento de viaje válido."
+    }
+  },
+  "lost_or_damaged":{
+    "title":"Pasaporte perdido o dañado",
+    "description":"Si pierdes o dañas el pasaporte durante el viaje, debes contactar a las autoridades correspondientes y a tu representación consular para conocer el procedimiento aplicable.",
+    "actions":[
+      "Contacta a la autoridad local correspondiente.",
+      "Contacta a tu embajada o consulado.",
+      "Conserva una copia de la identificación y del pasaporte si dispones de ella.",
+      "No intentes viajar utilizando un documento que ya no sea válido."
+    ]
+  },
+  "different_passport":{
+    "title":"Viaje con un pasaporte diferente",
+    "description":"Si obtuviste un pasaporte nuevo después de solicitar una visa o completar otro trámite, verifica si los datos del trámite deben actualizarse.",
+    "warning":"No asumas que una visa asociada a un pasaporte anterior puede utilizarse automáticamente con un pasaporte nuevo."
+  },
+  "dual_nationality":{
+    "title":"Doble nacionalidad",
+    "description":"Las personas con más de una nacionalidad pueden estar sujetas a reglas diferentes según el pasaporte utilizado y las normas aplicables.",
+    "instruction":"Antes de viajar, verifica qué documento debes utilizar para entrar y salir de Cuba y qué requisitos corresponden a cada nacionalidad."
+  },
+  "cuban_nationals":{
+    "title":"Ciudadanos cubanos",
+    "description":"Los ciudadanos cubanos pueden estar sujetos a requisitos documentales diferentes de los aplicables a turistas extranjeros.",
+    "instruction":"Si eres ciudadano cubano o tienes otra condición migratoria cubana, verifica los requisitos específicos antes de viajar."
+  },
+  "passport_and_visa":{
+    "passport_required":true,
+    "visa_separate":true,
+    "description":"El pasaporte y la visa son requisitos diferentes. Tener pasaporte válido no significa que el viajero esté exento de visa, y tener visa no sustituye el pasaporte.",
+    "check_both":true
+  },
+  "passport_and_dviajeros":{
+    "passport_required":true,
+    "dviajeros_separate":true,
+    "description":"Los datos del pasaporte se utilizan durante el proceso de D'Viajeros. D'Viajeros no sustituye el documento de viaje.",
+    "check_data":true
+  },
+  "travel_checklist":[
+    "Pasaporte vigente",
+    "Comprobar que tenga al menos 6 meses de validez desde la entrada prevista",
+    "Comprobar nombre y apellidos",
+    "Comprobar número de pasaporte",
+    "Comprobar fecha de nacimiento",
+    "Comprobar nacionalidad",
+    "Comprobar país emisor",
+    "Comprobar fecha de vencimiento",
+    "Comprobar coincidencia con la visa cuando corresponda",
+    "Comprobar coincidencia con D'Viajeros",
+    "Llevar el pasaporte durante el viaje"
+  ],
+  "warnings":[
+    "No presentes información diferente a la que aparece en tu documento.",
+    "No viajes con un pasaporte vencido.",
+    "Si tu pasaporte está próximo a vencer, verifica los requisitos antes de viajar.",
+    "Las reglas pueden cambiar y pueden existir excepciones según la nacionalidad o condición migratoria.",
+    "Esta información es orientativa y no sustituye la confirmación oficial."
+  ],
+  "status_labels":{
+    "valid":"Válido",
+    "not_valid":"No válido",
+    "verify":"Verificar",
+    "meets_general_rule":"Cumple regla general",
+    "unknown":"No determinado"
+  }
+}
+```
