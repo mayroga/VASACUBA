@@ -1,138 +1,231 @@
 {
-  "module": "visa",
-  "name": "Visa cubana / eVisa",
-  "version": "2026.1",
-  "country": "Cuba",
-
-  "description": "Información y preparación para la visa cubana/eVisa. La aplicación no emite visas ni determina por sí sola la aprobación de una solicitud.",
-
-  "official_portal": {
-    "name": "eVisa Cuba",
-    "url": "https://evisacuba.cu/"
+  "module":"visa",
+  "name":"Visa cubana / eVisa",
+  "version":"2026.3",
+  "country":"Cuba",
+  "description":"Guía de preparación para la visa cubana/eVisa. Explica el proceso oficial paso a paso, ayuda al viajero a preparar sus datos y lo dirige al portal oficial. No solicita, paga, aprueba ni emite visas.",
+  "official_portal":{
+    "name":"eVisa Cuba",
+    "url":"https://evisacuba.cu/"
   },
-
-  "status_policy": {
-    "CONFIRMED": "Información respaldada por una fuente oficial aplicable.",
-    "VERIFY": "La información requiere verificación según nacionalidad, situación o circunstancia del viajero.",
-    "UNKNOWN": "No existe información suficiente para realizar una determinación segura.",
-    "INCOMPLETE": "Faltan datos necesarios del viajero."
+  "status_policy":{
+    "CONFIRMED":"Información respaldada por información oficial disponible.",
+    "VERIFY":"Debe comprobarse en el portal oficial según la nacionalidad, trámite o circunstancia del viajero.",
+    "INCOMPLETE":"Faltan datos para continuar con la preparación.",
+    "UNKNOWN":"No existe información suficiente para realizar una determinación segura.",
+    "PREPARED":"La información fue preparada dentro de CUBA AUTO TRAVEL 2026; esto no significa que la solicitud oficial haya sido enviada."
   },
-
-  "application_scope": {
-    "can_prepare": true,
-    "can_validate_user_data": true,
-    "can_show_requirements": true,
-    "can_link_official_portal": true,
-    "can_issue_visa": false,
-    "can_approve_visa": false,
-    "can_generate_official_visa": false
+  "application_scope":{
+    "can_prepare":true,
+    "can_explain_process":true,
+    "can_show_steps":true,
+    "can_show_questions":true,
+    "can_validate_user_data":true,
+    "can_show_requirements":true,
+    "can_link_official_portal":true,
+    "can_issue_visa":false,
+    "can_approve_visa":false,
+    "can_modify_visa":false,
+    "can_submit_official_application":false,
+    "can_generate_official_visa":false,
+    "can_generate_official_code":false,
+    "can_process_official_payment":false
   },
-
-  "traveler_information": {
-    "status": "CONFIRMED",
-    "fields": [
-      {
-        "id": "nationality",
-        "label": "Nacionalidad",
-        "required": true,
-        "status": "CONFIRMED"
-      },
-      {
-        "id": "country_of_residence",
-        "label": "País de residencia",
-        "required": true,
-        "status": "CONFIRMED"
-      },
-      {
-        "id": "passport_country",
-        "label": "País que emitió el pasaporte",
-        "required": true,
-        "status": "CONFIRMED"
-      },
-      {
-        "id": "travel_purpose",
-        "label": "Motivo del viaje",
-        "required": true,
-        "status": "CONFIRMED"
-      }
+  "what_is_it":{
+    "status":"CONFIRMED",
+    "title":"¿Qué es la eVisa?",
+    "description":"La eVisa es el sistema electrónico utilizado para solicitar la visa de turismo cubana cuando corresponde. El trámite oficial se realiza en el portal correspondiente.",
+    "important":"CUBA AUTO TRAVEL 2026 no sustituye el trámite oficial."
+  },
+  "before_start":{
+    "status":"CONFIRMED",
+    "title":"Antes de comenzar",
+    "instructions":[
+      "Ten a mano el pasaporte que utilizarás para viajar.",
+      "Comprueba cuidadosamente tus datos personales antes de introducirlos.",
+      "Ten acceso al correo electrónico que utilizarás en la solicitud.",
+      "Ten preparada la información relacionada con tu viaje.",
+      "Si otra persona viaja contigo y debe realizar un trámite adicional, prepara también sus datos.",
+      "No envíes información falsa o que no coincida con tus documentos.",
+      "La información final debe revisarse en el portal oficial antes de enviar."
     ]
   },
-
-  "passport": {
-    "status": "VERIFY",
-    "requirements": [
-      {
-        "id": "passport",
-        "title": "Pasaporte",
-        "description": "El viajero debe verificar los requisitos oficiales de pasaporte aplicables a su situación.",
-        "status": "VERIFY"
-      },
-      {
-        "id": "passport_validity",
-        "title": "Validez del pasaporte",
-        "description": "La validez requerida debe verificarse con la fuente oficial correspondiente antes del viaje.",
-        "status": "VERIFY"
-      }
+  "traveler_information":{
+    "status":"CONFIRMED",
+    "fields":[
+      {"id":"nationality","label":"Nacionalidad","question":"¿Cuál es tu nacionalidad?","required":true,"explanation":"Indica la nacionalidad correspondiente a tu situación y revisa que coincida con la documentación utilizada para el trámite.","status":"CONFIRMED"},
+      {"id":"country_of_residence","label":"País de residencia","question":"¿En qué país resides?","required":true,"explanation":"Indica tu país de residencia según corresponda al procedimiento.","status":"VERIFY"},
+      {"id":"passport_country","label":"País emisor del pasaporte","question":"¿Qué país emitió tu pasaporte?","required":true,"explanation":"Utiliza el país que aparece como emisor del pasaporte que usarás para viajar.","status":"CONFIRMED"},
+      {"id":"passport_number","label":"Número de pasaporte","question":"¿Cuál es tu número de pasaporte?","required":true,"explanation":"Cópialo exactamente como aparece en el pasaporte.","status":"CONFIRMED"},
+      {"id":"first_name","label":"Primer nombre","question":"¿Cuál es tu primer nombre?","required":true,"explanation":"Escribe el nombre tal como aparece en tu pasaporte.","status":"CONFIRMED"},
+      {"id":"second_name","label":"Segundo nombre","question":"¿Tienes segundo nombre?","required":false,"explanation":"Si corresponde, utiliza el nombre que aparece en tu documentación.","status":"CONFIRMED"},
+      {"id":"first_surname","label":"Primer apellido","question":"¿Cuál es tu primer apellido?","required":true,"explanation":"Escribe el apellido de acuerdo con tu pasaporte.","status":"CONFIRMED"},
+      {"id":"second_surname","label":"Segundo apellido","question":"¿Tienes segundo apellido?","required":false,"explanation":"Si corresponde, introdúcelo de acuerdo con tu documentación.","status":"CONFIRMED"},
+      {"id":"date_of_birth","label":"Fecha de nacimiento","question":"¿Cuál es tu fecha de nacimiento?","required":true,"explanation":"Debe coincidir con tu pasaporte.","status":"CONFIRMED"},
+      {"id":"email","label":"Correo electrónico","question":"¿Cuál es tu correo electrónico?","required":true,"explanation":"Utiliza un correo al que tengas acceso. El correo es importante porque el sistema oficial utiliza comunicación electrónica durante el proceso.","status":"CONFIRMED"},
+      {"id":"gender","label":"Sexo/Género","question":"¿Cuál corresponde según el formulario oficial?","required":true,"explanation":"Selecciona la opción que corresponda en el formulario oficial.","status":"VERIFY"},
+      {"id":"phone","label":"Teléfono","question":"¿Cuál es tu número de teléfono?","required":false,"explanation":"Puede existir información de contacto adicional según el formulario y la modalidad utilizada.","status":"VERIFY"}
     ]
   },
-
-  "visa_requirement": {
-    "status": "VERIFY",
-    "description": "La necesidad de visa y la modalidad aplicable pueden depender de la nacionalidad, propósito del viaje y demás circunstancias del viajero. Deben verificarse oficialmente.",
-    "do_not_assume": true
+  "passport":{
+    "status":"VERIFY",
+    "title":"Pasaporte",
+    "requirements":[
+      {"id":"passport_present","title":"Pasaporte disponible","description":"Ten disponible el pasaporte que utilizarás para el viaje.","status":"CONFIRMED"},
+      {"id":"passport_data","title":"Datos coincidentes","description":"Los nombres, apellidos, fecha de nacimiento y número de pasaporte deben revisarse cuidadosamente contra el documento.","status":"CONFIRMED"},
+      {"id":"passport_validity","title":"Validez del pasaporte","description":"La validez requerida debe comprobarse según las reglas oficiales aplicables al viajero.","status":"VERIFY"}
+    ],
+    "warning":"CUBA AUTO TRAVEL 2026 no determina por sí sola que un pasaporte sea válido para entrar en Cuba."
   },
-
-  "evisa": {
-    "status": "VERIFY",
-    "description": "Cuando corresponda utilizar el sistema eVisa, el viajero debe completar el proceso a través del portal oficial.",
-    "official_portal": "https://evisacuba.cu/",
-    "application_by_app": false,
-    "approval_by_app": false,
-    "official_document_generated_by_app": false
+  "travel_purpose":{
+    "status":"VERIFY",
+    "title":"Motivo del viaje",
+    "description":"El propósito del viaje puede afectar el procedimiento aplicable. Debe seleccionarse o declararse según las opciones reales disponibles en el portal oficial.",
+    "do_not_assume":true
   },
-
-  "email": {
-    "status": "VERIFY",
-    "description": "El usuario debe proporcionar y verificar correctamente cualquier información de contacto requerida por el procedimiento oficial."
-  },
-
-  "nationality_rules": {
-    "status": "VERIFY",
-    "description": "La aplicación no presume automáticamente que una persona necesita o no necesita visa únicamente por su nacionalidad. La condición aplicable debe verificarse con las fuentes oficiales."
-  },
-
-  "dual_nationality": {
-    "status": "VERIFY",
-    "description": "Las situaciones de doble nacionalidad pueden requerir una revisión específica. No se realiza una determinación automática."
-  },
-
-  "travel_purpose": {
-    "status": "VERIFY",
-    "description": "El propósito del viaje puede afectar los requisitos aplicables. La aplicación solicita el propósito para orientar la revisión, pero no sustituye la determinación oficial."
-  },
-
-  "entry_information": {
-    "status": "VERIFY",
-    "description": "Los requisitos relacionados con la entrada a Cuba deben verificarse según el viajero, nacionalidad, documento de viaje y modalidad de viaje."
-  },
-
-  "official_verification": {
-    "required": true,
-    "message": "Antes de viajar, el usuario debe verificar la información vigente directamente con las autoridades y portales oficiales correspondientes."
-  },
-
-  "sources": [
+  "application_steps":[
     {
-      "id": "evisa_cuba",
-      "name": "eVisa Cuba",
-      "type": "official",
-      "url": "https://evisacuba.cu/",
-      "status": "CONFIRMED"
+      "step":1,
+      "id":"application_details",
+      "title":"Detalles del trámite",
+      "status":"CONFIRMED",
+      "explanation":"Primera etapa del formulario oficial. Aquí se introducen los datos correspondientes al trámite y al solicitante.",
+      "prepare":["Pasaporte","Datos personales","Correo electrónico","Información solicitada por el formulario oficial"],
+      "questions":"El sistema puede solicitar datos personales y del documento de viaje. La aplicación muestra los campos conocidos y señala como VERIFICAR aquellos que pueden depender de la pantalla o modalidad vigente.",
+      "user_action":"Completa los datos exactamente como aparecen en tus documentos.",
+      "common_mistakes":[
+        "Escribir mal el número de pasaporte.",
+        "Cambiar la escritura de nombres o apellidos.",
+        "Usar un correo al que no se tiene acceso.",
+        "Enviar información sin revisar."
+      ]
+    },
+    {
+      "step":2,
+      "id":"extra_applications",
+      "title":"Detalles de trámites extras",
+      "status":"CONFIRMED",
+      "explanation":"El sistema oficial incluye una etapa para gestionar trámites adicionales cuando corresponda, por ejemplo solicitudes relacionadas con otras personas.",
+      "prepare":["Datos de las personas que deban incluirse","Documentos correspondientes"],
+      "questions":"Las personas y datos que puedan añadirse deben comprobarse en la pantalla oficial vigente.",
+      "user_action":"Añade únicamente las personas o trámites que realmente correspondan.",
+      "important":"No asumir que una persona adicional debe incluirse automáticamente."
+    },
+    {
+      "step":3,
+      "id":"payment_details",
+      "title":"Detalles del pago",
+      "status":"CONFIRMED",
+      "explanation":"El sistema oficial incluye una etapa específica para los datos relacionados con el pago.",
+      "prepare":["Medio de pago aceptado por el procedimiento correspondiente","Monto mostrado por el sistema oficial"],
+      "questions":"El monto, método de pago y condiciones aplicables deben revisarse en el portal oficial antes de pagar.",
+      "user_action":"Comprueba el monto que muestra el sistema oficial antes de confirmar cualquier pago.",
+      "important":"CUBA AUTO TRAVEL 2026 no procesa el pago oficial."
+    },
+    {
+      "step":4,
+      "id":"review_confirm",
+      "title":"Revisar y confirmar solicitud",
+      "status":"CONFIRMED",
+      "explanation":"Antes de enviar, el sistema permite revisar la información introducida.",
+      "prepare":["Todos los datos introducidos","Captcha","Confirmación de veracidad","Monto a pagar"],
+      "questions":"El sistema oficial solicita completar el CAPTCHA y confirmar que los datos enviados y el monto a pagar son correctos.",
+      "user_action":"Revisa cada dato antes de enviar.",
+      "final_action":"ENVIAR",
+      "important":"Una vez enviada la solicitud, el proceso pasa al sistema oficial."
     }
   ],
-
-  "disclaimer": {
-    "status": "CONFIRMED",
-    "text": "CUBA AUTO TRAVEL 2026 es una aplicación informativa y de preparación. No pertenece al Gobierno de Cuba ni a sus autoridades migratorias o consulares. No emite, aprueba ni modifica visas. La información debe verificarse directamente con las fuentes oficiales antes de viajar."
+  "after_submission":{
+    "status":"CONFIRMED",
+    "title":"¿Qué ocurre después de enviar?",
+    "steps":[
+      {"id":"email_confirmation","title":"Correo de confirmación","description":"El sistema oficial indica que se recibe un correo notificando que la solicitud fue realizada correctamente.","status":"CONFIRMED"},
+      {"id":"consular_processing","title":"Procesamiento por el consulado","description":"La solicitud debe ser procesada por la autoridad correspondiente.","status":"CONFIRMED"},
+      {"id":"approval_email","title":"Correo posterior","description":"Una vez aprobado por el consulado, el sistema indica que se recibe otro correo con los datos del trámite y los códigos de las visas solicitadas.","status":"CONFIRMED"},
+      {"id":"visa_verification","title":"Verificar visa","description":"El sistema oficial dispone de una función para consultar el estado y vigencia del visado mediante el correo utilizado en el trámite y la información solicitada por el portal.","status":"CONFIRMED"}
+    ]
+  },
+  "visa_verification":{
+    "status":"CONFIRMED",
+    "title":"Verificar la visa",
+    "official_url":"https://evisacuba.cu/",
+    "required_information":["Correo electrónico utilizado en el trámite","Captcha o información solicitada por el sistema"],
+    "description":"El portal oficial permite consultar información sobre el estado y vigencia del visado.",
+    "important":"La aplicación no puede confirmar por sí misma que una visa haya sido aprobada."
+  },
+  "visa_validity":{
+    "status":"CONFIRMED",
+    "description":"La información oficial publicada para la visa de turismo indica una sola entrada a Cuba y una estancia de 90 días, prorrogables por otros 90 días.",
+    "important":"El viajero debe comprobar siempre las condiciones que correspondan a su visa concreta."
+  },
+  "nationality_rules":{
+    "status":"VERIFY",
+    "description":"La necesidad de visa, modalidad aplicable y procedimiento pueden variar según la nacionalidad y las circunstancias del viajero.",
+    "do_not_assume":true,
+    "instruction":"No presentar una determinación automática como decisión oficial cuando no exista una regla oficial suficientemente clara y vigente."
+  },
+  "dual_nationality":{
+    "status":"VERIFY",
+    "description":"La doble nacionalidad puede requerir una revisión específica de los documentos y de la nacionalidad utilizada para viajar.",
+    "instruction":"La aplicación debe pedir al usuario que verifique su situación cuando corresponda y no asumir automáticamente qué nacionalidad utilizar."
+  },
+  "passport_check":{
+    "status":"VERIFY",
+    "checks":[
+      "passport_country_present",
+      "passport_number_present",
+      "first_name_present",
+      "last_name_present",
+      "date_of_birth_present",
+      "expiration_date_present",
+      "expiration_after_travel_date"
+    ],
+    "important":"Estas comprobaciones son internas y de preparación. No certifican la validez oficial del pasaporte."
+  },
+  "simulation":{
+    "enabled":true,
+    "title":"Simulación de preparación",
+    "description":"CUBA AUTO TRAVEL 2026 puede mostrar al viajero, antes de entrar al portal oficial, las etapas y preguntas conocidas del proceso para que pueda preparar sus respuestas.",
+    "not_official":true,
+    "rules":[
+      "No enviar datos al portal oficial desde esta simulación.",
+      "No presentar la simulación como solicitud oficial.",
+      "No afirmar que una visa fue solicitada, pagada o aprobada.",
+      "Mostrar claramente cuando un dato debe verificarse en el portal oficial.",
+      "No inventar campos que no hayan sido verificados."
+    ]
+  },
+  "pre_submission_checklist":[
+    {"id":"passport","text":"Tengo mi pasaporte disponible.","status":"CONFIRMED"},
+    {"id":"personal_data","text":"Mis nombres, apellidos y fecha de nacimiento coinciden con mi pasaporte.","status":"CONFIRMED"},
+    {"id":"passport_number","text":"Revisé el número de pasaporte.","status":"CONFIRMED"},
+    {"id":"email","text":"Tengo acceso al correo electrónico utilizado.","status":"CONFIRMED"},
+    {"id":"nationality","text":"Revisé mi nacionalidad y la modalidad que corresponde a mi viaje.","status":"VERIFY"},
+    {"id":"payment","text":"Revisé el monto y método de pago que muestra el portal oficial.","status":"VERIFY"},
+    {"id":"review","text":"Revisé todos los datos antes de enviar.","status":"CONFIRMED"}
+  ],
+  "official_verification":{
+    "required":true,
+    "message":"Antes de pagar, enviar o viajar, verifica la información vigente directamente en el portal oficial y, cuando corresponda, con la autoridad consular competente."
+  },
+  "sources":[
+    {
+      "id":"evisa_cuba",
+      "name":"eVisa Cuba",
+      "type":"official",
+      "url":"https://evisacuba.cu/",
+      "status":"CONFIRMED"
+    },
+    {
+      "id":"evisa_instruction_manual",
+      "name":"Información oficial eVisa Cuba",
+      "type":"official",
+      "url":"https://evisacuba.cu/doc/es/info.pdf",
+      "status":"CONFIRMED"
+    }
+  ],
+  "disclaimer":{
+    "status":"CONFIRMED",
+    "text":"CUBA AUTO TRAVEL 2026 es una aplicación independiente de información y preparación. No pertenece al Gobierno de Cuba, MINREX, autoridades migratorias ni consulados cubanos. No emite, aprueba, modifica ni verifica oficialmente visas. No presenta solicitudes oficiales ni procesa pagos oficiales. La información debe comprobarse en el portal oficial antes de realizar el trámite o viajar."
   }
 }
