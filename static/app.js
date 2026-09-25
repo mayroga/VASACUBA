@@ -68,7 +68,8 @@ function qs(s){return document.querySelector(s)}
 function qsa(s){return [...document.querySelectorAll(s)]}
 
 function esc(v){
-return String(v??"").replace(/[&<>"']/g,c=>({"&":"&","<":"<",">":">",'"':""","'":"'"}[c]))
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
 }
 
 function applyLanguage(){
