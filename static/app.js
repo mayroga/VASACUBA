@@ -1,7 +1,6 @@
 (function () {
 "use strict";
 
-```
 document.addEventListener("DOMContentLoaded", function () {
 
     var language = localStorage.getItem("cu_language") || "es";
@@ -287,11 +286,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-
     function byId(id) {
         return document.getElementById(id);
     }
-
 
     function setLanguage(newLanguage) {
 
@@ -339,7 +336,6 @@ document.addEventListener("DOMContentLoaded", function () {
         updateNavigation("dviajeros");
     }
 
-
     function showScreen(screenId) {
 
         var screens = document.querySelectorAll(".screen");
@@ -356,7 +352,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function showModule(module) {
 
         if (module === "visa") {
@@ -372,7 +367,6 @@ document.addEventListener("DOMContentLoaded", function () {
             showStep("dviajeros", dviajerosStep);
         }
     }
-
 
     function showStep(module, step) {
 
@@ -423,7 +417,6 @@ document.addEventListener("DOMContentLoaded", function () {
         window.scrollTo(0, 0);
     }
 
-
     function updateStepper(module) {
 
         var container;
@@ -467,7 +460,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function updateNavigation(module) {
 
         var previousButton;
@@ -501,7 +493,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function nextStep(module) {
 
         var current;
@@ -529,7 +520,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function previousStep(module) {
 
         if (module === "visa") {
@@ -548,7 +538,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function getValue(id) {
 
         var element = byId(id);
@@ -560,7 +549,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return element.value || "";
     }
 
-
     function getChecked(id) {
 
         var element = byId(id);
@@ -571,7 +559,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return Boolean(element.checked);
     }
-
 
     function setValue(id, value) {
 
@@ -592,7 +579,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function saveVisa() {
 
         var data = {
@@ -611,7 +597,6 @@ document.addEventListener("DOMContentLoaded", function () {
             JSON.stringify(data)
         );
     }
-
 
     function loadVisa() {
 
@@ -640,7 +625,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function saveDviajeros() {
 
         var data = {
@@ -667,7 +651,6 @@ document.addEventListener("DOMContentLoaded", function () {
             JSON.stringify(data)
         );
     }
-
 
     function loadDviajeros() {
 
@@ -703,7 +686,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function buildReviewRow(container, label, value) {
 
         var row = document.createElement("div");
@@ -729,7 +711,6 @@ document.addEventListener("DOMContentLoaded", function () {
         row.appendChild(content);
         container.appendChild(row);
     }
-
 
     function buildVisaReview() {
 
@@ -791,7 +772,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 : ""
         );
     }
-
 
     function buildDviajerosReview() {
 
@@ -870,7 +850,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
     function copyFromField(id, button) {
 
         var element = byId(id);
@@ -900,7 +879,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function fallbackCopy(element, button) {
 
         element.focus();
@@ -913,7 +891,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
     }
-
 
     function showCopyFeedback(button) {
 
@@ -943,7 +920,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 1200);
     }
 
-
     function attachInputSaving() {
 
         var inputs = document.querySelectorAll(
@@ -970,7 +946,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function attachCopyButtons() {
 
         var buttons = document.querySelectorAll(
@@ -993,7 +968,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function attachEvents() {
 
         var languageButton = byId("languageButton");
@@ -1013,7 +987,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-
         var visaButton = byId("startVisaButton");
 
         if (visaButton) {
@@ -1026,7 +999,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-
         var dviajerosButton = byId("startDviajerosButton");
 
         if (dviajerosButton) {
@@ -1038,7 +1010,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             );
         }
-
 
         var backButtons = document.querySelectorAll(
             "[data-back-home]"
@@ -1054,7 +1025,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-
         var visaPrevious = byId("visaPreviousButton");
 
         if (visaPrevious) {
@@ -1066,7 +1036,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             );
         }
-
 
         var visaNext = byId("visaNextButton");
 
@@ -1080,7 +1049,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-
         var dvPrevious = byId("dviajerosPreviousButton");
 
         if (dvPrevious) {
@@ -1093,7 +1061,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-
         var dvNext = byId("dviajerosNextButton");
 
         if (dvNext) {
@@ -1105,7 +1072,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             );
         }
-
 
         var clearVisa = byId("clearVisaButton");
 
@@ -1137,7 +1103,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-
         var clearDviajeros = byId("clearDviajerosButton");
 
         if (clearDviajeros) {
@@ -1167,7 +1132,6 @@ document.addEventListener("DOMContentLoaded", function () {
         attachInputSaving();
     }
 
-
     loadVisa();
     loadDviajeros();
 
@@ -1179,6 +1143,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("CU CUBA AUTO TRAVEL 2026 - APP.JS CARGADO");
 });
-```
 
 }());
