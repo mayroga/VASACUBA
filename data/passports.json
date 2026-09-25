@@ -1,144 +1,117 @@
 {
   "app":"CUBA AUTO TRAVEL 2026",
-  "updated":"2026-09-25",
-  "title":"Pasaporte para viajar a Cuba",
-  "description":"Información de orientación sobre el pasaporte y el documento de viaje necesario para entrar a Cuba.",
-  "official_source":{
-    "name":"Cuba Travel",
-    "url":"https://www.cuba.travel/informacion-util/regulaciones-y-tramites"
-  },
-  "general_rule":{
-    "required":true,
-    "title":"Pasaporte válido",
-    "description":"Los viajeros extranjeros deben presentar un documento de viaje válido para entrar a Cuba.",
-    "document":"Pasaporte",
-    "keep_until_departure":true
-  },
-  "validity":{
-    "minimum_months":6,
-    "description":"La información publicada por Cuba Travel establece que el pasaporte debe tener una validez mínima de 6 meses a partir de la fecha de entrada a Cuba.",
-    "calculation":"La validez se cuenta desde la fecha prevista de entrada.",
-    "warning":"Comprueba la fecha de vencimiento antes de comprar o iniciar el viaje."
-  },
-  "passport_data":{
-    "important_fields":[
-      "Nombre",
-      "Apellidos",
-      "Número de pasaporte",
-      "Nacionalidad",
-      "Fecha de nacimiento",
-      "Fecha de emisión",
-      "Fecha de vencimiento",
-      "País emisor"
+  "title_es":"Pasaporte para viajar a Cuba",
+  "title_en":"Passport for travel to Cuba",
+  "intro_es":"Antes de comenzar la visa o D'Viajeros, revisa los datos y la vigencia de tu pasaporte.",
+  "intro_en":"Before starting your visa or D'Viajeros, check your passport information and validity.",
+  "requirements":{
+    "es":[
+      "Debes viajar con un pasaporte válido.",
+      "Comprueba que tu nombre y apellidos coincidan con los datos que utilizarás en la visa y D'Viajeros.",
+      "Revisa el número de pasaporte antes de introducirlo en cualquier formulario.",
+      "Comprueba la fecha de vencimiento antes del viaje.",
+      "Verifica los requisitos vigentes para tu nacionalidad antes de viajar."
     ],
-    "accuracy":"Los datos utilizados para la visa, D'Viajeros, boletos y demás documentos deben coincidir con el pasaporte."
-  },
-  "before_travel":[
-    {
-      "step":1,
-      "title":"Revisa la fecha de vencimiento",
-      "description":"Comprueba que el pasaporte cumpla el período de validez exigido desde la fecha prevista de entrada."
-    },
-    {
-      "step":2,
-      "title":"Revisa tus datos",
-      "description":"Comprueba nombres, apellidos, número de pasaporte y nacionalidad."
-    },
-    {
-      "step":3,
-      "title":"Compara con la visa",
-      "description":"Si necesitas visa, comprueba que los datos utilizados para solicitarla correspondan al mismo pasaporte."
-    },
-    {
-      "step":4,
-      "title":"Compara con D'Viajeros",
-      "description":"Introduce los datos del pasaporte exactamente como aparecen en el documento."
-    },
-    {
-      "step":5,
-      "title":"Lleva el pasaporte",
-      "description":"Debes viajar con el documento de viaje utilizado para realizar los trámites correspondientes."
-    }
-  ],
-  "expiration":{
-    "less_than_6_months":{
-      "status":"verify",
-      "title":"Revisa tu pasaporte antes de viajar",
-      "description":"Si al momento de entrar a Cuba quedan menos de 6 meses de validez, verifica la situación antes de viajar porque no cumplirías la regla general de validez publicada."
-    },
-    "6_months_or_more":{
-      "status":"meets_general_rule",
-      "title":"Cumple la regla general de validez",
-      "description":"El pasaporte tiene al menos 6 meses de validez desde la fecha de entrada indicada."
-    },
-    "expired":{
-      "status":"not_valid",
-      "title":"Pasaporte vencido",
-      "description":"Un pasaporte vencido no cumple el requisito general de documento de viaje válido."
-    }
-  },
-  "lost_or_damaged":{
-    "title":"Pasaporte perdido o dañado",
-    "description":"Si pierdes o dañas el pasaporte durante el viaje, debes contactar a las autoridades correspondientes y a tu representación consular para conocer el procedimiento aplicable.",
-    "actions":[
-      "Contacta a la autoridad local correspondiente.",
-      "Contacta a tu embajada o consulado.",
-      "Conserva una copia de la identificación y del pasaporte si dispones de ella.",
-      "No intentes viajar utilizando un documento que ya no sea válido."
+    "en":[
+      "You must travel with a valid passport.",
+      "Make sure your first name and surname match the information you will use for the visa and D'Viajeros.",
+      "Check your passport number before entering it into any form.",
+      "Check the expiration date before traveling.",
+      "Verify the current requirements for your nationality before traveling."
     ]
   },
-  "different_passport":{
-    "title":"Viaje con un pasaporte diferente",
-    "description":"Si obtuviste un pasaporte nuevo después de solicitar una visa o completar otro trámite, verifica si los datos del trámite deben actualizarse.",
-    "warning":"No asumas que una visa asociada a un pasaporte anterior puede utilizarse automáticamente con un pasaporte nuevo."
+  "steps":{
+    "es":[
+      {
+        "number":1,
+        "title":"Mira tu pasaporte",
+        "text":"Ten tu pasaporte delante antes de comenzar cualquier solicitud."
+      },
+      {
+        "number":2,
+        "title":"Comprueba tu nombre",
+        "text":"Utiliza el nombre y los apellidos exactamente como aparecen en el pasaporte."
+      },
+      {
+        "number":3,
+        "title":"Comprueba el número",
+        "text":"Copia el número de pasaporte cuidadosamente y evita confundir letras con números."
+      },
+      {
+        "number":4,
+        "title":"Revisa la fecha",
+        "text":"Comprueba la fecha de vencimiento y las condiciones de entrada aplicables a tu viaje."
+      },
+      {
+        "number":5,
+        "title":"Revisa antes de enviar",
+        "text":"Compara nuevamente los datos escritos en la visa y D'Viajeros con tu pasaporte."
+      }
+    ],
+    "en":[
+      {
+        "number":1,
+        "title":"Look at your passport",
+        "text":"Have your passport in front of you before starting any application."
+      },
+      {
+        "number":2,
+        "title":"Check your name",
+        "text":"Use your first name and surname exactly as they appear on your passport."
+      },
+      {
+        "number":3,
+        "title":"Check the number",
+        "text":"Enter your passport number carefully and avoid confusing letters with numbers."
+      },
+      {
+        "number":4,
+        "title":"Check the date",
+        "text":"Check the expiration date and the entry conditions applicable to your trip."
+      },
+      {
+        "number":5,
+        "title":"Review before submitting",
+        "text":"Compare the information entered in your visa and D'Viajeros with your passport again."
+      }
+    ]
   },
-  "dual_nationality":{
-    "title":"Doble nacionalidad",
-    "description":"Las personas con más de una nacionalidad pueden estar sujetas a reglas diferentes según el pasaporte utilizado y las normas aplicables.",
-    "instruction":"Antes de viajar, verifica qué documento debes utilizar para entrar y salir de Cuba y qué requisitos corresponden a cada nacionalidad."
+  "checklist":{
+    "es":[
+      "Pasaporte a mano",
+      "Nombre revisado",
+      "Apellidos revisados",
+      "Número revisado",
+      "Fecha de vencimiento revisada"
+    ],
+    "en":[
+      "Passport ready",
+      "First name checked",
+      "Surname checked",
+      "Passport number checked",
+      "Expiration date checked"
+    ]
   },
-  "cuban_nationals":{
-    "title":"Ciudadanos cubanos",
-    "description":"Los ciudadanos cubanos pueden estar sujetos a requisitos documentales diferentes de los aplicables a turistas extranjeros.",
-    "instruction":"Si eres ciudadano cubano o tienes otra condición migratoria cubana, verifica los requisitos específicos antes de viajar."
+  "buttons":{
+    "es":{
+      "visa":"IR A LA VISA",
+      "dviajeros":"IR A D'VIAJEROS"
+    },
+    "en":{
+      "visa":"GO TO VISA",
+      "dviajeros":"GO TO D'VIAJEROS"
+    }
   },
-  "passport_and_visa":{
-    "passport_required":true,
-    "visa_separate":true,
-    "description":"El pasaporte y la visa son requisitos diferentes. Tener pasaporte válido no significa que el viajero esté exento de visa, y tener visa no sustituye el pasaporte.",
-    "check_both":true
-  },
-  "passport_and_dviajeros":{
-    "passport_required":true,
-    "dviajeros_separate":true,
-    "description":"Los datos del pasaporte se utilizan durante el proceso de D'Viajeros. D'Viajeros no sustituye el documento de viaje.",
-    "check_data":true
-  },
-  "travel_checklist":[
-    "Pasaporte vigente",
-    "Comprobar que tenga al menos 6 meses de validez desde la entrada prevista",
-    "Comprobar nombre y apellidos",
-    "Comprobar número de pasaporte",
-    "Comprobar fecha de nacimiento",
-    "Comprobar nacionalidad",
-    "Comprobar país emisor",
-    "Comprobar fecha de vencimiento",
-    "Comprobar coincidencia con la visa cuando corresponda",
-    "Comprobar coincidencia con D'Viajeros",
-    "Llevar el pasaporte durante el viaje"
-  ],
-  "warnings":[
-    "No presentes información diferente a la que aparece en tu documento.",
-    "No viajes con un pasaporte vencido.",
-    "Si tu pasaporte está próximo a vencer, verifica los requisitos antes de viajar.",
-    "Las reglas pueden cambiar y pueden existir excepciones según la nacionalidad o condición migratoria.",
-    "Esta información es orientativa y no sustituye la confirmación oficial."
-  ],
-  "status_labels":{
-    "valid":"Válido",
-    "not_valid":"No válido",
-    "verify":"Verificar",
-    "meets_general_rule":"Cumple regla general",
-    "unknown":"No determinado"
-  }
+  "notice_es":"Las condiciones de entrada pueden depender de la nacionalidad y de las normas vigentes al momento del viaje. Confirma siempre los requisitos oficiales antes de viajar.",
+  "notice_en":"Entry requirements may depend on nationality and the rules in effect at the time of travel. Always confirm official requirements before traveling.",
+  "sources":[
+    {
+      "name":"Cuba Travel - Regulaciones y trámites",
+      "url":"https://www.cuba.travel/informacion-util/regulaciones-y-tramites"
+    },
+    {
+      "name":"eVisa Cuba",
+      "url":"https://evisacuba.cu/"
+    }
+  ]
 }
