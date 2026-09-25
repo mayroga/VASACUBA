@@ -1,675 +1,378 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
+const VISA_URL = "https://evisacuba.cu/";
+const DVIJEROS_URL = "https://dviajeros.mitrans.gob.cu/";
 
 ```
-const OFFICIAL_VISA_URL = "https://evisacuba.cu/";
-const OFFICIAL_DVIAJEROS_URL =
-    "https://dviajeros.mitrans.gob.cu/";
+const STORAGE_VISA = "cu_cuba_auto_travel_2026_visa";
+const STORAGE_DVIAJEROS = "cu_cuba_auto_travel_2026_dviajeros";
+const STORAGE_LANGUAGE = "cu_cuba_auto_travel_2026_language";
 
-const VISA_STORAGE = "cuba_auto_travel_2026_visa";
-const DV_STORAGE = "cuba_auto_travel_2026_dviajeros";
-const LANGUAGE_STORAGE = "cuba_auto_travel_2026_language";
+let language = localStorage.getItem(STORAGE_LANGUAGE) || "es";
 
-let language =
-    localStorage.getItem(LANGUAGE_STORAGE) || "es";
+let visaStep = 0;
+let dviajerosStep = 0;
 
-let currentVisaStep = 1;
-let currentDvStep = 1;
+const visaTotalSteps = 6;
+const dviajerosTotalSteps = 8;
 
 const translations = {
-
     es: {
-        hero_badge: "TU GUÍA ANTES DE VOLAR",
-        hero_title: "Viaja a Cuba sabiendo qué hacer.",
-        hero_text:
-            "CUBA AUTO TRAVEL te acompaña paso a paso para preparar la Visa electrónica y D'Viajeros antes de entrar en los portales oficiales.",
-        flow_understand: "Entender",
-        flow_prepare: "Preparar",
-        flow_simulate: "Simular",
-        flow_do: "Hacer",
-        flow_review: "Revisar",
-
-        official_title:
-            "¿Quieres ir directamente al sitio oficial?",
-        official_text:
-            "Se abrirá en otra pestaña. Esta aplicación permanecerá abierta para que puedas consultar, copiar y regresar.",
-
-        module_visa_label: "VISA",
-        module_visa_title: "Visa electrónica / eVisa",
-        module_visa_text:
-            "Aprende qué vas a hacer, prepara tus datos, practica el recorrido y después abre el portal oficial.",
-        visa_point_1: "✓ Te explicamos cada etapa",
-        visa_point_2: "✓ Preparas tus datos",
-        visa_point_3: "✓ Entiendes el pago",
-        visa_point_4: "✓ Abres el portal sin cerrar esta app",
-
-        module_dv_label: "VIAJERO",
-        module_dv_title: "D'Viajeros",
-        module_dv_text:
-            "Te guiamos por las secciones del formulario para que llegues preparado y puedas completarlo con rapidez.",
-        dv_point_1: "✓ Datos personales",
-        dv_point_2: "✓ Información del viaje",
-        dv_point_3: "✓ Salud y aduana explicadas",
-        dv_point_4: "✓ Revisión antes del QR",
-
-        how_title: "¿Cómo funciona?",
-        how_1_title: "Aprende",
-        how_1_text:
-            "Te explicamos qué estás haciendo y para qué sirve cada parte.",
-        how_2_title: "Prepara",
-        how_2_text:
-            "Colocas aquí tus datos para tenerlos organizados.",
-        how_3_title: "Simula",
-        how_3_text:
-            "Ves el camino antes de entrar al portal real.",
-        how_4_title: "Hazlo",
-        how_4_text:
-            "Abres el sitio oficial en otra pestaña y vuelves cuando necesites ayuda.",
-
-        notice_title: "Importante",
-        notice_text:
-            "CUBA AUTO TRAVEL 2026 es una aplicación independiente. No emite visas, no genera el QR oficial y no presenta trámites en nombre del viajero. El trámite oficial se realiza directamente en los sitios correspondientes.",
-
+        independent_badge: "APLICACIÓN INDEPENDIENTE",
+        hero_title: "Prepárate para viajar a Cuba sin miedo a perderte.",
+        hero_text: "CU CUBA AUTO TRAVEL 2026 te explica, te prepara y te acompaña paso a paso antes de entrar a los portales oficiales.",
+        visa_button: "Preparar Visa / eVisa",
+        dviajeros_button: "Preparar D'Viajeros",
+        official_kicker: "PORTALES OFICIALES",
+        official_title: "Tenlos siempre a mano",
+        official_text: "Se abrirán en una nueva pestaña. CU CUBA AUTO TRAVEL permanecerá abierta para que puedas mirar, copiar, volver y continuar.",
+        open_official_visa: "Abrir portal oficial de Visa",
+        open_official_dviajeros: "Abrir portal oficial de D'Viajeros",
+        how_kicker: "CÓMO FUNCIONA",
+        how_title: "Como tener un agente a tu lado",
+        how_1_title: "Entender",
+        how_1_text: "Te explicamos qué vas a hacer antes de comenzar.",
+        how_2_title: "Preparar",
+        how_2_text: "Organizas tus datos y tienes todo listo.",
+        how_3_title: "Simular",
+        how_3_text: "Practicas el camino antes de entrar al sitio oficial.",
+        how_4_title: "Continuar",
+        how_4_text: "Abres el portal oficial y vuelves aquí cuando necesites orientación.",
+        important_label: "IMPORTANTE",
+        disclaimer: "CU CUBA AUTO TRAVEL 2026 es independiente. No pertenece al Gobierno de Cuba ni a sus autoridades migratorias, consulares, sanitarias o aduanales. No emite visas, no presenta solicitudes oficiales y no genera QR oficiales.",
         back: "Volver",
-        agent_mode: "MODO ACOMPAÑAMIENTO",
-
-        visa_header: "Vamos a preparar tu Visa paso a paso.",
-        visa_header_text:
-            "No estás haciendo todavía el trámite oficial. Primero vamos a entenderlo y preparar la información.",
-
-        visa_step_1: "Entender",
-        visa_step_2: "Preparar",
-        visa_step_3: "Simular",
-        visa_step_4: "Pago",
-        visa_step_5: "Revisar",
-        visa_step_6: "Abrir oficial",
-
-        visa_welcome_title:
-            "Primero: tranquilo. Vamos a hacerlo juntos.",
-        visa_welcome_text:
-            "La Visa electrónica se tramita mediante el sistema correspondiente. Tu trabajo aquí es preparar la información. Después te acompañaremos mientras utilizas el portal oficial.",
-
-        visa_what_title: "¿Qué vas a hacer?",
-        visa_what_text:
-            "Vas a solicitar una visa electrónica de turismo. El portal oficial te lleva por diferentes etapas. Nuestra aplicación te muestra previamente el camino para que no tengas que descubrirlo por primera vez cuando ya estés intentando hacer el trámite.",
-
-        simulation_title: "SIMULACIÓN",
-        simulation_text:
-            "Lo que verás aquí es una guía preparada por CUBA AUTO TRAVEL. No es una copia ni reemplaza el formulario oficial.",
-
-        visa_flow_1: "Detalles del trámite",
-        visa_flow_2: "Trámites extras",
-        visa_flow_3: "Pago",
-        visa_flow_4: "Revisar y confirmar",
-
-        continue: "Continuar",
-        prepare_title: "Prepara tus datos",
-        prepare_text:
-            "Estos datos estarán aquí para que puedas consultarlos y copiar cada uno cuando estés en el portal oficial.",
-
+        agent_title: "Te voy guiando paso a paso.",
+        agent_text: "Primero entendemos el procedimiento. Después preparamos los datos, simulamos el recorrido y finalmente abrimos el sitio oficial.",
+        visa_title: "Visa cubana / eVisa",
+        visa_intro: "Vamos a prepararla juntos antes de abrir el portal oficial.",
+        step_1: "PASO 1",
+        step_2: "PASO 2",
+        step_3: "PASO 3",
+        step_4: "PASO 4",
+        step_5: "PASO 5",
+        step_6: "PASO 6",
+        step_7: "PASO 7",
+        step_8: "PASO 8",
+        visa_step1_title: "¿Qué vas a hacer?",
+        visa_step1_text: "La eVisa es un procedimiento electrónico. CU CUBA AUTO TRAVEL no expide la visa: aquí preparas la información y después continúas directamente en el portal oficial.",
+        what_we_do: "Aquí hacemos",
+        visa_here: "Preparar, explicar, revisar y practicar.",
+        official_does: "En el portal oficial",
+        visa_official: "Presentas la solicitud y realizas el procedimiento oficial.",
+        visa_step2_title: "Prepara tus datos",
+        visa_step2_text: "Completa estos datos con la información real de tu pasaporte y de tu viaje. Los datos se guardan solamente en este navegador para que puedas continuar.",
         nationality: "Nacionalidad",
-        nationality_help:
-            "Escribe tu nacionalidad tal como corresponde a tu documentación.",
         residence: "País de residencia",
-        residence_help:
-            "El país donde resides actualmente.",
         passport_country: "País que emitió tu pasaporte",
-        passport_country_help:
-            "Busca esta información en tu pasaporte.",
         travel_purpose: "Motivo del viaje",
-        travel_purpose_help:
-            "Ten clara la finalidad de tu viaje antes de comenzar.",
         email: "Correo electrónico",
-        email_help:
-            "Usa un correo que puedas consultar. La comunicación del trámite puede llegar allí.",
-
-        passport_available: "Tengo mi pasaporte disponible",
-        passport_available_help:
-            "Lo necesitarás para comprobar y copiar sus datos.",
-        passport_valid: "He revisado la vigencia",
-        passport_valid_help:
-            "No marques esto sin haber revisado tu documento.",
-
+        copy: "Copiar",
+        visa_step3_title: "Revisa tu pasaporte",
+        passport_available: "Tengo mi pasaporte disponible.",
+        passport_valid: "He revisado la vigencia de mi pasaporte.",
+        dual_nationality: "Tengo doble nacionalidad.",
+        tip: "CONSEJO",
+        passport_tip: "Si tienes dudas sobre tu nacionalidad aplicable o sobre un requisito específico, no adivines. Compruébalo en la información oficial antes de enviar la solicitud.",
+        visa_step4_title: "Así es el camino del trámite",
+        visa_sim1_title: "Detalles del trámite",
+        visa_sim1_text: "Introduces la información solicitada por el portal.",
+        visa_sim2_title: "Trámites adicionales",
+        visa_sim2_text: "Si el portal muestra procedimientos adicionales aplicables, los revisas antes de continuar.",
+        visa_sim3_title: "Pago",
+        visa_sim3_text: "El método de pago no debe suponerse. El portal muestra las opciones correspondientes al trámite y al consulado.",
+        visa_sim4_title: "Revisar y confirmar",
+        visa_sim4_text: "Compruebas los datos antes de confirmar y enviar.",
+        payment_attention: "ATENCIÓN AL PAGO",
+        payment_text: "No vamos a decirte que existe un único método de pago para todos. Las opciones pueden depender del consulado. Mira siempre lo que indique el portal oficial para tu trámite.",
+        visa_step5_title: "Haz una última revisión",
+        clear: "Borrar preparación",
+        visa_step6_title: "Ahora sí: abre el portal oficial",
+        portal_instruction1: "Pulsa el botón. El portal oficial se abrirá en otra pestaña.",
+        portal_instruction2: "Deja CU CUBA AUTO TRAVEL abierta.",
+        portal_instruction3: "Mira aquí, copia el dato que necesites, pégalo en el portal oficial y vuelve aquí cuando necesites continuar.",
+        open_visa_portal: "ABRIR eVISA OFICIAL ↗",
+        official_note: "Esta aplicación no presenta la solicitud ni emite la visa.",
         previous: "Anterior",
-        continue_simulation: "Preparar simulación",
-
-        simulation_step_title:
-            "Ahora vamos a simular el recorrido.",
-        simulation_step_text:
-            "Así, cuando abras el sitio real, reconocerás la lógica del proceso y sabrás qué estás haciendo.",
-
-        fake_step_1: "Detalles del trámite",
-        fake_step_2: "Trámites extras",
-        fake_step_3: "Pago",
-        fake_step_4: "Revisión",
-        fake_form_title: "Detalles del trámite",
-        fake_passport_label: "Pasaporte",
-        fake_passport_placeholder:
-            "Aquí colocarías el dato de tu pasaporte",
-        fake_email_label: "Correo electrónico",
-        fake_email_placeholder:
-            "Aquí colocarías tu correo",
-        remember_title: "Recuerda:",
-        fake_help:
-            "tú puedes volver a esta aplicación para mirar qué dato necesitas y copiarlo.",
-
-        simulation_a_title: "¿Qué haces tú?",
-        simulation_a_text:
-            "Lees la pregunta del portal, buscas el dato en tu documentación o en la información que preparaste, y lo introduces.",
-        simulation_b_title: "¿Te olvidaste de un dato?",
-        simulation_b_text:
-            "No cierres el portal. Vuelve a esta pestaña, consulta tu información y continúa.",
-
-        understand_payment: "Entender el pago",
-        payment_title:
-            "El pago: aquí es donde debes prestar atención.",
-        payment_text:
-            "No asumimos que todos los consulados utilizan el mismo método. La modalidad de pago puede variar según el consulado.",
-        payment_alert_title: "IMPORTANTE",
-        payment_alert_text:
-            "No envíes dinero ni compres un método de pago basándote solamente en esta aplicación. Primero confirma en el portal o consulado que corresponda a tu trámite cuál es la modalidad aceptada y el importe vigente.",
-
-        payment_transfer: "Transferencia",
-        payment_transfer_text:
-            "Puede aparecer como modalidad disponible dependiendo del consulado. Sigue únicamente las instrucciones oficiales.",
-        payment_cash: "Efectivo",
-        payment_cash_text:
-            "Puede existir como modalidad en determinados lugares. No la des por disponible hasta comprobarlo.",
-        payment_money_order: "Money Order",
-        payment_money_order_text:
-            "Puede aparecer como opción en determinados consulados. Verifica siempre las instrucciones del lugar donde tramitas.",
-
-        agent_tip_title: "Consejo de agente",
-        agent_tip_text:
-            "Primero confirma quién recibe el pago, cuánto debes pagar, qué método aceptan, a nombre de quién y qué comprobante debes conservar. Después realiza el pago.",
-
-        review_application: "Revisar mi preparación",
-        review_title:
-            "Antes de abrir el portal, revisemos juntos.",
-        review_text:
-            "Si algo falta, puedes volver atrás. No tienes que memorizarlo.",
-        review_note_title: "Cuando todo esté preparado:",
-        review_note_text:
-            "abre eVisa Cuba en una nueva pestaña. Mantén esta aplicación abierta. Puedes mirar aquí, copiar un dato, volver al portal y continuar.",
-
-        open_official: "Abrir eVisa oficial",
-        official_open_title: "Ya sabes el camino.",
-        official_open_text:
-            "El portal oficial se abrirá en otra pestaña. Esta aplicación queda aquí para acompañarte.",
-        copy_return_1: "Mira el dato",
-        copy_return_2: "Cópialo",
-        copy_return_3: "Pégalo",
-        copy_return_4: "Vuelve si necesitas ayuda",
-        open_official_again: "Abrir eVisa oficial",
-        finish_home: "Volver al inicio",
-
-        dv_header: "Vamos a preparar D'Viajeros juntos.",
-        dv_header_text:
-            "La idea no es que llegues al formulario oficial sin saber qué hacer. Primero organizamos la información y recorremos el camino.",
-
-        dv_step_1: "Entender",
-        dv_step_2: "Datos personales",
-        dv_step_3: "Viaje",
-        dv_step_4: "Salud",
-        dv_step_5: "Aduana",
-        dv_step_6: "Revisar",
-        dv_step_7: "Abrir oficial",
-
-        dv_welcome_title:
-            "Piensa en esto como si un agente te estuviera preparando antes del aeropuerto.",
-        dv_welcome_text:
-            "D'Viajeros reúne información que se utiliza en los procesos de entrada a Cuba. Nosotros vamos a organizarla antes de que abras el formulario oficial.",
-
-        dv_what_title: "¿Qué vamos a preparar?",
-        dv_road_1: "Quién eres",
-        dv_road_2: "Cómo llegas",
-        dv_road_3: "Información sanitaria",
-        dv_road_4: "Qué declaras",
-        dv_road_5: "Revisión y QR",
-        dv_simulation_text:
-            "No estamos copiando el formulario oficial. Estamos preparando el contenido para que sepas qué hacer cuando estés frente a él.",
-
-        start_prepare: "Empezar a preparar",
-        dv_personal_title: "Primero: ¿quién viaja?",
-        dv_personal_text:
-            "Coloca aquí los datos que quieras tener preparados. Después podrás copiarlos uno por uno.",
-
+        next: "Siguiente",
+        dviajeros_intro: "Vamos a organizar la información para que el formulario oficial sea más fácil de completar.",
+        dviajeros_agent_title: "No tienes que recordar todo de golpe.",
+        dviajeros_agent_text: "Avanzaremos por partes: datos personales, viaje, alojamiento, salud, aduana y revisión.",
+        dv_step1_title: "Primero entendamos D'Viajeros",
+        dv_step1_text: "D'Viajeros reúne información que el viajero debe proporcionar antes de su entrada a Cuba. Aquí no generamos el QR oficial. Preparamos contigo la información para que después puedas completar y revisar el procedimiento en el sitio oficial.",
+        dv_personal: "Información personal",
+        dv_personal_text: "Quién eres y los datos de tu documento.",
+        dv_trip: "Información del viaje",
+        dv_trip_text: "Cuándo llegas, vuelo y aerolínea.",
+        dv_health: "Salud",
+        dv_health_text: "Respondes según tu situación real.",
+        dv_customs: "Aduana",
+        dv_customs_text: "Declaras lo que corresponda a tu caso.",
+        dv_step2_title: "Datos personales",
         first_name: "Nombre",
         last_name: "Apellidos",
         birth_date: "Fecha de nacimiento",
+        where_to_find: "¿Dónde encontrar estos datos?",
+        personal_tip: "Utiliza tu pasaporte. Es mejor copiar exactamente cómo aparece allí que intentar recordarlo.",
+        dv_step3_title: "Pasaporte y viaje",
         passport_number: "Número de pasaporte",
-        passport_number_help:
-            "Copia exactamente los caracteres del documento.",
-
-        dv_trip_title: "Ahora: ¿cómo llegas a Cuba?",
-        dv_trip_text:
-            "Ten estos datos preparados antes de abrir el formulario.",
         arrival_date: "Fecha de llegada",
         flight_number: "Número de vuelo",
-        flight_help:
-            "Puedes encontrarlo en tu boleto o confirmación de vuelo.",
         airline: "Aerolínea",
-        origin: "Lugar de procedencia",
-        origin_help:
-            "Prepara el lugar desde donde comienza tu viaje hacia Cuba.",
+        travel_tip_title: "Consejo del agente",
+        travel_tip: "Ten a mano tu boleto o confirmación de vuelo. Ahí normalmente encontrarás el número de vuelo y la aerolínea.",
+        dv_step4_title: "Alojamiento y otros datos",
         accommodation: "Alojamiento",
         address_cuba: "Dirección en Cuba",
-        purpose_trip: "Motivo del viaje",
-
-        where_find_title: "¿Dónde encuentro estos datos?",
-        where_find_text:
-            "En tu pasaporte, boleto, confirmación de vuelo, reserva de alojamiento o documentos relacionados con tu viaje.",
-
-        continue_health: "Continuar con Salud",
-        health_title: "Salud: no adivinamos por ti.",
-        health_text:
-            "Aquí la aplicación te ayuda a organizar la información. La respuesta final debe ser verdadera y corresponder a tu situación.",
-        health_q1_title:
-            "¿Tienes alguna información sanitaria que debas declarar?",
-        yes: "Sí",
-        no: "No",
-        not_sure: "No estoy seguro",
-        health_q1_help:
-            "Si no sabes cómo responder una pregunta sanitaria específica del formulario oficial, no inventes la respuesta. Revísala con la información oficial correspondiente.",
-        health_q2_title:
-            "Información adicional que quieras preparar",
-        health_q2_help:
-            "Esto es una ayuda personal. No sustituye las preguntas exactas que aparezcan en el portal oficial.",
-        truth_title: "Regla principal",
-        truth_text:
-            "En salud, responde siempre con la verdad. CUBA AUTO TRAVEL organiza; la declaración oficial la realiza el viajero.",
-
-        continue_customs: "Continuar con Aduana",
-        customs_title:
-            "Aduana: primero organiza, después declara.",
-        customs_text:
-            "No vamos a inventar cantidades ni valores. Te ayudamos a pensar qué información necesitas tener lista.",
-        customs_q1_title:
-            "¿Tienes algo que debas declarar?",
-        customs_q2_title:
-            "¿Hay información adicional que quieras tener preparada?",
-        customs_q2_help:
-            "Si tienes dudas sobre una mercancía, cantidad, valor o condición particular, compruébala en la información aduanera oficial antes de declarar.",
-        customs_tip_title: "Importante",
-        customs_tip_text:
-            "Declarar información no significa automáticamente que una persona tenga que pagar. Las consecuencias dependen de la mercancía, cantidad, valor y reglas aplicables.",
-
-        review_dv: "Revisar D'Viajeros",
-        dv_review_title:
-            "Última revisión antes de abrir D'Viajeros.",
-        dv_review_text:
-            "Comprueba que tienes preparados los datos principales.",
-        dv_review_note_title: "Después:",
-        dv_review_note_text:
-            "abre D'Viajeros en una nueva pestaña. Mantén CUBA AUTO TRAVEL abierta para consultar y copiar información.",
-        open_dv_official: "Abrir D'Viajeros oficial",
-
-        dv_official_title:
-            "Ya estás preparado para entrar al formulario oficial.",
-        dv_official_text:
-            "D'Viajeros se abrirá en otra pestaña. Esta aplicación seguirá disponible para ayudarte.",
-        open_dv_again: "Abrir D'Viajeros oficial",
-
-        footer_text:
-            "Aplicación independiente de preparación y acompañamiento."
+        trip_purpose: "Motivo del viaje",
+        extra_information: "¿Tienes algo más?",
+        extra_information_text: "Si el portal oficial te solicita un dato que no aparece aquí, no significa que estés perdido. Anótalo y podrás revisarlo nuevamente en esta aplicación.",
+        dv_step5_title: "Salud: responde según tu realidad",
+        dv_health_intro: "Esta parte no debe rellenarse por adivinación. CU CUBA AUTO TRAVEL te ayuda a organizar la respuesta, pero tú debes declarar la información verdadera que corresponda a tu situación.",
+        health_declaration: "Información de salud que deba declarar",
+        select_option: "Selecciona una opción",
+        no_information: "No tengo información adicional que declarar",
+        yes_information: "Sí, tengo información que debo declarar",
+        health_extra: "Información adicional",
+        health_placeholder: "Escribe aquí solamente información real que corresponda a tu caso.",
+        do_not_guess: "NO ADIVINES",
+        health_warning: "Si una pregunta oficial no está clara, léela exactamente en el portal oficial y utiliza esta sección para organizar tu respuesta.",
+        dv_step6_title: "Aduana: prepara lo que realmente corresponda",
+        dv_customs_intro: "No vamos a inventar cantidades, valores ni categorías. Esta sección sirve para que pienses y organices la información antes de responder en el portal oficial.",
+        customs_declaration: "¿Tienes información que debas declarar?",
+        nothing_to_declare: "No tengo información adicional que declarar",
+        something_to_declare: "Sí, tengo algo que declarar",
+        customs_extra: "Detalles que quieras preparar",
+        customs_placeholder: "Escribe aquí los detalles reales que necesites revisar.",
+        customs_tip_title: "Recuerda",
+        customs_tip: "Si tienes una mercancía, cantidad, valor o situación especial, utiliza la información oficial aplicable para determinar cómo debe declararse.",
+        dv_step7_title: "Revisión antes de abrir D'Viajeros",
+        dv_step8_title: "Ahora abre D'Viajeros",
+        dv_portal_instruction3: "Completa el formulario oficial y vuelve aquí cuando necesites consultar o revisar un dato.",
+        open_dviajeros_portal: "ABRIR D'VIAJEROS OFICIAL ↗",
+        qr_note: "El QR oficial lo genera el sistema oficial después de completar el procedimiento correspondiente.",
+        footer_text: "Aplicación independiente de preparación y acompañamiento."
     },
 
     en: {
-        hero_badge: "YOUR GUIDE BEFORE YOU FLY",
-        hero_title: "Travel to Cuba knowing what to do.",
-        hero_text:
-            "CUBA AUTO TRAVEL guides you step by step to prepare your electronic Visa and D'Viajeros before entering the official portals.",
-        flow_understand: "Understand",
-        flow_prepare: "Prepare",
-        flow_simulate: "Simulate",
-        flow_do: "Do it",
-        flow_review: "Review",
-
-        official_title: "Want to go directly to the official site?",
-        official_text:
-            "It will open in another tab. This application will remain open so you can consult, copy and return.",
-
-        module_visa_label: "VISA",
-        module_visa_title: "Electronic Visa / eVisa",
-        module_visa_text:
-            "Learn what you are going to do, prepare your information, practice the process and then open the official portal.",
-        visa_point_1: "✓ We explain each stage",
-        visa_point_2: "✓ Prepare your information",
-        visa_point_3: "✓ Understand the payment step",
-        visa_point_4: "✓ Open the portal without closing this app",
-
-        module_dv_label: "TRAVELER",
-        module_dv_title: "D'Viajeros",
-        module_dv_text:
-            "We guide you through the form sections so you arrive prepared and can complete it efficiently.",
-        dv_point_1: "✓ Personal information",
-        dv_point_2: "✓ Travel information",
-        dv_point_3: "✓ Health and customs explained",
-        dv_point_4: "✓ Review before the QR",
-
-        how_title: "How does it work?",
-        how_1_title: "Learn",
-        how_1_text:
-            "We explain what you are doing and why each part matters.",
+        independent_badge: "INDEPENDENT APPLICATION",
+        hero_title: "Prepare for your trip to Cuba without getting lost.",
+        hero_text: "CU CUBA AUTO TRAVEL 2026 explains, prepares and guides you step by step before you enter the official portals.",
+        visa_button: "Prepare Visa / eVisa",
+        dviajeros_button: "Prepare D'Viajeros",
+        official_kicker: "OFFICIAL PORTALS",
+        official_title: "Keep them within reach",
+        official_text: "They open in a new tab. CU CUBA AUTO TRAVEL stays open so you can look, copy, return and continue.",
+        open_official_visa: "Open official Visa portal",
+        open_official_dviajeros: "Open official D'Viajeros portal",
+        how_kicker: "HOW IT WORKS",
+        how_title: "Like having an agent beside you",
+        how_1_title: "Understand",
+        how_1_text: "We explain what you are going to do before you begin.",
         how_2_title: "Prepare",
-        how_2_text:
-            "Enter your information here so it stays organized.",
-        how_3_title: "Simulate",
-        how_3_text:
-            "See the path before entering the real portal.",
-        how_4_title: "Do it",
-        how_4_text:
-            "Open the official site in another tab and return whenever you need help.",
-
-        notice_title: "Important",
-        notice_text:
-            "CUBA AUTO TRAVEL 2026 is an independent application. It does not issue visas, generate the official QR or submit applications on behalf of the traveler. The official process is completed directly on the corresponding sites.",
-
+        how_2_text: "Organize your information and get everything ready.",
+        how_3_title: "Practice",
+        how_3_text: "Practice the process before entering the official site.",
+        how_4_title: "Continue",
+        how_4_text: "Open the official portal and return here whenever you need guidance.",
+        important_label: "IMPORTANT",
+        disclaimer: "CU CUBA AUTO TRAVEL 2026 is independent. It is not part of the Government of Cuba or its migration, consular, health or customs authorities. It does not issue visas, submit official applications or generate official QR codes.",
         back: "Back",
-        agent_mode: "GUIDED MODE",
-
-        visa_header: "Let's prepare your Visa step by step.",
-        visa_header_text:
-            "You are not completing the official process yet. First we will understand it and prepare your information.",
-
-        visa_step_1: "Understand",
-        visa_step_2: "Prepare",
-        visa_step_3: "Simulate",
-        visa_step_4: "Payment",
-        visa_step_5: "Review",
-        visa_step_6: "Open official",
-
-        visa_welcome_title:
-            "First: relax. We will do it together.",
-        visa_welcome_text:
-            "The electronic Visa is processed through the corresponding system. Your job here is to prepare the information. Then we will accompany you while you use the official portal.",
-
-        visa_what_title: "What are you going to do?",
-        visa_what_text:
-            "You are going to request an electronic tourist visa. The official portal takes you through different stages. Our application shows you the path first so you do not have to discover it for the first time while trying to complete the process.",
-
-        simulation_title: "SIMULATION",
-        simulation_text:
-            "What you see here is a guide prepared by CUBA AUTO TRAVEL. It is not a copy of and does not replace the official form.",
-
-        visa_flow_1: "Application details",
-        visa_flow_2: "Extra procedures",
-        visa_flow_3: "Payment",
-        visa_flow_4: "Review and confirm",
-
-        continue: "Continue",
-        prepare_title: "Prepare your information",
-        prepare_text:
-            "Keep these details here so you can consult and copy each one while using the official portal.",
-
+        agent_title: "I will guide you step by step.",
+        agent_text: "First we understand the process. Then we prepare the information, practice the path and finally open the official site.",
+        visa_title: "Cuban Visa / eVisa",
+        visa_intro: "Let's prepare it together before opening the official portal.",
+        step_1: "STEP 1",
+        step_2: "STEP 2",
+        step_3: "STEP 3",
+        step_4: "STEP 4",
+        step_5: "STEP 5",
+        step_6: "STEP 6",
+        step_7: "STEP 7",
+        step_8: "STEP 8",
+        visa_step1_title: "What are you going to do?",
+        visa_step1_text: "The eVisa is an electronic procedure. CU CUBA AUTO TRAVEL does not issue the visa: you prepare your information here and then continue directly on the official portal.",
+        what_we_do: "Here we",
+        visa_here: "Prepare, explain, review and practice.",
+        official_does: "On the official portal",
+        visa_official: "You submit the application and complete the official procedure.",
+        visa_step2_title: "Prepare your information",
+        visa_step2_text: "Enter the real information from your passport and trip. The information is stored only in this browser so you can continue.",
         nationality: "Nationality",
-        nationality_help:
-            "Enter your nationality according to your travel documentation.",
         residence: "Country of residence",
-        residence_help:
-            "The country where you currently live.",
-        passport_country: "Passport issuing country",
-        passport_country_help:
-            "Find this information in your passport.",
+        passport_country: "Country that issued your passport",
         travel_purpose: "Purpose of travel",
-        travel_purpose_help:
-            "Know the purpose of your trip before starting.",
-        email: "Email address",
-        email_help:
-            "Use an email account you can access. Process communications may arrive there.",
-
-        passport_available: "I have my passport available",
-        passport_available_help:
-            "You will need it to check and copy its information.",
-        passport_valid: "I have checked its validity",
-        passport_valid_help:
-            "Do not select this unless you have checked your document.",
-
+        email: "Email",
+        copy: "Copy",
+        visa_step3_title: "Check your passport",
+        passport_available: "I have my passport available.",
+        passport_valid: "I have checked my passport validity.",
+        dual_nationality: "I have dual nationality.",
+        tip: "TIP",
+        passport_tip: "If you are unsure about your applicable nationality or a specific requirement, do not guess. Check the official information before submitting.",
+        visa_step4_title: "This is the path of the procedure",
+        visa_sim1_title: "Application details",
+        visa_sim1_text: "Enter the information requested by the portal.",
+        visa_sim2_title: "Additional procedures",
+        visa_sim2_text: "If the portal shows additional procedures that apply, review them before continuing.",
+        visa_sim3_title: "Payment",
+        visa_sim3_text: "Do not assume a payment method. The portal shows the options corresponding to the procedure and consulate.",
+        visa_sim4_title: "Review and confirm",
+        visa_sim4_text: "Check the information before confirming and submitting.",
+        payment_attention: "PAYMENT ATTENTION",
+        payment_text: "We will not tell you there is one payment method for everyone. Options may depend on the consulate. Always follow what the official portal shows for your application.",
+        visa_step5_title: "Do one final review",
+        clear: "Clear preparation",
+        visa_step6_title: "Now open the official portal",
+        portal_instruction1: "Press the button. The official portal will open in another tab.",
+        portal_instruction2: "Leave CU CUBA AUTO TRAVEL open.",
+        portal_instruction3: "Look here, copy the information you need, paste it into the official portal and return here whenever you need to continue.",
+        open_visa_portal: "OPEN OFFICIAL eVISA ↗",
+        official_note: "This application does not submit the application or issue the visa.",
         previous: "Previous",
-        continue_simulation: "Prepare simulation",
-
-        simulation_step_title:
-            "Now let's simulate the process.",
-        simulation_step_text:
-            "That way, when you open the real site, you will recognize the process and know what you are doing.",
-
-        fake_step_1: "Application details",
-        fake_step_2: "Extra procedures",
-        fake_step_3: "Payment",
-        fake_step_4: "Review",
-        fake_form_title: "Application details",
-        fake_passport_label: "Passport",
-        fake_passport_placeholder:
-            "This is where you would enter your passport information",
-        fake_email_label: "Email address",
-        fake_email_placeholder:
-            "This is where you would enter your email",
-        remember_title: "Remember:",
-        fake_help:
-            "you can return to this application to see which information you need and copy it.",
-
-        simulation_a_title: "What do you do?",
-        simulation_a_text:
-            "Read the portal question, find the information in your documents or in the information you prepared, and enter it.",
-        simulation_b_title: "Forgot something?",
-        simulation_b_text:
-            "Do not close the portal. Return to this tab, check your information and continue.",
-
-        understand_payment: "Understand payment",
-        payment_title:
-            "Payment: this is where you should pay attention.",
-        payment_text:
-            "We do not assume every consulate uses the same method. The payment method may vary by consulate.",
-        payment_alert_title: "IMPORTANT",
-        payment_alert_text:
-            "Do not send money or purchase a payment method based only on this application. First confirm with the applicable official portal or consulate which method is accepted and the current amount.",
-
-        payment_transfer: "Transfer",
-        payment_transfer_text:
-            "It may appear as an available method depending on the consulate. Follow only the official instructions.",
-        payment_cash: "Cash",
-        payment_cash_text:
-            "It may be available in certain locations. Do not assume it is available until you confirm it.",
-        payment_money_order: "Money Order",
-        payment_money_order_text:
-            "It may appear as an option at certain consulates. Always verify the instructions for your processing location.",
-
-        agent_tip_title: "Agent tip",
-        agent_tip_text:
-            "First confirm who receives the payment, how much you must pay, which method they accept, who it should be payable to and which receipt you should keep. Then make the payment.",
-
-        review_application: "Review my preparation",
-        review_title:
-            "Before opening the portal, let's review together.",
-        review_text:
-            "If something is missing, you can go back. You do not have to memorize anything.",
-        review_note_title: "When everything is ready:",
-        review_note_text:
-            "open eVisa Cuba in a new tab. Keep this application open. You can look here, copy information, return to the portal and continue.",
-
-        open_official: "Open official eVisa",
-        official_open_title: "Now you know the path.",
-        official_open_text:
-            "The official portal will open in another tab. This application stays here to guide you.",
-        copy_return_1: "Look",
-        copy_return_2: "Copy",
-        copy_return_3: "Paste",
-        copy_return_4: "Return if you need help",
-        open_official_again: "Open official eVisa",
-        finish_home: "Return home",
-
-        dv_header: "Let's prepare D'Viajeros together.",
-        dv_header_text:
-            "The goal is not to arrive at the official form without knowing what to do. First we organize the information and walk through the process.",
-
-        dv_step_1: "Understand",
-        dv_step_2: "Personal",
-        dv_step_3: "Travel",
-        dv_step_4: "Health",
-        dv_step_5: "Customs",
-        dv_step_6: "Review",
-        dv_step_7: "Open official",
-
-        dv_welcome_title:
-            "Think of this as an agent preparing you before the airport.",
-        dv_welcome_text:
-            "D'Viajeros gathers information used in Cuba's entry processes. We will organize it before you open the official form.",
-
-        dv_what_title: "What are we preparing?",
-        dv_road_1: "Who you are",
-        dv_road_2: "How you arrive",
-        dv_road_3: "Health information",
-        dv_road_4: "What you declare",
-        dv_road_5: "Review and QR",
-        dv_simulation_text:
-            "We are not copying the official form. We are preparing the information so you know what to do when you face it.",
-
-        start_prepare: "Start preparing",
-        dv_personal_title: "First: who is traveling?",
-        dv_personal_text:
-            "Enter the information you want to have prepared. You can then copy each item individually.",
-
+        next: "Next",
+        dviajeros_intro: "Let's organize the information so the official form is easier to complete.",
+        dviajeros_agent_title: "You do not have to remember everything at once.",
+        dviajeros_agent_text: "We will go section by section: personal information, trip, accommodation, health, customs and review.",
+        dv_step1_title: "First, understand D'Viajeros",
+        dv_step1_text: "D'Viajeros collects information that travelers must provide before entering Cuba. We do not generate the official QR here. We prepare the information with you so you can complete and review the procedure on the official site.",
+        dv_personal: "Personal information",
+        dv_personal_text: "Who you are and your document details.",
+        dv_trip: "Trip information",
+        dv_trip_text: "When you arrive, flight and airline.",
+        dv_health: "Health",
+        dv_health_text: "Answer according to your real situation.",
+        dv_customs: "Customs",
+        dv_customs_text: "Declare what applies to your situation.",
+        dv_step2_title: "Personal information",
         first_name: "First name",
         last_name: "Last name",
         birth_date: "Date of birth",
+        where_to_find: "Where can you find these details?",
+        personal_tip: "Use your passport. It is better to copy exactly what appears there than to rely on memory.",
+        dv_step3_title: "Passport and trip",
         passport_number: "Passport number",
-        passport_number_help:
-            "Copy the characters exactly as they appear on the document.",
-
-        dv_trip_title: "Now: how are you arriving in Cuba?",
-        dv_trip_text:
-            "Have these details ready before opening the form.",
         arrival_date: "Arrival date",
         flight_number: "Flight number",
-        flight_help:
-            "You can find it on your ticket or flight confirmation.",
         airline: "Airline",
-        origin: "Place of departure",
-        origin_help:
-            "Prepare the place where your journey to Cuba begins.",
+        travel_tip_title: "Agent tip",
+        travel_tip: "Keep your ticket or flight confirmation nearby. You will normally find the flight number and airline there.",
+        dv_step4_title: "Accommodation and other information",
         accommodation: "Accommodation",
         address_cuba: "Address in Cuba",
-        purpose_trip: "Purpose of trip",
-
-        where_find_title: "Where can I find these details?",
-        where_find_text:
-            "In your passport, ticket, flight confirmation, accommodation reservation or other travel documents.",
-
-        continue_health: "Continue to Health",
-        health_title: "Health: we do not guess for you.",
-        health_text:
-            "The application helps you organize information. Your final answer must be truthful and match your situation.",
-        health_q1_title:
-            "Do you have health information that you need to declare?",
-        yes: "Yes",
-        no: "No",
-        not_sure: "Not sure",
-        health_q1_help:
-            "If you do not know how to answer a specific health question in the official form, do not guess. Check the applicable official information.",
-        health_q2_title:
-            "Additional information you want to prepare",
-        health_q2_help:
-            "This is a personal preparation aid. It does not replace the exact questions shown on the official portal.",
-        truth_title: "Main rule",
-        truth_text:
-            "For health information, always answer truthfully. CUBA AUTO TRAVEL organizes; the traveler makes the official declaration.",
-
-        continue_customs: "Continue to Customs",
-        customs_title:
-            "Customs: organize first, then declare.",
-        customs_text:
-            "We will not invent quantities or values. We help you identify what information you need to have ready.",
-        customs_q1_title:
-            "Do you have anything you need to declare?",
-        customs_q2_title:
-            "Is there additional information you want to prepare?",
-        customs_q2_help:
-            "If you have questions about an item, quantity, value or special condition, verify it in the official customs information before declaring.",
-        customs_tip_title: "Important",
-        customs_tip_text:
-            "Declaring information does not automatically mean that you must pay. Consequences depend on the item, quantity, value and applicable rules.",
-
-        review_dv: "Review D'Viajeros",
-        dv_review_title:
-            "Final review before opening D'Viajeros.",
-        dv_review_text:
-            "Check that your main information is prepared.",
-        dv_review_note_title: "After that:",
-        dv_review_note_text:
-            "open D'Viajeros in a new tab. Keep CUBA AUTO TRAVEL open so you can consult and copy information.",
-        open_dv_official: "Open official D'Viajeros",
-
-        dv_official_title:
-            "You are ready to enter the official form.",
-        dv_official_text:
-            "D'Viajeros will open in another tab. This application will remain available to help you.",
-        open_dv_again: "Open official D'Viajeros",
-
-        footer_text:
-            "Independent preparation and guidance application."
+        trip_purpose: "Purpose of travel",
+        extra_information: "Do you have anything else?",
+        extra_information_text: "If the official portal asks for information that is not shown here, that does not mean you are lost. Write it down and review it again in this application.",
+        dv_step5_title: "Health: answer according to your situation",
+        dv_health_intro: "Do not fill this section by guessing. CU CUBA AUTO TRAVEL helps you organize your answer, but you must declare the true information that applies to your situation.",
+        health_declaration: "Health information that must be declared",
+        select_option: "Select an option",
+        no_information: "I have no additional information to declare",
+        yes_information: "Yes, I have information to declare",
+        health_extra: "Additional information",
+        health_placeholder: "Write only real information that applies to your situation here.",
+        do_not_guess: "DO NOT GUESS",
+        health_warning: "If an official question is unclear, read it exactly on the official portal and use this section to organize your answer.",
+        dv_step6_title: "Customs: prepare what actually applies",
+        dv_customs_intro: "We will not invent quantities, values or categories. Use this section to think through and organize your information before answering on the official portal.",
+        customs_declaration: "Do you have information that must be declared?",
+        nothing_to_declare: "I have no additional information to declare",
+        something_to_declare: "Yes, I have something to declare",
+        customs_extra: "Details you want to prepare",
+        customs_placeholder: "Write the real details you need to review here.",
+        customs_tip_title: "Remember",
+        customs_tip: "If you have merchandise, a quantity, value or special situation, use the applicable official information to determine how it should be declared.",
+        dv_step7_title: "Review before opening D'Viajeros",
+        dv_step8_title: "Now open D'Viajeros",
+        dv_portal_instruction3: "Complete the official form and return here whenever you need to check or review information.",
+        open_dviajeros_portal: "OPEN OFFICIAL D'VIAJEROS ↗",
+        qr_note: "The official QR is generated by the official system after the corresponding procedure is completed.",
+        footer_text: "Independent preparation and companion application."
     }
 };
 
+function $(id) {
+    return document.getElementById(id);
+}
 
-function translatePage() {
+function getValue(id) {
+    const element = $(id);
+    return element ? element.value : "";
+}
+
+function getChecked(id) {
+    const element = $(id);
+    return element ? element.checked : false;
+}
+
+function setValue(id, value) {
+    const element = $(id);
+    if (element) {
+        element.value = value || "";
+    }
+}
+
+function setChecked(id, value) {
+    const element = $(id);
+    if (element) {
+        element.checked = Boolean(value);
+    }
+}
+
+function saveJSON(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+        console.warn("No se pudo guardar en localStorage.", error);
+    }
+}
+
+function loadJSON(key) {
+    try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : {};
+    } catch (error) {
+        return {};
+    }
+}
+
+function applyTranslations() {
+    const dictionary = translations[language];
+
     document.documentElement.lang = language;
 
-    document.querySelectorAll("[data-i18n]").forEach(element => {
-        const key = element.dataset.i18n;
-        if (
-            Object.prototype.hasOwnProperty.call(
-                translations[language],
-                key
-            )
-        ) {
-            element.textContent =
-                translations[language][key];
+    document.querySelectorAll("[data-i18n]").forEach(function (element) {
+        const key = element.getAttribute("data-i18n");
+        if (dictionary[key] !== undefined) {
+            element.textContent = dictionary[key];
         }
     });
 
-    document.querySelectorAll("[data-placeholder-es]").forEach(element => {
-        element.placeholder =
-            language === "es"
-                ? element.dataset.placeholderEs
-                : element.dataset.placeholderEn;
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (element) {
+        const key = element.getAttribute("data-i18n-placeholder");
+        if (dictionary[key] !== undefined) {
+            element.placeholder = dictionary[key];
+        }
     });
 
-    const languageButton =
-        document.getElementById("languageToggle");
+    $("languageButton").textContent = language === "es" ? "EN" : "ES";
 
-    if (languageButton) {
-        languageButton.textContent =
-            language === "es"
-                ? "ENGLISH"
-                : "ESPAÑOL";
-    }
-
-    localStorage.setItem(
-        LANGUAGE_STORAGE,
-        language
-    );
+    updateVisaStepper();
+    updateDviajerosStepper();
+    updateNavigationButtons();
+    updateVisaReview();
+    updateDviajerosReview();
 }
 
-
-function openOfficial(url) {
-    window.open(
-        url,
-        "_blank",
-        "noopener,noreferrer"
-    );
-}
-
-
-function showScreen(id) {
-    document.querySelectorAll(".screen").forEach(screen => {
+function showScreen(screenId) {
+    document.querySelectorAll(".screen").forEach(function (screen) {
         screen.classList.remove("active");
     });
 
-    const target = document.getElementById(id);
+    const screen = $(screenId);
 
-    if (target) {
-        target.classList.add("active");
+    if (screen) {
+        screen.classList.add("active");
         window.scrollTo({
             top: 0,
             behavior: "smooth"
@@ -677,58 +380,174 @@ function showScreen(id) {
     }
 }
 
+function saveVisa() {
+    const data = {
+        nationality: getValue("visaNationality"),
+        residence: getValue("visaResidence"),
+        passportCountry: getValue("visaPassportCountry"),
+        purpose: getValue("visaPurpose"),
+        email: getValue("visaEmail"),
+        hasPassport: getChecked("visaHasPassport"),
+        passportValid: getChecked("visaPassportValid"),
+        dualNationality: getChecked("visaDualNationality")
+    };
 
-function setVisaStep(step) {
-    currentVisaStep = Number(step);
+    saveJSON(STORAGE_VISA, data);
+}
 
-    document.querySelectorAll("[data-step-panel]").forEach(panel => {
-        panel.classList.toggle(
-            "active",
-            Number(panel.dataset.stepPanel) === currentVisaStep
-        );
-    });
+function loadVisa() {
+    const data = loadJSON(STORAGE_VISA);
 
-    document.querySelectorAll(".step-link[data-step]").forEach(link => {
-        link.classList.toggle(
-            "active",
-            Number(link.dataset.step) === currentVisaStep
-        );
-    });
+    setValue("visaNationality", data.nationality);
+    setValue("visaResidence", data.residence);
+    setValue("visaPassportCountry", data.passportCountry);
+    setValue("visaPurpose", data.purpose);
+    setValue("visaEmail", data.email);
 
-    if (currentVisaStep === 5) {
-        renderVisaReview();
+    setChecked("visaHasPassport", data.hasPassport);
+    setChecked("visaPassportValid", data.passportValid);
+    setChecked("visaDualNationality", data.dualNationality);
+}
+
+function saveDviajeros() {
+    const data = {
+        firstName: getValue("dvFirstName"),
+        lastName: getValue("dvLastName"),
+        nationality: getValue("dvNationality"),
+        birthDate: getValue("dvBirthDate"),
+        passportNumber: getValue("dvPassportNumber"),
+        passportCountry: getValue("dvPassportCountry"),
+        arrivalDate: getValue("dvArrivalDate"),
+        flightNumber: getValue("dvFlightNumber"),
+        airline: getValue("dvAirline"),
+        accommodation: getValue("dvAccommodation"),
+        addressCuba: getValue("dvAddressCuba"),
+        purpose: getValue("dvPurpose"),
+        healthAnswer: getValue("dvHealthAnswer"),
+        healthExtra: getValue("dvHealthExtra"),
+        customsAnswer: getValue("dvCustomsAnswer"),
+        customsExtra: getValue("dvCustomsExtra")
+    };
+
+    saveJSON(STORAGE_DVIAJEROS, data);
+}
+
+function loadDviajeros() {
+    const data = loadJSON(STORAGE_DVIAJEROS);
+
+    setValue("dvFirstName", data.firstName);
+    setValue("dvLastName", data.lastName);
+    setValue("dvNationality", data.nationality);
+    setValue("dvBirthDate", data.birthDate);
+    setValue("dvPassportNumber", data.passportNumber);
+    setValue("dvPassportCountry", data.passportCountry);
+    setValue("dvArrivalDate", data.arrivalDate);
+    setValue("dvFlightNumber", data.flightNumber);
+    setValue("dvAirline", data.airline);
+    setValue("dvAccommodation", data.accommodation);
+    setValue("dvAddressCuba", data.addressCuba);
+    setValue("dvPurpose", data.purpose);
+    setValue("dvHealthAnswer", data.healthAnswer);
+    setValue("dvHealthExtra", data.healthExtra);
+    setValue("dvCustomsAnswer", data.customsAnswer);
+    setValue("dvCustomsExtra", data.customsExtra);
+}
+
+function updateVisaStepper() {
+    const container = $("visaStepper");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    for (let i = 0; i < visaTotalSteps; i += 1) {
+        const dot = document.createElement("div");
+        dot.className = "step-dot";
+
+        if (i === visaStep) {
+            dot.classList.add("active");
+        } else if (i < visaStep) {
+            dot.classList.add("done");
+        }
+
+        dot.textContent = String(i + 1);
+        container.appendChild(dot);
+    }
+}
+
+function updateDviajerosStepper() {
+    const container = $("dviajerosStepper");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    for (let i = 0; i < dviajerosTotalSteps; i += 1) {
+        const dot = document.createElement("div");
+        dot.className = "step-dot";
+
+        if (i === dviajerosStep) {
+            dot.classList.add("active");
+        } else if (i < dviajerosStep) {
+            dot.classList.add("done");
+        }
+
+        dot.textContent = String(i + 1);
+        container.appendChild(dot);
+    }
+}
+
+function showVisaStep(step) {
+    if (step < 0) {
+        step = 0;
+    }
+
+    if (step >= visaTotalSteps) {
+        step = visaTotalSteps - 1;
     }
 
     saveVisa();
+    visaStep = step;
+
+    document.querySelectorAll("[data-visa-step]").forEach(function (panel) {
+        const panelStep = Number(panel.getAttribute("data-visa-step"));
+        panel.classList.toggle("hidden", panelStep !== visaStep);
+    });
+
+    updateVisaStepper();
+    updateNavigationButtons();
+    updateVisaReview();
+
     window.scrollTo({
         top: 0,
         behavior: "smooth"
     });
 }
 
+function showDviajerosStep(step) {
+    if (step < 0) {
+        step = 0;
+    }
 
-function setDvStep(step) {
-    currentDvStep = Number(step);
-
-    document.querySelectorAll("[data-dv-panel]").forEach(panel => {
-        panel.classList.toggle(
-            "active",
-            Number(panel.dataset.dvPanel) === currentDvStep
-        );
-    });
-
-    document.querySelectorAll(".dv-step-link").forEach(link => {
-        link.classList.toggle(
-            "active",
-            Number(link.dataset.dvStep) === currentDvStep
-        );
-    });
-
-    if (currentDvStep === 6) {
-        renderDvReview();
+    if (step >= dviajerosTotalSteps) {
+        step = dviajerosTotalSteps - 1;
     }
 
     saveDviajeros();
+    dviajerosStep = step;
+
+    document.querySelectorAll("[data-dviajeros-step]").forEach(function (panel) {
+        const panelStep = Number(panel.getAttribute("data-dviajeros-step"));
+        panel.classList.toggle("hidden", panelStep !== dviajerosStep);
+    });
+
+    updateDviajerosStepper();
+    updateNavigationButtons();
+    updateDviajerosReview();
 
     window.scrollTo({
         top: 0,
@@ -736,784 +555,354 @@ function setDvStep(step) {
     });
 }
 
+function updateNavigationButtons() {
+    const previousVisa = $("visaPreviousButton");
+    const nextVisa = $("visaNextButton");
+    const previousDV = $("dviajerosPreviousButton");
+    const nextDV = $("dviajerosNextButton");
 
-function value(id) {
-    const element = document.getElementById(id);
-    return element ? element.value.trim() : "";
-}
+    if (previousVisa) {
+        previousVisa.disabled = visaStep === 0;
+        previousVisa.style.visibility = visaStep === 0 ? "hidden" : "visible";
+    }
 
+    if (nextVisa) {
+        nextVisa.style.display = visaStep === visaTotalSteps - 1 ? "none" : "inline-flex";
+    }
 
-function checked(id) {
-    const element = document.getElementById(id);
-    return element ? element.checked : false;
-}
+    if (previousDV) {
+        previousDV.disabled = dviajerosStep === 0;
+        previousDV.style.visibility = dviajerosStep === 0 ? "hidden" : "visible";
+    }
 
-
-function setValue(id, val) {
-    const element = document.getElementById(id);
-    if (element && val !== undefined && val !== null) {
-        element.value = val;
+    if (nextDV) {
+        nextDV.style.display = dviajerosStep === dviajerosTotalSteps - 1 ? "none" : "inline-flex";
     }
 }
 
+function reviewItem(label, value) {
+    const item = document.createElement("div");
+    const hasValue = String(value || "").trim().length > 0;
 
-function saveVisa() {
-    const data = {
-        nationality: value("visaNationality"),
-        country_of_residence: value("visaResidence"),
-        passport_country: value("visaPassportCountry"),
-        travel_purpose: value("visaPurpose"),
-        email: value("visaEmail"),
-        has_passport: checked("visaHasPassport"),
-        passport_valid: checked("visaPassportValid")
-    };
+    item.className = "review-item " + (hasValue ? "ok" : "missing");
 
-    localStorage.setItem(
-        VISA_STORAGE,
-        JSON.stringify(data)
-    );
+    const labelElement = document.createElement("span");
+    labelElement.className = "review-label";
+    labelElement.textContent = label;
+
+    const status = document.createElement("span");
+    status.className = "review-status";
+    status.textContent = hasValue
+        ? (language === "es" ? "LISTO" : "READY")
+        : (language === "es" ? "FALTA INFORMACIÓN" : "MISSING");
+
+    item.appendChild(labelElement);
+    item.appendChild(status);
+
+    return item;
 }
 
+function updateVisaReview() {
+    const container = $("visaReview");
 
-function loadVisa() {
-    try {
-        const data = JSON.parse(
-            localStorage.getItem(VISA_STORAGE) || "{}"
-        );
-
-        setValue("visaNationality", data.nationality);
-        setValue("visaResidence", data.country_of_residence);
-        setValue("visaPassportCountry", data.passport_country);
-        setValue("visaPurpose", data.travel_purpose);
-        setValue("visaEmail", data.email);
-
-        const passport =
-            document.getElementById("visaHasPassport");
-
-        const valid =
-            document.getElementById("visaPassportValid");
-
-        if (passport) {
-            passport.checked = Boolean(
-                data.has_passport
-            );
-        }
-
-        if (valid) {
-            valid.checked = Boolean(
-                data.passport_valid
-            );
-        }
-
-    } catch {
-        localStorage.removeItem(VISA_STORAGE);
-    }
-}
-
-
-function saveDviajeros() {
-    const healthRadio =
-        document.querySelector(
-            'input[name="healthDeclaration"]:checked'
-        );
-
-    const customsRadio =
-        document.querySelector(
-            'input[name="customsDeclaration"]:checked'
-        );
-
-    const data = {
-        first_name: value("dvFirstName"),
-        last_name: value("dvLastName"),
-        nationality: value("dvNationality"),
-        date_of_birth: value("dvBirthDate"),
-        passport_number: value("dvPassport"),
-        passport_country: value("dvPassportCountry"),
-        arrival_date: value("dvArrivalDate"),
-        flight_number: value("dvFlight"),
-        airline: value("dvAirline"),
-        origin: value("dvOrigin"),
-        accommodation: value("dvAccommodation"),
-        address_in_cuba: value("dvAddress"),
-        purpose_of_trip: value("dvPurpose"),
-        health_declaration:
-            healthRadio ? healthRadio.value : "",
-        health_notes: value("dvHealthNotes"),
-        customs_declaration:
-            customsRadio ? customsRadio.value : "",
-        customs_notes: value("dvCustomsNotes")
-    };
-
-    localStorage.setItem(
-        DV_STORAGE,
-        JSON.stringify(data)
-    );
-}
-
-
-function loadDviajeros() {
-    try {
-        const data = JSON.parse(
-            localStorage.getItem(DV_STORAGE) || "{}"
-        );
-
-        const mapping = {
-            first_name: "dvFirstName",
-            last_name: "dvLastName",
-            nationality: "dvNationality",
-            date_of_birth: "dvBirthDate",
-            passport_number: "dvPassport",
-            passport_country: "dvPassportCountry",
-            arrival_date: "dvArrivalDate",
-            flight_number: "dvFlight",
-            airline: "dvAirline",
-            origin: "dvOrigin",
-            accommodation: "dvAccommodation",
-            address_in_cuba: "dvAddress",
-            purpose_of_trip: "dvPurpose",
-            health_notes: "dvHealthNotes",
-            customs_notes: "dvCustomsNotes"
-        };
-
-        Object.entries(mapping).forEach(
-            ([key, id]) => {
-                setValue(id, data[key]);
-            }
-        );
-
-        if (data.health_declaration) {
-            const radio = document.querySelector(
-                `input[name="healthDeclaration"][value="${data.health_declaration}"]`
-            );
-            if (radio) {
-                radio.checked = true;
-            }
-        }
-
-        if (data.customs_declaration) {
-            const radio = document.querySelector(
-                `input[name="customsDeclaration"][value="${data.customs_declaration}"]`
-            );
-            if (radio) {
-                radio.checked = true;
-            }
-        }
-
-    } catch {
-        localStorage.removeItem(DV_STORAGE);
-    }
-}
-
-
-async function copyField(id, button) {
-    const element = document.getElementById(id);
-
-    if (!element) {
+    if (!container) {
         return;
     }
 
-    const text =
-        element.value ||
-        element.textContent ||
-        "";
+    container.innerHTML = "";
 
-    if (!text.trim()) {
-        button.textContent =
+    const dictionary = translations[language];
+
+    container.appendChild(
+        reviewItem(dictionary.nationality, getValue("visaNationality"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.residence, getValue("visaResidence"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.passport_country, getValue("visaPassportCountry"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.travel_purpose, getValue("visaPurpose"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.email, getValue("visaEmail"))
+    );
+
+    container.appendChild(
+        reviewItem(
             language === "es"
-                ? "Vacío"
-                : "Empty";
+                ? "Pasaporte disponible"
+                : "Passport available",
+            getChecked("visaHasPassport") ? "ok" : ""
+        )
+    );
 
-        setTimeout(() => {
-            button.textContent =
-                language === "es"
-                    ? "Copiar"
-                    : "Copy";
-        }, 1200);
+    container.appendChild(
+        reviewItem(
+            language === "es"
+                ? "Vigencia revisada"
+                : "Validity checked",
+            getChecked("visaPassportValid") ? "ok" : ""
+        )
+    );
+}
 
+function updateDviajerosReview() {
+    const container = $("dviajerosReview");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    const dictionary = translations[language];
+
+    container.appendChild(
+        reviewItem(dictionary.first_name, getValue("dvFirstName"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.last_name, getValue("dvLastName"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.nationality, getValue("dvNationality"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.birth_date, getValue("dvBirthDate"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.passport_number, getValue("dvPassportNumber"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.passport_country, getValue("dvPassportCountry"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.arrival_date, getValue("dvArrivalDate"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.flight_number, getValue("dvFlightNumber"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.airline, getValue("dvAirline"))
+    );
+
+    container.appendChild(
+        reviewItem(dictionary.accommodation, getValue("dvAccommodation"))
+    );
+}
+
+function clearVisa() {
+    localStorage.removeItem(STORAGE_VISA);
+
+    [
+        "visaNationality",
+        "visaResidence",
+        "visaPassportCountry",
+        "visaPurpose",
+        "visaEmail"
+    ].forEach(function (id) {
+        setValue(id, "");
+    });
+
+    setChecked("visaHasPassport", false);
+    setChecked("visaPassportValid", false);
+    setChecked("visaDualNationality", false);
+
+    updateVisaReview();
+}
+
+function clearDviajeros() {
+    localStorage.removeItem(STORAGE_DVIAJEROS);
+
+    [
+        "dvFirstName",
+        "dvLastName",
+        "dvNationality",
+        "dvBirthDate",
+        "dvPassportNumber",
+        "dvPassportCountry",
+        "dvArrivalDate",
+        "dvFlightNumber",
+        "dvAirline",
+        "dvAccommodation",
+        "dvAddressCuba",
+        "dvPurpose",
+        "dvHealthAnswer",
+        "dvHealthExtra",
+        "dvCustomsAnswer",
+        "dvCustomsExtra"
+    ].forEach(function (id) {
+        setValue(id, "");
+    });
+
+    updateDviajerosReview();
+}
+
+async function copyValue(targetId, button) {
+    const value = getValue(targetId);
+
+    if (!value) {
         return;
     }
 
     try {
-        await navigator.clipboard.writeText(text);
-
-        button.textContent =
-            language === "es"
-                ? "¡Copiado!"
-                : "Copied!";
-
-    } catch {
-        const temp =
-            document.createElement("textarea");
-
-        temp.value = text;
-        temp.style.position = "fixed";
-        temp.style.opacity = "0";
-
-        document.body.appendChild(temp);
-        temp.focus();
-        temp.select();
+        await navigator.clipboard.writeText(value);
+    } catch (error) {
+        const temporary = document.createElement("textarea");
+        temporary.value = value;
+        document.body.appendChild(temporary);
+        temporary.select();
 
         try {
             document.execCommand("copy");
-
-            button.textContent =
-                language === "es"
-                    ? "¡Copiado!"
-                    : "Copied!";
-        } catch {
-            button.textContent =
-                language === "es"
-                    ? "Selecciona"
-                    : "Select";
+        } catch (copyError) {
+            console.warn("No se pudo copiar.", copyError);
         }
 
-        temp.remove();
+        document.body.removeChild(temporary);
     }
 
-    setTimeout(() => {
-        button.textContent =
-            language === "es"
-                ? "Copiar"
-                : "Copy";
-    }, 1400);
+    const original = button.textContent;
+    button.textContent = language === "es" ? "¡Copiado!" : "Copied!";
+
+    window.setTimeout(function () {
+        button.textContent = original;
+    }, 1200);
 }
 
-
-function renderVisaReview() {
-    const container =
-        document.getElementById("visaReview");
-
-    if (!container) {
+function openModule(module) {
+    if (module === "visa") {
+        showScreen("visaSection");
+        showVisaStep(0);
         return;
     }
 
-    const fields = [
-        ["visaNationality", "nationality"],
-        ["visaResidence", "residence"],
-        ["visaPassportCountry", "passport_country"],
-        ["visaPurpose", "travel_purpose"],
-        ["visaEmail", "email"]
-    ];
-
-    container.innerHTML = "";
-
-    fields.forEach(([id, key]) => {
-        const currentValue = value(id);
-        const ready = Boolean(currentValue);
-
-        const row =
-            document.createElement("div");
-
-        row.className =
-            `review-item ${ready ? "ready" : "missing"}`;
-
-        row.innerHTML = `
-            <div>
-                <strong>${translations[language][key]}</strong>
-                <small>${ready ? escapeHtml(currentValue) : (
-                    language === "es"
-                        ? "Falta información"
-                        : "Information missing"
-                )}</small>
-            </div>
-            <span class="review-status">
-                ${ready
-                    ? (language === "es" ? "LISTO" : "READY")
-                    : (language === "es" ? "FALTA" : "MISSING")}
-            </span>
-        `;
-
-        container.appendChild(row);
-    });
-
-    const passportRow =
-        document.createElement("div");
-
-    passportRow.className =
-        `review-item ${
-            checked("visaHasPassport")
-                ? "ready"
-                : "missing"
-        }`;
-
-    passportRow.innerHTML = `
-        <div>
-            <strong>${
-                language === "es"
-                    ? "Pasaporte disponible"
-                    : "Passport available"
-            }</strong>
-            <small>${
-                checked("visaHasPassport")
-                    ? (language === "es"
-                        ? "Indicado por el viajero"
-                        : "Confirmed by traveler")
-                    : (language === "es"
-                        ? "Comprueba que lo tienes contigo"
-                        : "Make sure you have it available")
-            }</small>
-        </div>
-        <span class="review-status">
-            ${
-                checked("visaHasPassport")
-                    ? (language === "es" ? "LISTO" : "READY")
-                    : (language === "es" ? "REVISAR" : "REVIEW")
-            }
-        </span>
-    `;
-
-    container.appendChild(passportRow);
-
-    const validityRow =
-        document.createElement("div");
-
-    validityRow.className =
-        `review-item ${
-            checked("visaPassportValid")
-                ? "ready"
-                : "missing"
-        }`;
-
-    validityRow.innerHTML = `
-        <div>
-            <strong>${
-                language === "es"
-                    ? "Vigencia revisada"
-                    : "Validity checked"
-            }</strong>
-            <small>${
-                checked("visaPassportValid")
-                    ? (language === "es"
-                        ? "Indicado por el viajero"
-                        : "Confirmed by traveler")
-                    : (language === "es"
-                        ? "Debes revisar tu documento"
-                        : "You should check your document")
-            }</small>
-        </div>
-        <span class="review-status">
-            ${
-                checked("visaPassportValid")
-                    ? (language === "es" ? "LISTO" : "READY")
-                    : (language === "es" ? "REVISAR" : "REVIEW")
-            }
-        </span>
-    `;
-
-    container.appendChild(validityRow);
-}
-
-
-function renderDvReview() {
-    const container =
-        document.getElementById("dvReview");
-
-    if (!container) {
-        return;
+    if (module === "dviajeros") {
+        showScreen("dviajerosSection");
+        showDviajerosStep(0);
     }
-
-    const fields = [
-        ["dvFirstName", "first_name"],
-        ["dvLastName", "last_name"],
-        ["dvNationality", "nationality"],
-        ["dvBirthDate", "birth_date"],
-        ["dvPassport", "passport_number"],
-        ["dvPassportCountry", "passport_country"],
-        ["dvArrivalDate", "arrival_date"],
-        ["dvFlight", "flight_number"],
-        ["dvAirline", "airline"]
-    ];
-
-    container.innerHTML = "";
-
-    fields.forEach(([id, key]) => {
-        const currentValue = value(id);
-        const ready = Boolean(currentValue);
-
-        const row =
-            document.createElement("div");
-
-        row.className =
-            `review-item ${ready ? "ready" : "missing"}`;
-
-        row.innerHTML = `
-            <div>
-                <strong>${translations[language][key]}</strong>
-                <small>${ready ? escapeHtml(currentValue) : (
-                    language === "es"
-                        ? "Falta información"
-                        : "Information missing"
-                )}</small>
-            </div>
-            <span class="review-status">
-                ${ready
-                    ? (language === "es" ? "LISTO" : "READY")
-                    : (language === "es" ? "FALTA" : "MISSING")}
-            </span>
-        `;
-
-        container.appendChild(row);
-    });
-
-    const health =
-        document.querySelector(
-            'input[name="healthDeclaration"]:checked'
-        );
-
-    const customs =
-        document.querySelector(
-            'input[name="customsDeclaration"]:checked'
-        );
-
-    addReviewChoice(
-        container,
-        language === "es"
-            ? "Preparación de salud"
-            : "Health preparation",
-        health
-            ? health.value
-            : "",
-        "health"
-    );
-
-    addReviewChoice(
-        container,
-        language === "es"
-            ? "Preparación de aduana"
-            : "Customs preparation",
-        customs
-            ? customs.value
-            : "",
-        "customs"
-    );
 }
 
+$("languageButton").addEventListener("click", function () {
+    language = language === "es" ? "en" : "es";
+    localStorage.setItem(STORAGE_LANGUAGE, language);
+    applyTranslations();
+});
 
-function addReviewChoice(
-    container,
-    title,
-    selected,
-    type
-) {
-    const row =
-        document.createElement("div");
+$("startVisaButton").addEventListener("click", function () {
+    openModule("visa");
+});
 
-    const ready = Boolean(selected);
+$("startDviajerosButton").addEventListener("click", function () {
+    openModule("dviajeros");
+});
 
-    const display = {
-        yes: language === "es" ? "Sí" : "Yes",
-        no: language === "es" ? "No" : "No",
-        review: language === "es"
-            ? "No estoy seguro"
-            : "Not sure"
-    };
-
-    row.className =
-        `review-item ${ready ? "ready" : "missing"}`;
-
-    row.innerHTML = `
-        <div>
-            <strong>${title}</strong>
-            <small>${
-                ready
-                    ? display[selected]
-                    : (
-                        language === "es"
-                            ? "Revisar"
-                            : "Review"
-                    )
-            }</small>
-        </div>
-        <span class="review-status">
-            ${
-                ready
-                    ? (language === "es"
-                        ? "LISTO"
-                        : "READY")
-                    : (language === "es"
-                        ? "REVISAR"
-                        : "REVIEW")
-            }
-        </span>
-    `;
-
-    container.appendChild(row);
-}
-
-
-function escapeHtml(text) {
-    return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-
-function bindNavigation() {
-
-    document
-        .getElementById("homeButton")
-        ?.addEventListener(
-            "click",
-            () => showScreen("homeSection")
-        );
-
-    document
-        .getElementById("startVisa")
-        ?.addEventListener(
-            "click",
-            () => {
-                showScreen("visaSection");
-                setVisaStep(1);
-            }
-        );
-
-    document
-        .getElementById("startDviajeros")
-        ?.addEventListener(
-            "click",
-            () => {
-                showScreen("dviajerosSection");
-                setDvStep(1);
-            }
-        );
-
-    document
-        .getElementById("visaBack")
-        ?.addEventListener(
-            "click",
-            () => showScreen("homeSection")
-        );
-
-    document
-        .getElementById("dviajerosBack")
-        ?.addEventListener(
-            "click",
-            () => showScreen("homeSection")
-        );
-
-    document
-        .getElementById("visaHome")
-        ?.addEventListener(
-            "click",
-            () => showScreen("homeSection")
-        );
-
-    document
-        .getElementById("dvHome")
-        ?.addEventListener(
-            "click",
-            () => showScreen("homeSection")
-        );
-}
-
-
-function bindOfficialButtons() {
-
-    [
-        "openVisaTop",
-        "visaOpenOfficial",
-        "visaOpenOfficialAgain"
-    ].forEach(id => {
-        document
-            .getElementById(id)
-            ?.addEventListener(
-                "click",
-                () => openOfficial(
-                    OFFICIAL_VISA_URL
-                )
-            );
+document.querySelectorAll("[data-back-home]").forEach(function (button) {
+    button.addEventListener("click", function () {
+        showScreen("homeSection");
     });
+});
 
-    [
-        "openDviajerosTop",
-        "dvOpenOfficial",
-        "dvOpenOfficialAgain"
-    ].forEach(id => {
-        document
-            .getElementById(id)
-            ?.addEventListener(
-                "click",
-                () => openOfficial(
-                    OFFICIAL_DVIAJEROS_URL
-                )
-            );
-    });
-}
+$("visaPreviousButton").addEventListener("click", function () {
+    showVisaStep(visaStep - 1);
+});
 
+$("visaNextButton").addEventListener("click", function () {
+    saveVisa();
+    showVisaStep(visaStep + 1);
+});
 
-function bindVisaSteps() {
+$("dviajerosPreviousButton").addEventListener("click", function () {
+    showDviajerosStep(dviajerosStep - 1);
+});
 
-    document.querySelectorAll(
-        ".step-link[data-step]"
-    ).forEach(button => {
-        button.addEventListener(
-            "click",
-            () => setVisaStep(
-                button.dataset.step
-            )
+$("dviajerosNextButton").addEventListener("click", function () {
+    saveDviajeros();
+    showDviajerosStep(dviajerosStep + 1);
+});
+
+$("clearVisaButton").addEventListener("click", function () {
+    const message = language === "es"
+        ? "¿Quieres borrar toda la preparación de Visa?"
+        : "Do you want to clear all Visa preparation?";
+
+    if (window.confirm(message)) {
+        clearVisa();
+    }
+});
+
+$("clearDviajerosButton").addEventListener("click", function () {
+    const message = language === "es"
+        ? "¿Quieres borrar toda la preparación de D'Viajeros?"
+        : "Do you want to clear all D'Viajeros preparation?";
+
+    if (window.confirm(message)) {
+        clearDviajeros();
+    }
+});
+
+document.querySelectorAll("[data-copy-target]").forEach(function (button) {
+    button.addEventListener("click", function () {
+        copyValue(
+            button.getAttribute("data-copy-target"),
+            button
         );
     });
+});
 
-    document.querySelectorAll(
-        ".next-step"
-    ).forEach(button => {
-        button.addEventListener(
-            "click",
-            () => setVisaStep(
-                button.dataset.next
-            )
-        );
+document.querySelectorAll("#visaSection input, #visaSection textarea, #visaSection select").forEach(function (element) {
+    element.addEventListener("input", function () {
+        saveVisa();
+        updateVisaReview();
     });
 
-    document.querySelectorAll(
-        ".prev-step"
-    ).forEach(button => {
-        button.addEventListener(
-            "click",
-            () => setVisaStep(
-                button.dataset.prev
-            )
-        );
+    element.addEventListener("change", function () {
+        saveVisa();
+        updateVisaReview();
     });
-}
+});
 
-
-function bindDvSteps() {
-
-    document.querySelectorAll(
-        ".dv-step-link"
-    ).forEach(button => {
-        button.addEventListener(
-            "click",
-            () => setDvStep(
-                button.dataset.dvStep
-            )
-        );
+document.querySelectorAll("#dviajerosSection input, #dviajerosSection textarea, #dviajerosSection select").forEach(function (element) {
+    element.addEventListener("input", function () {
+        saveDviajeros();
+        updateDviajerosReview();
     });
 
-    document.querySelectorAll(
-        ".next-dv-step"
-    ).forEach(button => {
-        button.addEventListener(
-            "click",
-            () => setDvStep(
-                button.dataset.next
-            )
-        );
+    element.addEventListener("change", function () {
+        saveDviajeros();
+        updateDviajerosReview();
     });
-
-    document.querySelectorAll(
-        ".prev-dv-step"
-    ).forEach(button => {
-        button.addEventListener(
-            "click",
-            () => setDvStep(
-                button.dataset.prev
-            )
-        );
-    });
-}
-
-
-function bindAutoSave() {
-
-    document.querySelectorAll(
-        "#visaSection input"
-    ).forEach(element => {
-        element.addEventListener(
-            "input",
-            saveVisa
-        );
-
-        element.addEventListener(
-            "change",
-            saveVisa
-        );
-    });
-
-    document.querySelectorAll(
-        "#dviajerosSection input, #dviajerosSection textarea"
-    ).forEach(element => {
-        element.addEventListener(
-            "input",
-            saveDviajeros
-        );
-
-        element.addEventListener(
-            "change",
-            saveDviajeros
-        );
-    });
-}
-
-
-function bindCopyButtons() {
-    document.querySelectorAll(
-        ".copy-field"
-    ).forEach(button => {
-        button.addEventListener(
-            "click",
-            () => copyField(
-                button.dataset.copy,
-                button
-            )
-        );
-    });
-}
-
-
-function bindLanguage() {
-    document
-        .getElementById("languageToggle")
-        ?.addEventListener(
-            "click",
-            () => {
-                language =
-                    language === "es"
-                        ? "en"
-                        : "es";
-
-                translatePage();
-
-                if (
-                    document
-                        .getElementById("visaSection")
-                        ?.classList.contains("active")
-                    && currentVisaStep === 5
-                ) {
-                    renderVisaReview();
-                }
-
-                if (
-                    document
-                        .getElementById("dviajerosSection")
-                        ?.classList.contains("active")
-                    && currentDvStep === 6
-                ) {
-                    renderDvReview();
-                }
-            }
-        );
-}
-
+});
 
 loadVisa();
 loadDviajeros();
 
-bindNavigation();
-bindOfficialButtons();
-bindVisaSteps();
-bindDvSteps();
-bindAutoSave();
-bindCopyButtons();
-bindLanguage();
+applyTranslations();
+showScreen("homeSection");
+showVisaStep(0);
+showDviajerosStep(0);
 
-translatePage();
-setVisaStep(1);
-setDvStep(1);
+window.CU_CUBA_AUTO_TRAVEL = {
+    openVisa: function () {
+        window.open(VISA_URL, "_blank", "noopener,noreferrer");
+    },
+    openDviajeros: function () {
+        window.open(DVIJEROS_URL, "_blank", "noopener,noreferrer");
+    }
+};
 ```
 
 });
