@@ -1,4 +1,3 @@
-```python id="w0s6az"
 # services/checklist_service.py
 # Cuba Travel & Consular Assistant
 # Servicio central de checklists.
@@ -816,4 +815,3 @@ __all__ = [
     "merge_checklist_state",
     "checklist_summary",
 ]
-```
