@@ -2,13 +2,11 @@
 # Cuba Travel & Consular Assistant
 # Servicio central de checklists.
 #
-# IMPORTANTE:
-# - Las reglas oficiales permanecen en rules_engine.py y data/*.json.
-# - Este servicio NO inventa requisitos.
-# - VERIFY / UNKNOWN nunca se convierten en CONFIRMED.
-# - El estado "completed" representa una acción del usuario,
-#   no una aprobación oficial.
-# - Este servicio no certifica cumplimiento legal.
+# Las reglas oficiales permanecen en rules_engine.py y data/*.json.
+# Este servicio no inventa requisitos.
+# VERIFY / UNKNOWN nunca se convierten en CONFIRMED.
+# "completed" representa una acción del usuario, no una aprobación oficial.
+# Este servicio no certifica cumplimiento legal.
 
 from __future__ import annotations
 
@@ -25,18 +23,13 @@ from rules_engine import (
 def _status_value(value: Any) -> str:
     if value is None:
         return RuleStatus.UNKNOWN.value
-
     if isinstance(value, RuleStatus):
         return value.value
-
     return str(getattr(value, "value", value)).lower()
 
 
 def _serialize(value: Any) -> Any:
-    if value is None:
-        return None
-
-    if isinstance(value, (str, int, float, bool)):
+    if value is None or isinstance(value, (str, int, float, bool)):
         return value
 
     if isinstance(value, dict):
@@ -53,7 +46,6 @@ def _serialize(value: Any) -> Any:
 
     if hasattr(value, "__dataclass_fields__"):
         from dataclasses import asdict
-
         return _serialize(asdict(value))
 
     if hasattr(value, "__dict__"):
@@ -93,7 +85,6 @@ def _profile_dict(profile: Any) -> Dict[str, Any]:
 def _category_value(category: Any) -> str:
     if category is None:
         return ""
-
     return str(getattr(category, "value", category)).lower()
 
 
@@ -104,10 +95,10 @@ def _normalize_category(category: Any) -> Any:
     if isinstance(category, RuleCategory):
         return category
 
-    raw = str(category).strip()
+    raw = str(category).strip().lower()
 
     for item in RuleCategory:
-        if raw.lower() in {
+        if raw in {
             str(item.value).lower(),
             str(item.name).lower(),
         }:
@@ -179,13 +170,6 @@ def _rule_source(item: Any) -> Any:
 
 
 def _item_status(status: Any) -> str:
-    """
-    Normaliza el estado del motor a un estado de checklist.
-
-    ACTIVE -> CONFIRMED
-    CONDITIONAL / VERIFY / EXPIRED -> VERIFY
-    UNKNOWN -> UNKNOWN
-    """
     value = _status_value(status)
 
     if value == RuleStatus.ACTIVE.value:
@@ -316,20 +300,12 @@ def _normalize_engine_items(
 
         else:
             source_status = getattr(item, "status", None)
-
             status = _item_status(source_status)
-
-            item_id = _rule_id(
-                item,
-                f"checklist-{index}",
-            )
-
+            item_id = _rule_id(item, f"checklist-{index}")
             title = _rule_title(item)
             description = _rule_description(item)
             source = _rule_source(item)
-            completed = bool(
-                getattr(item, "completed", False)
-            )
+            completed = bool(getattr(item, "completed", False))
 
         if status != "CONFIRMED":
             completed = False
@@ -390,34 +366,27 @@ def build_checklist(
 
     if not items:
         if normalized_category is not None:
-            results = _evaluate_category(
-                profile_data,
-                normalized_category,
-            )
-
             items = _normalize_engine_items(
-                results,
+                _evaluate_category(
+                    profile_data,
+                    normalized_category,
+                ),
                 normalized_category,
             )
-
         else:
             for category_item in RuleCategory:
-                results = _evaluate_category(
-                    profile_data,
-                    category_item,
-                )
-
                 items.extend(
                     _normalize_engine_items(
-                        results,
+                        _evaluate_category(
+                            profile_data,
+                            category_item,
+                        ),
                         category_item,
                     )
                 )
 
-    items = _deduplicate_items(items)
-
     return _finalize_checklist(
-        items=items,
+        items=_deduplicate_items(items),
         profile=profile_data,
         category=normalized_category,
     )
@@ -434,10 +403,14 @@ def build_category_checklist(
     profile: Any,
     category: Any,
 ) -> Dict[str, Any]:
-    return build_checklist(
-        profile,
-        category,
-    )
+    return build_checklist(profile, category)
+
+
+def generate_category_checklist(
+    profile: Any,
+    category: Any,
+) -> Dict[str, Any]:
+    return build_category_checklist(profile, category)
 
 
 def _finalize_checklist(
@@ -446,26 +419,22 @@ def _finalize_checklist(
     category: Any = None,
 ) -> Dict[str, Any]:
     confirmed = sum(
-        1
-        for item in items
+        1 for item in items
         if item["status"] == "CONFIRMED"
     )
 
     verification = sum(
-        1
-        for item in items
+        1 for item in items
         if item["status"] == "VERIFY"
     )
 
     unknown = sum(
-        1
-        for item in items
+        1 for item in items
         if item["status"] == "UNKNOWN"
     )
 
     completed = sum(
-        1
-        for item in items
+        1 for item in items
         if item["completed"]
     )
 
@@ -509,11 +478,6 @@ def update_checklist(
     checklist: Any,
     completed: Any = None,
 ) -> Dict[str, Any]:
-    """
-    Actualiza el estado de completado.
-
-    Completar una casilla NO cambia el estado oficial de la regla.
-    """
     if isinstance(checklist, dict):
         result = dict(checklist)
         items = list(result.get("items") or [])
@@ -578,7 +542,6 @@ def update_checklist(
             status = existing_status
 
         normalized["status"] = status
-
         normalized["completed"] = (
             item_id in completed_ids
             and status == "CONFIRMED"
@@ -614,8 +577,7 @@ def reset_checklist(
 
     return _finalize_checklist(
         items=[
-            item
-            for item in items
+            item for item in items
             if isinstance(item, dict)
         ],
         profile=result.get("profile") or {},
@@ -626,11 +588,6 @@ def reset_checklist(
 def complete_checklist(
     checklist: Any,
 ) -> Dict[str, Any]:
-    """
-    Marca como completados únicamente los elementos CONFIRMED.
-
-    VERIFY y UNKNOWN permanecen pendientes.
-    """
     if isinstance(checklist, dict):
         result = dict(checklist)
         items = list(result.get("items") or [])
@@ -647,16 +604,14 @@ def complete_checklist(
         if not isinstance(item, dict):
             continue
 
-        status = str(
-            item.get("status") or ""
-        ).upper()
-
-        item["completed"] = status == "CONFIRMED"
+        item["completed"] = (
+            str(item.get("status") or "").upper()
+            == "CONFIRMED"
+        )
 
     return _finalize_checklist(
         items=[
-            item
-            for item in items
+            item for item in items
             if isinstance(item, dict)
         ],
         profile=result.get("profile") or {},
@@ -665,7 +620,6 @@ def complete_checklist(
 
 
 def get_checklist_categories() -> List[str]:
-    """Devuelve las categorías disponibles en RuleCategory."""
     return [
         _category_value(category)
         for category in RuleCategory
@@ -673,19 +627,14 @@ def get_checklist_categories() -> List[str]:
 
 
 def checklist_categories() -> List[str]:
-    """
-    Alias de compatibilidad para main.py y versiones anteriores.
-    """
     return get_checklist_categories()
 
 
 def checklist_progress(checklist: Any) -> Dict[str, Any]:
     if isinstance(checklist, dict):
         items = checklist.get("items") or []
-
     elif isinstance(checklist, list):
         items = checklist
-
     else:
         items = []
 
@@ -739,22 +688,18 @@ def merge_checklist_state(
     state: Any = None,
 ) -> Dict[str, Any]:
     """
-    Fusiona un estado previamente guardado con una checklist.
-
     Compatible con:
-      - lista de IDs completados
-      - diccionario {id: true/false}
-      - objeto {completed: [...]}
-      - objeto {items: [...]}
-      - payload {checklist: [...], completed: [...]}
-      - payload {profile: {...}, checklist: [...]}
+    - lista de IDs completados
+    - {id: true/false}
+    - {completed: [...]}
+    - {items: [...]}
+    - {checklist: [...], completed: [...]}
+    - {profile: {...}, checklist: [...]}
     """
 
-    # Compatibilidad con un payload completo enviado por main.py.
     if isinstance(checklist, dict) and state is None:
         if "checklist" in checklist:
             payload = checklist
-
             raw_checklist = payload.get("checklist")
 
             if isinstance(raw_checklist, dict):
@@ -782,21 +727,16 @@ def merge_checklist_state(
             ):
                 completed = payload["state"].get("completed")
 
-            if completed is None:
-                completed = []
-
             return update_checklist(
                 base,
-                completed,
+                completed or [],
             )
 
         return checklist
 
     if state is None:
         if isinstance(checklist, list):
-            return {
-                "items": checklist,
-            }
+            return {"items": checklist}
 
         if isinstance(checklist, dict):
             return checklist
@@ -807,15 +747,17 @@ def merge_checklist_state(
         if "completed" in state:
             completed = state["completed"]
 
-        elif "items" in state and isinstance(
-            state["items"],
-            list,
+        elif (
+            "items" in state
+            and isinstance(state["items"], list)
         ):
             completed = [
                 item.get("id")
                 for item in state["items"]
-                if isinstance(item, dict)
-                and item.get("completed")
+                if (
+                    isinstance(item, dict)
+                    and item.get("completed")
+                )
             ]
 
         else:
@@ -837,7 +779,9 @@ def merge_checklist_state(
     )
 
 
-def checklist_summary(checklist: Any) -> Dict[str, Any]:
+def checklist_summary(
+    checklist: Any,
+) -> Dict[str, Any]:
     progress = checklist_progress(checklist)
 
     status = None
@@ -855,6 +799,7 @@ __all__ = [
     "build_checklist",
     "get_checklist",
     "build_category_checklist",
+    "generate_category_checklist",
     "update_checklist",
     "reset_checklist",
     "complete_checklist",
