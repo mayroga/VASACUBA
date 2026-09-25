@@ -20,13 +20,16 @@ OFFICIAL_DVIAJEROS_URL="https://dviajeros.mitrans.gob.cu/"
 
 app=FastAPI(title=APP_NAME,version=APP_VERSION,description="Práctica y preparación independiente para Visa/eVisa Cuba y D'Viajeros.")
 
-def load_json(path:Path)->Dict[str,Any]:
-try:
-if not path.exists():return {}
-with path.open("r",encoding="utf-8") as f:data=json.load(f)
-return data if isinstance(data,dict) else {}
-except (OSError,ValueError,TypeError):return {}
-
+def load_json(path: Path) -> Dict[str, Any]:
+    try:
+        if not path.exists():
+            return {}
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError, TypeError):
+        return {}
+      
 def clean(v:Any)->str:return "" if v is None else str(v).strip()
 
 def missing_fields(data:Dict,fields:List)->List[str]:
