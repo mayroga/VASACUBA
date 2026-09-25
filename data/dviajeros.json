@@ -1,1 +1,180 @@
-{"module":"dviajeros","version":"2026.4","name":"D'Viajeros","purpose":"Simulador de práctica para preparar y revisar la información que el viajero deberá transcribir posteriormente en el portal oficial D'Viajeros.","official_portal":"https://dviajeros.mitrans.gob.cu/","status_policy":{"CONFIRMED":"Información que puede utilizarse directamente en la práctica.","VERIFY":"Debe comprobarse en el formulario o fuente oficial antes de transcribirla.","INCOMPLETE":"Falta información para continuar con la práctica."},"app_scope":{"can_explain":true,"can_simulate":true,"can_save_practice":true,"can_review_practice":true,"can_generate_official_qr":false,"can_submit_official_form":false,"can_process_official_payment":false,"can_modify_official_data":false},"what_is_it":{"title":"¿Qué es D'Viajeros?","description":"D'Viajeros es el proceso oficial de información adelantada de viajeros para la entrada a Cuba. La información permite adelantar datos utilizados por las autoridades correspondientes en el proceso de entrada.","official_areas":["Inmigración y Extranjería","Aduana General de la República","Ministerio de Salud Pública"],"important":"CUBA AUTO TRAVEL 2026 no sustituye el formulario oficial. La práctica sirve para que el viajero prepare sus respuestas con calma y después las transcriba al portal oficial."},"practice_method":{"title":"Practica antes de hacerlo oficialmente","steps":["Leer la explicación de la pantalla.","Preparar los documentos y datos necesarios.","Introducir las respuestas en la práctica.","Guardar y revisar las respuestas.","Corregir cualquier dato antes de terminar.","Abrir el portal oficial D'Viajeros.","Transcribir la información preparada en el formulario oficial.","Completar y enviar el proceso únicamente en el portal oficial.","Obtener allí el comprobante o QR oficial cuando corresponda."],"warning":"Completar esta práctica no significa que el formulario oficial haya sido enviado."},"screens":[{"id":"intro","order":1,"title":"Antes de comenzar","status":"CONFIRMED","explanation":"Primero prepara la información que necesitarás durante el formulario oficial.","prepare":["Pasaporte","Información personal","Información del viaje","Información del vuelo cuando corresponda","Información de alojamiento cuando corresponda","Información necesaria para las secciones de salud y aduana"],"example":{"title":"Ejemplo de preparación","text":"Este ejemplo solamente muestra cómo organizar la información. No debe copiarse como información personal."}},{"id":"personal_information","order":2,"title":"Información personal","status":"CONFIRMED","explanation":"En esta parte se preparan los datos de identificación del viajero.","fields":[{"name":"first_name","label":"Nombre","status":"CONFIRMED","required":true,"example":"JUAN","help":"Escribe el nombre tal como aparece en tu documento."},{"name":"last_name","label":"Apellido(s)","status":"CONFIRMED","required":true,"example":"PÉREZ GÓMEZ","help":"Utiliza los apellidos correspondientes a tu documento."},{"name":"nationality","label":"Nacionalidad","status":"CONFIRMED","required":true,"example":"ESTADOS UNIDOS","help":"Selecciona o escribe tu nacionalidad según corresponda en el formulario oficial."},{"name":"date_of_birth","label":"Fecha de nacimiento","status":"CONFIRMED","required":true,"example":"15/08/1985","help":"Comprueba la fecha directamente con tu documento."}],"review":"Antes de continuar, compara los datos con tu pasaporte."},{"id":"migration","order":3,"title":"Información migratoria","status":"CONFIRMED","explanation":"Esta sección prepara la información relacionada con la identificación del viajero y su entrada al país.","fields":[{"name":"passport_number","label":"Número de pasaporte","status":"CONFIRMED","required":true,"example":"A1234567","help":"Copia el número exactamente como aparece en el pasaporte."},{"name":"passport_country","label":"País emisor del pasaporte","status":"CONFIRMED","required":true,"example":"ESTADOS UNIDOS","help":"Indica el país que emitió el pasaporte."},{"name":"arrival_date","label":"Fecha de llegada","status":"CONFIRMED","required":true,"example":"20/10/2026","help":"Utiliza la fecha correspondiente a tu llegada a Cuba."},{"name":"flight_number","label":"Número de vuelo","status":"VERIFY","required":false,"example":"Ejemplo: AB123","help":"La disponibilidad y forma exacta de este campo deben comprobarse en el formulario oficial."},{"name":"airline","label":"Aerolínea","status":"VERIFY","required":false,"example":"Ejemplo: Nombre de aerolínea","help":"Comprueba cómo aparece este dato en el formulario oficial."}],"review":"Comprueba número de pasaporte, país emisor y fecha de llegada antes de continuar."},{"id":"accommodation","order":4,"title":"Alojamiento y viaje","status":"VERIFY","explanation":"Prepara la información relacionada con tu estancia y viaje cuando el formulario oficial la solicite.","fields":[{"name":"accommodation","label":"Alojamiento","status":"VERIFY","required":false,"example":"Ejemplo: nombre del hotel","help":"El campo y sus opciones deben comprobarse en el formulario oficial."},{"name":"address_in_cuba","label":"Dirección en Cuba","status":"VERIFY","required":false,"example":"Ejemplo: dirección del alojamiento","help":"Utiliza la información real de tu estancia cuando corresponda."},{"name":"purpose_of_trip","label":"Motivo del viaje","status":"VERIFY","required":false,"example":"Ejemplo: turismo","help":"La opción exacta debe seleccionarse según lo que muestre el formulario oficial."}],"warning":"No se deben inventar opciones ni respuestas. Si el formulario oficial presenta una pregunta diferente, sigue el formulario oficial."},{"id":"health","order":5,"title":"Información de salud","status":"VERIFY","explanation":"Esta parte corresponde a la información sanitaria solicitada dentro del proceso oficial.","fields":[{"name":"health_information","label":"Información solicitada sobre salud","status":"VERIFY","required":false,"example":"Practica aquí exactamente la información que corresponda cuando el formulario oficial la solicite.","help":"No se agregan preguntas, enfermedades, cantidades ni requisitos que no hayan sido verificados en la fuente oficial."}],"warning":"CUBA AUTO TRAVEL 2026 no determina requisitos sanitarios oficiales. El contenido exacto debe comprobarse en el formulario oficial."},{"id":"customs","order":6,"title":"Aduana","status":"VERIFY","explanation":"Esta parte corresponde a la información que el viajero debe proporcionar a la Aduana General de la República mediante el proceso oficial.","fields":[{"name":"customs_information","label":"Información de aduana","status":"VERIFY","required":false,"example":"Practica aquí las declaraciones que correspondan según las preguntas reales del formulario oficial.","help":"No se inventan límites, cantidades, valores, categorías ni respuestas."}],"warning":"Las reglas y preguntas aduaneras deben verificarse directamente con la Aduana y con el formulario oficial."},{"id":"review","order":7,"title":"Revisión final","status":"CONFIRMED","explanation":"Aquí el viajero revisa toda la información que preparó antes de pasar al portal oficial.","review_items":["Datos personales","Pasaporte","Fecha de llegada","Vuelo y aerolínea cuando corresponda","Alojamiento cuando corresponda","Información de salud","Información de aduana"],"actions":["Revisar","Corregir","Volver a practicar","Finalizar preparación"],"important":"Finalizar esta pantalla solamente termina la práctica. No envía información al Gobierno de Cuba."},{"id":"official","order":8,"title":"Pasar al portal oficial","status":"CONFIRMED","explanation":"Después de revisar la práctica, el viajero puede abrir el portal oficial y transcribir allí sus respuestas.","official_portal":"https://dviajeros.mitrans.gob.cu/","steps":["Abrir el portal oficial.","Completar el formulario oficial directamente.","Comparar cada respuesta con la práctica guardada.","Revisar antes de enviar.","Completar el proceso oficial.","Obtener el comprobante o QR oficial cuando corresponda."],"important":"CUBA AUTO TRAVEL 2026 no envía el formulario oficial ni genera el QR oficial."}],"saved_practice":{"enabled":true,"storage":"local_session","purpose":"Conservar las respuestas introducidas por el usuario durante la práctica para que pueda revisarlas y corregirlas antes de utilizar el portal oficial.","allow_edit":true,"allow_review":true,"official_submission":false,"official_qr":false},"example_policy":{"title":"Ejemplos de práctica","rules":["Los ejemplos son ficticios y sirven solamente para demostrar cómo preparar una respuesta.","Nunca deben presentarse como datos oficiales del usuario.","Los ejemplos deben conservar el tipo de información que solicita el proceso real.","No se deben inventar preguntas o campos para completar artificialmente una pantalla.","Cuando un campo no esté confirmado, debe aparecer como VERIFY."],"example_person":"JUAN PÉREZ GÓMEZ","example_passport":"A1234567","example_birth_date":"15/08/1985","example_arrival":"20/10/2026","warning":"Los ejemplos anteriores son datos ficticios."},"final_checklist":["Pasaporte a mano","Nombre y apellidos revisados","Fecha de nacimiento revisada","Nacionalidad revisada","Número de pasaporte revisado","País emisor revisado","Fecha de llegada revisada","Información del vuelo revisada cuando corresponda","Alojamiento revisado cuando corresponda","Salud revisada según el formulario oficial","Aduana revisada según el formulario oficial","Toda la práctica revisada antes de abrir el portal oficial"],"qr_code":{"official":true,"generated_by_app":false,"description":"El QR, cuando corresponda, pertenece al proceso oficial. CUBA AUTO TRAVEL 2026 no crea ni simula un QR oficial."},"official_submission":{"completed_by_app":false,"description":"La aplicación no envía datos al portal oficial. El usuario debe completar y enviar el formulario directamente en D'Viajeros."},"official_sources":[{"name":"D'Viajeros","url":"https://dviajeros.mitrans.gob.cu/"},{"name":"Inmigración y Extranjería","url":"https://diie.minint.gob.cu/"},{"name":"Aduana General de la República","url":"https://www.aduana.gob.cu/"},{"name":"Ministerio de Salud Pública","url":"https://salud.msp.gob.cu/"}],"disclaimer":"CUBA AUTO TRAVEL 2026 es una herramienta independiente de preparación y práctica. No pertenece al Gobierno de Cuba, Ministerio de Transporte, Dirección de Identificación, Inmigración y Extranjería, Aduana General de la República ni Ministerio de Salud Pública. No recibe ni envía el formulario oficial, no aprueba trámites, no genera el QR oficial y no sustituye las instrucciones, preguntas o decisiones de las autoridades correspondientes."}
+{
+  "app":"CUBA AUTO TRAVEL 2026",
+  "updated":"2026-09-25",
+  "title":"D'Viajeros",
+  "description":"Formulario digital obligatorio para los viajeros que ingresan a Cuba.",
+  "official_source":{
+    "name":"D'Viajeros",
+    "url":"https://www.dviajeros.mitrans.gob.cu/"
+  },
+  "purpose":"Permitir al viajero proporcionar por adelantado la información requerida para su entrada a Cuba y obtener el código QR correspondiente.",
+  "required":true,
+  "applies_to":"Viajeros que ingresan a Cuba, conforme a las reglas vigentes.",
+  "when_to_complete":{
+    "description":"El formulario debe completarse antes del viaje dentro del período establecido por las autoridades cubanas.",
+    "instruction":"Consulta el portal oficial antes de completar el formulario para confirmar el plazo vigente."
+  },
+  "result":{
+    "name":"Código QR",
+    "description":"Al finalizar correctamente el formulario se genera un código QR que debe conservarse para presentarlo durante el proceso de entrada.",
+    "keep_copy":true,
+    "recommended_copies":[
+      "Teléfono móvil",
+      "Correo electrónico",
+      "Copia descargada o impresa"
+    ]
+  },
+  "information_required":{
+    "traveler":{
+      "title":"Datos del viajero",
+      "fields":[
+        "Nombre",
+        "Apellidos",
+        "Fecha de nacimiento",
+        "Sexo",
+        "Nacionalidad",
+        "País de nacimiento"
+      ]
+    },
+    "passport":{
+      "title":"Datos del documento de viaje",
+      "fields":[
+        "Número de pasaporte",
+        "País emisor",
+        "Fecha de emisión",
+        "Fecha de vencimiento"
+      ]
+    },
+    "travel":{
+      "title":"Datos del viaje",
+      "fields":[
+        "Fecha de llegada",
+        "Vuelo",
+        "Aeropuerto de entrada",
+        "País de procedencia"
+      ]
+    },
+    "accommodation":{
+      "title":"Alojamiento",
+      "description":"Cuando corresponda, se proporciona la información del lugar donde se hospedará el viajero.",
+      "possible_information":[
+        "Dirección del alojamiento",
+        "Provincia",
+        "Municipio",
+        "Hotel o casa particular"
+      ]
+    },
+    "health":{
+      "title":"Información sanitaria",
+      "description":"El formulario puede solicitar información relacionada con la declaración sanitaria requerida para el ingreso.",
+      "instruction":"Responde las preguntas sanitarias exactamente según tu situación."
+    },
+    "customs":{
+      "title":"Información aduanera",
+      "description":"El proceso puede incluir información necesaria para las autoridades aduaneras.",
+      "instruction":"Declara correctamente los bienes y artículos cuando el formulario lo solicite."
+    },
+    "immigration":{
+      "title":"Información migratoria",
+      "description":"La información migratoria forma parte del proceso de entrada."
+    }
+  },
+  "visa":{
+    "related":true,
+    "description":"Cuando el viajero necesita visa, debe disponer de la información de visa correspondiente durante el proceso.",
+    "visa_code":"Puede solicitarse el código correspondiente a la visa.",
+    "important":"D'Viajeros no sustituye la visa."
+  },
+  "steps":[
+    {
+      "number":1,
+      "title":"Entra al portal",
+      "description":"Accede al sitio oficial de D'Viajeros."
+    },
+    {
+      "number":2,
+      "title":"Selecciona el formulario",
+      "description":"Inicia el proceso correspondiente a tu entrada a Cuba."
+    },
+    {
+      "number":3,
+      "title":"Completa tus datos",
+      "description":"Introduce tus datos personales y los datos de tu documento de viaje."
+    },
+    {
+      "number":4,
+      "title":"Completa los datos del viaje",
+      "description":"Introduce la información del vuelo, procedencia y entrada a Cuba."
+    },
+    {
+      "number":5,
+      "title":"Completa las declaraciones",
+      "description":"Responde las secciones sanitaria, migratoria y aduanera que correspondan."
+    },
+    {
+      "number":6,
+      "title":"Revisa",
+      "description":"Comprueba que los datos coincidan exactamente con tus documentos."
+    },
+    {
+      "number":7,
+      "title":"Envía",
+      "description":"Finaliza el formulario."
+    },
+    {
+      "number":8,
+      "title":"Guarda el QR",
+      "description":"Conserva el código QR generado para presentarlo durante tu entrada."
+    }
+  ],
+  "before_start":[
+    "Pasaporte",
+    "Datos personales",
+    "Información del vuelo",
+    "Datos de procedencia",
+    "Información del alojamiento",
+    "Información de visa cuando corresponda",
+    "Información sanitaria requerida",
+    "Información aduanera requerida"
+  ],
+  "common_errors":[
+    {
+      "error":"Número de pasaporte incorrecto",
+      "solution":"Escribe el número exactamente como aparece en el pasaporte."
+    },
+    {
+      "error":"Nombre diferente al pasaporte",
+      "solution":"Utiliza exactamente los datos del documento de viaje."
+    },
+    {
+      "error":"Fecha incorrecta",
+      "solution":"Comprueba día, mes y año antes de enviar."
+    },
+    {
+      "error":"Datos del vuelo incorrectos",
+      "solution":"Comprueba la información directamente con tu reserva o boleto."
+    },
+    {
+      "error":"No guardar el QR",
+      "solution":"Guarda una copia en el teléfono y, si es posible, otra copia adicional."
+    }
+  ],
+  "important":[
+    "D'Viajeros no es una visa.",
+    "Completar D'Viajeros no sustituye los requisitos migratorios.",
+    "Completar D'Viajeros no sustituye el pasaporte.",
+    "Completar D'Viajeros no sustituye el seguro médico requerido.",
+    "La información debe coincidir con los documentos del viajero.",
+    "No introduzcas información falsa.",
+    "Los requisitos y el funcionamiento del sistema pueden cambiar.",
+    "Utiliza el portal oficial para realizar el trámite."
+  ],
+  "official_links":[
+    {
+      "title":"Portal oficial D'Viajeros",
+      "url":"https://www.dviajeros.mitrans.gob.cu/"
+    }
+  ],
+  "app_notice":"CUBA AUTO TRAVEL 2026 ofrece orientación. El formulario oficial y la decisión de las autoridades corresponden exclusivamente a las autoridades cubanas."
+}
+
