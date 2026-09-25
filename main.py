@@ -1,5 +1,3 @@
-from **future** import annotations
-
 import json
 from datetime import date
 from pathlib import Path
@@ -12,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from schemas import VisaRequest, DViajerosRequest
 
 APP_NAME = "CUBA AUTO TRAVEL 2026"
-APP_VERSION = "4.0.0"
+APP_VERSION = "4.0.1"
 
 BASE_DIR = Path(**file**).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -28,10 +26,7 @@ OFFICIAL_DVIAJEROS_URL = "https://dviajeros.mitrans.gob.cu/"
 app = FastAPI(
 title=APP_NAME,
 version=APP_VERSION,
-description=(
-"Asistente independiente para preparar y acompañar al viajero "
-"antes y durante el uso de los portales oficiales de eVisa Cuba y D'Viajeros."
-),
+description="Asistente independiente para preparar y acompañar al viajero antes y durante el uso de los portales oficiales de eVisa Cuba y D'Viajeros."
 )
 
 def load_json(path: Path) -> Dict[str, Any]:
@@ -68,7 +63,12 @@ return False
 
 def email_valid(value: str) -> bool:
 value = clean(value)
-return "@" in value and "." in value.rsplit("@", 1)[-1]
+
+if not value or "@" not in value:
+    return False
+
+domain = value.rsplit("@", 1)[-1]
+return "." in domain
 
 def passport_number_valid(value: str) -> bool:
 value = clean(value).replace(" ", "")
@@ -85,7 +85,7 @@ first_name: str,
 last_name: str,
 birth_date: str,
 expiration: str,
-travel_date: str = "",
+travel_date: str = ""
 ) -> Dict[str, Any]:
 
 missing = []
@@ -96,7 +96,7 @@ fields = {
     "first_name": first_name,
     "last_name": last_name,
     "date_of_birth": birth_date,
-    "passport_expiration": expiration,
+    "passport_expiration": expiration
 }
 
 for field, value in fields.items():
@@ -164,7 +164,7 @@ return {
     "message": message,
     "missing_fields": missing,
     "checks": checks,
-    "official_validity_confirmed": False,
+    "official_validity_confirmed": False
 }
 
 @app.get("/")
@@ -177,7 +177,7 @@ if index.exists():
 return {
     "app": APP_NAME,
     "version": APP_VERSION,
-    "status": "ok",
+    "status": "ok"
 }
 
 @app.get("/health")
@@ -185,7 +185,7 @@ def health():
 return {
 "status": "ok",
 "app": APP_NAME,
-"version": APP_VERSION,
+"version": APP_VERSION
 }
 
 @app.get("/api/health")
@@ -197,19 +197,16 @@ def api_info():
 return {
 "app": APP_NAME,
 "version": APP_VERSION,
-"purpose": (
-"Preparar, revisar y acompañar al viajero "
-"sin sustituir los trámites oficiales."
-),
+"purpose": "Preparar, revisar y acompañar al viajero sin sustituir los trámites oficiales.",
 "modules": {
 "visa": True,
 "dviajeros": True,
-"passport_check": True,
+"passport_check": True
 },
 "official_portals": {
 "visa": OFFICIAL_VISA_URL,
-"dviajeros": OFFICIAL_DVIAJEROS_URL,
-},
+"dviajeros": OFFICIAL_DVIAJEROS_URL
+}
 }
 
 @app.get("/api/visa")
@@ -218,7 +215,7 @@ return {
 "module": "visa",
 "name": "Visa cubana / eVisa",
 "official_portal": OFFICIAL_VISA_URL,
-"data": get_visa_data(),
+"data": get_visa_data()
 }
 
 @app.get("/api/dviajeros")
@@ -227,14 +224,14 @@ return {
 "module": "dviajeros",
 "name": "D'Viajeros",
 "official_portal": OFFICIAL_DVIAJEROS_URL,
-"data": get_dviajeros_data(),
+"data": get_dviajeros_data()
 }
 
 @app.get("/api/passports")
 def passports_information():
 return {
 "module": "passports",
-"data": get_passports_data(),
+"data": get_passports_data()
 }
 
 @app.post("/api/visa/evaluate")
@@ -246,7 +243,7 @@ first_name=request.first_name,
 last_name=request.last_name,
 birth_date=request.date_of_birth,
 expiration=request.passport_expiration,
-travel_date=request.arrival_date,
+travel_date=request.arrival_date
 )
 
 required = [
@@ -259,7 +256,7 @@ required = [
     "date_of_birth",
     "passport_expiration",
     "travel_purpose",
-    "email",
+    "email"
 ]
 
 data = request.model_dump()
@@ -286,9 +283,7 @@ if request.dual_nationality:
         "message": "Revisa las instrucciones oficiales aplicables a tu situación."
     })
 
-if passport["missing_fields"]:
-    status = "FALTA ESTE DATO"
-elif missing:
+if passport["missing_fields"] or missing:
     status = "FALTA ESTE DATO"
 elif checks:
     status = "REVISA ESTO"
@@ -305,13 +300,14 @@ return {
     "official_document_issued": False,
     "app_issues_visa": False,
     "official_submission_completed": False,
-    "payment_received_by_app": False,
+    "payment_received_by_app": False
 }
 
 @app.post("/api/dviajeros/evaluate")
 def dviajeros_evaluate(request: DViajerosRequest):
 data = request.model_dump()
 
+```
 passport = passport_check(
     country=request.passport_country,
     number=request.passport_number,
@@ -319,7 +315,7 @@ passport = passport_check(
     last_name=request.last_name,
     birth_date=request.date_of_birth,
     expiration=request.passport_expiration,
-    travel_date=request.arrival_date,
+    travel_date=request.arrival_date
 )
 
 required = [
@@ -333,7 +329,7 @@ required = [
     "arrival_date",
     "flight_number",
     "airline",
-    "accommodation",
+    "accommodation"
 ]
 
 missing = [
@@ -343,18 +339,13 @@ missing = [
 ]
 
 health_ok = bool(request.health_information)
-
 customs_ok = bool(request.customs_information)
 
 modules = [
     {
         "id": "passport",
         "title": "Pasaporte",
-        "status": (
-            "LISTO"
-            if passport["status"] == "LISTO"
-            else passport["status"]
-        ),
+        "status": passport["status"]
     },
     {
         "id": "travel",
@@ -366,11 +357,11 @@ modules = [
                 for field in [
                     "arrival_date",
                     "flight_number",
-                    "airline",
+                    "airline"
                 ]
             )
             else "FALTA ESTE DATO"
-        ),
+        )
     },
     {
         "id": "accommodation",
@@ -379,18 +370,18 @@ modules = [
             "LISTO"
             if clean(request.accommodation)
             else "FALTA ESTE DATO"
-        ),
+        )
     },
     {
         "id": "health",
         "title": "Salud",
-        "status": "LISTO" if health_ok else "REVISA ESTO",
+        "status": "LISTO" if health_ok else "REVISA ESTO"
     },
     {
         "id": "customs",
         "title": "Aduana",
-        "status": "LISTO" if customs_ok else "REVISA ESTO",
-    },
+        "status": "LISTO" if customs_ok else "REVISA ESTO"
+    }
 ]
 
 if passport["status"] != "LISTO":
@@ -415,7 +406,7 @@ return {
     ),
     "official_portal": OFFICIAL_DVIAJEROS_URL,
     "official_qr_generated": False,
-    "official_submission_completed": False,
+    "official_submission_completed": False
 }
 
 @app.get("/api/sources")
@@ -423,31 +414,23 @@ def sources():
 return {
 "visa": {
 "name": "eVisa Cuba",
-"url": OFFICIAL_VISA_URL,
+"url": OFFICIAL_VISA_URL
 },
 "dviajeros": {
 "name": "D'Viajeros",
-"url": OFFICIAL_DVIAJEROS_URL,
-},
+"url": OFFICIAL_DVIAJEROS_URL
+}
 }
 
 @app.get("/api/disclaimer")
 def disclaimer():
 return {
-"text": (
-"CUBA AUTO TRAVEL 2026 es una aplicación independiente "
-"de preparación y acompañamiento. No pertenece al Gobierno "
-"de Cuba, MINREX ni a las autoridades migratorias, sanitarias "
-"o aduanales. No emite visas, no presenta trámites oficiales, "
-"no genera códigos QR oficiales y no sustituye los portales "
-"oficiales. El trámite oficial se realiza directamente con "
-"la autoridad correspondiente."
-)
+"text": "CUBA AUTO TRAVEL 2026 es una aplicación independiente de preparación y acompañamiento. No pertenece al Gobierno de Cuba, MINREX ni a las autoridades migratorias, sanitarias o aduanales. No emite visas, no presenta trámites oficiales, no genera códigos QR oficiales y no sustituye los portales oficiales. El trámite oficial se realiza directamente con la autoridad correspondiente."
 }
 
 if STATIC_DIR.exists():
 app.mount(
 "/static",
 StaticFiles(directory=str(STATIC_DIR)),
-name="static",
+name="static"
 )
