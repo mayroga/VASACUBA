@@ -225,18 +225,19 @@ function loadPractice(type){
 try{
 const raw=localStorage.getItem(getPracticeKey(type));
 const data=raw?JSON.parse(raw):{};
-state.sim[type]=data&&typeof data==="object"&&!Array.isArray(data)?data:{};
+if(data&&typeof data==="object"&&!Array.isArray(data))state.sim[type]=data;
+else state.sim[type]={};
 return state.sim[type]
 }catch(e){
 state.sim[type]={};
-return{}
+return state.sim[type]
 }
 }
 
 function captureCurrent(type){
 const fields=type==="visa"?visaSim[state.lang]:dSim;
 const box=qs(type==="visa"?"#visaSimFields":"#dSimFields");
-if(!box||!fields)return;
+if(!box)return;
 
 const step=type==="visa"?state.visaSimStep:state.dSimStep;
 const f=fields[step];
@@ -296,11 +297,13 @@ const required=f[4]==="required";
 const marker=required?` <span aria-hidden="true">*</span>`:` <small>${esc(T[state.lang].optional)}</small>`;
 const value=saved[f[0]]??"";
 let field="";
+
 if(f[3]==="select"){
 field=`<select data-practice-field="${esc(f[0])}" autocomplete="off"><option value="">${esc(f[2])}</option><option value="${state.lang==="es"?"Ejemplo A":"Example A"}">${state.lang==="es"?"Ejemplo A":"Example A"}</option><option value="${state.lang==="es"?"Ejemplo B":"Example B"}">${state.lang==="es"?"Ejemplo B":"Example B"}</option></select>`
 }else{
 field=`<input data-practice-field="${esc(f[0])}" type="${esc(f[3])}" value="${esc(value)}" placeholder="${esc(f[2])}" autocomplete="off" autocapitalize="characters" spellcheck="false">`
 }
+
 box.innerHTML=`<div class="sim-fields"><div class="sim-field active"><label>${esc(f[1])}${marker}</label>${field}<p class="field-help">${esc(T[state.lang].simulationText)}</p></div></div>`;
 
 const input=box.querySelector("[data-practice-field]");
@@ -312,6 +315,7 @@ input.addEventListener("change",()=>{state.sim[type][f[0]]=input.value})
 }
 
 const total=data.length;
+
 if(type==="visa"){
 const n=qs("#visaSimNumber"),tt=qs("#visaSimTotal"),c=qs("#visaSimCounter"),p=qs("#visaSimPrev"),nx=qs("#visaSimNext");
 if(n)n.textContent=step+1;
@@ -335,7 +339,9 @@ if(msg&&msg.textContent)msg.style.display="block"
 function moveSim(type,n){
 const arr=type==="visa"?visaSim[state.lang]:dSim;
 if(!arr.length)return;
+
 captureCurrent(type);
+
 if(type==="visa"){
 state.visaSimStep=Math.max(0,Math.min(state.visaSimStep+n,arr.length-1));
 renderSim(type)
