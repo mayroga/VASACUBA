@@ -2,7 +2,7 @@
 # Cuba Travel & Consular Assistant
 # Servicio de documentos.
 # No inventa requisitos oficiales.
-# VERIFY / UNKNOWN se conservan como estados de verificación.
+# VERIFY / UNKNOWN nunca se convierten en CONFIRMED.
 
 from __future__ import annotations
 
@@ -54,7 +54,8 @@ def _profile(profile: Any) -> Dict[str, Any]:
         return data if isinstance(data, dict) else {}
     if hasattr(profile, "__dict__"):
         return {
-            k: v for k, v in vars(profile).items()
+            k: v
+            for k, v in vars(profile).items()
             if not str(k).startswith("_")
         }
     return {}
@@ -80,12 +81,14 @@ def _item_id(item: Any, fallback: str) -> str:
     if isinstance(item, dict):
         value = (
             item.get("id")
+            or item.get("document_id")
             or item.get("rule_id")
             or item.get("key")
         )
     else:
         value = (
             getattr(item, "id", None)
+            or getattr(item, "document_id", None)
             or getattr(item, "rule_id", None)
             or getattr(item, "key", None)
         )
@@ -97,12 +100,15 @@ def _title(item: Any) -> str:
         return str(
             item.get("title")
             or item.get("name")
+            or item.get("document")
             or item.get("description")
             or "Document"
         )
+
     return str(
         getattr(item, "title", None)
         or getattr(item, "name", None)
+        or getattr(item, "document", None)
         or getattr(item, "description", None)
         or "Document"
     )
@@ -116,6 +122,7 @@ def _description(item: Any) -> str:
             or item.get("title")
             or ""
         )
+
     return str(
         getattr(item, "description", None)
         or getattr(item, "message", None)
@@ -127,6 +134,7 @@ def _description(item: Any) -> str:
 def _source(item: Any) -> Any:
     if isinstance(item, dict):
         return item.get("source") or item.get("sources")
+
     return (
         getattr(item, "source", None)
         or getattr(item, "sources", None)
@@ -158,6 +166,7 @@ def _normalize_items(
     result: List[Dict[str, Any]] = []
 
     for index, item in enumerate(raw, 1):
+
         if isinstance(item, dict):
             source_status = (
                 item.get("status")
@@ -206,10 +215,17 @@ def _normalize_items(
                 )
             )
 
-            completed = bool(item.get("completed", False))
+            completed = bool(
+                item.get("completed", False)
+            )
 
         else:
-            source_status = getattr(item, "status", None)
+            source_status = getattr(
+                item,
+                "status",
+                None,
+            )
+
             status = _status(source_status)
             document_id = _item_id(
                 item,
@@ -218,15 +234,25 @@ def _normalize_items(
             title = _title(item)
             description = _description(item)
             source = _source(item)
+
             required = bool(
                 getattr(
                     item,
                     "required",
-                    getattr(item, "mandatory", False),
+                    getattr(
+                        item,
+                        "mandatory",
+                        False,
+                    ),
                 )
             )
+
             completed = bool(
-                getattr(item, "completed", False)
+                getattr(
+                    item,
+                    "completed",
+                    False,
+                )
             )
 
         if status != "CONFIRMED":
@@ -237,7 +263,7 @@ def _normalize_items(
                 "id": str(document_id),
                 "title": str(title),
                 "description": str(description),
-                "status": str(status),
+                "status": str(status).upper(),
                 "required": required,
                 "completed": completed,
                 "source": _serialize(source),
@@ -269,6 +295,8 @@ def _category_items(
             )
         except Exception:
             raw = []
+    except Exception:
+        raw = []
 
     return _normalize_items(
         raw,
@@ -283,7 +311,10 @@ def evaluate_documents(
     data = _profile(profile)
 
     if category is not None:
-        items = _category_items(data, category)
+        items = _category_items(
+            data,
+            category,
+        )
     else:
         items = []
 
@@ -305,33 +336,59 @@ def evaluate_documents(
 def evaluate_complete_travel_documents(
     profile: Any,
 ) -> Dict[str, Any]:
-    """
-    Compatibilidad utilizada por main.py.
-
-    Evalúa los documentos relacionados con el viaje
-    utilizando las categorías existentes en rules_engine.py.
-    No crea requisitos ni convierte VERIFY/UNKNOWN en confirmados.
-    """
     return evaluate_documents(profile)
+
+
+def evaluate_document_inventory(
+    profile: Any,
+) -> Dict[str, Any]:
+    """
+    Compatibilidad para main.py.
+
+    Devuelve el inventario documental generado
+    a partir de las reglas existentes.
+    No inventa documentos ni requisitos.
+    """
+    result = evaluate_documents(profile)
+
+    documents = result.get(
+        "documents",
+        result.get("items", []),
+    )
+
+    return {
+        **result,
+        "documents": documents,
+        "items": documents,
+        "inventory": documents,
+        "document_inventory": documents,
+        "total_documents": len(documents),
+    }
 
 
 def evaluate_travel_documents(
     profile: Any,
 ) -> Dict[str, Any]:
-    return evaluate_complete_travel_documents(profile)
+    return evaluate_complete_travel_documents(
+        profile
+    )
 
 
 def get_documents(
     profile: Any,
     category: Any = None,
 ) -> Dict[str, Any]:
-    return evaluate_documents(profile, category)
+    return evaluate_documents(
+        profile,
+        category,
+    )
 
 
 def build_document_checklist(
     profile: Any,
     category: Any = None,
 ) -> Dict[str, Any]:
+
     data = _profile(profile)
 
     try:
@@ -343,6 +400,7 @@ def build_document_checklist(
                 category,
             )
         )
+
         items = _normalize_items(
             raw,
             category,
@@ -354,7 +412,10 @@ def build_document_checklist(
                 data,
                 category,
             )
+
     except (TypeError, AttributeError):
+        pass
+    except Exception:
         pass
 
     return evaluate_documents(
@@ -389,11 +450,14 @@ def _finalize(
     profile: Dict[str, Any],
     category: Any = None,
 ) -> Dict[str, Any]:
+
     unique: List[Dict[str, Any]] = []
     seen = set()
 
     for item in items:
-        item_id = str(item.get("id", ""))
+        item_id = str(
+            item.get("id", "")
+        )
 
         if item_id in seen:
             continue
@@ -402,17 +466,17 @@ def _finalize(
         unique.append(item)
 
     confirmed = sum(
-        item["status"] == "CONFIRMED"
+        item.get("status") == "CONFIRMED"
         for item in unique
     )
 
     verification = sum(
-        item["status"] == "VERIFY"
+        item.get("status") == "VERIFY"
         for item in unique
     )
 
     unknown = sum(
-        item["status"] == "UNKNOWN"
+        item.get("status") == "UNKNOWN"
         for item in unique
     )
 
@@ -443,7 +507,10 @@ def _finalize(
         "profile": profile,
         "documents": unique,
         "items": unique,
+        "inventory": unique,
+        "document_inventory": unique,
         "total": len(unique),
+        "total_documents": len(unique),
         "required": required,
         "confirmed": confirmed,
         "verification": verification,
@@ -466,16 +533,20 @@ def update_documents(
     documents: Any,
     completed: Any = None,
 ) -> Dict[str, Any]:
+
     if isinstance(documents, dict):
         result = dict(documents)
         items = list(
             result.get("documents")
             or result.get("items")
+            or result.get("inventory")
             or []
         )
+
     elif isinstance(documents, list):
         result = {}
         items = list(documents)
+
     else:
         result = {}
         items = []
@@ -489,16 +560,25 @@ def update_documents(
             for k, v in completed.items()
             if bool(v)
         }
-    elif isinstance(completed, (list, tuple, set)):
+
+    elif isinstance(
+        completed,
+        (list, tuple, set),
+    ):
         completed_ids = {
-            str(v) for v in completed
+            str(v)
+            for v in completed
         }
+
     else:
         completed_ids = set()
 
     normalized: List[Dict[str, Any]] = []
 
-    for index, item in enumerate(items, 1):
+    for index, item in enumerate(
+        items,
+        1,
+    ):
         if not isinstance(item, dict):
             continue
 
@@ -534,16 +614,20 @@ def update_documents(
 def reset_documents(
     documents: Any,
 ) -> Dict[str, Any]:
+
     if isinstance(documents, dict):
         result = dict(documents)
         items = list(
             result.get("documents")
             or result.get("items")
+            or result.get("inventory")
             or []
         )
+
     elif isinstance(documents, list):
         result = {}
         items = list(documents)
+
     else:
         result = {}
         items = []
@@ -554,7 +638,8 @@ def reset_documents(
 
     return _finalize(
         [
-            item for item in items
+            item
+            for item in items
             if isinstance(item, dict)
         ],
         result.get("profile") or {},
@@ -565,14 +650,18 @@ def reset_documents(
 def document_progress(
     documents: Any,
 ) -> Dict[str, Any]:
+
     if isinstance(documents, dict):
         items = (
             documents.get("documents")
             or documents.get("items")
+            or documents.get("inventory")
             or []
         )
+
     elif isinstance(documents, list):
         items = documents
+
     else:
         items = []
 
@@ -629,6 +718,7 @@ def document_progress(
 def documents_summary(
     documents: Any,
 ) -> Dict[str, Any]:
+
     progress = document_progress(
         documents
     )
@@ -647,6 +737,7 @@ def documents_summary(
 __all__ = [
     "evaluate_documents",
     "evaluate_complete_travel_documents",
+    "evaluate_document_inventory",
     "evaluate_travel_documents",
     "get_documents",
     "build_document_checklist",
@@ -658,4 +749,3 @@ __all__ = [
     "document_progress",
     "documents_summary",
 ]
-
