@@ -1,14 +1,15 @@
 # services/dviajeros_service.py
 # Cuba Travel & Consular Assistant
-# Servicio D'Viajeros.
+# D'Viajeros: preparación, validación y orientación.
 # No inventa requisitos oficiales.
-# VERIFY / UNKNOWN se conservan como estados de verificación.
+# VERIFY / UNKNOWN nunca se convierten en CONFIRMED.
+# La aplicación NO genera QR oficial ni sustituye el portal oficial.
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from rules_engine import (
     RuleCategory,
@@ -20,6 +21,10 @@ DATA_FILE = (
     Path(__file__).resolve().parent.parent
     / "data"
     / "dviajeros.json"
+)
+
+OFFICIAL_PORTAL = (
+    "https://dviajeros.mitrans.gob.cu/"
 )
 
 
@@ -44,10 +49,7 @@ def _serialize(value: Any) -> Any:
             for k, v in value.items()
         }
 
-    if isinstance(
-        value,
-        (list, tuple, set),
-    ):
+    if isinstance(value, (list, tuple, set)):
         return [
             _serialize(v)
             for v in value
@@ -149,17 +151,25 @@ def _find_modules(
             return value
 
         if isinstance(value, dict):
-            return [
-                {
-                    "id": str(k),
-                    **(
-                        v
-                        if isinstance(v, dict)
-                        else {"value": v}
-                    ),
-                }
-                for k, v in value.items()
-            ]
+            result = []
+
+            for key_name, value_item in value.items():
+                if isinstance(value_item, dict):
+                    result.append(
+                        {
+                            "id": str(key_name),
+                            **value_item,
+                        }
+                    )
+                else:
+                    result.append(
+                        {
+                            "id": str(key_name),
+                            "value": value_item,
+                        }
+                    )
+
+            return result
 
     return []
 
@@ -200,6 +210,16 @@ def get_dviajeros_modules() -> List[Dict[str, Any]]:
                 "name": str(module),
             }
 
+        item.setdefault(
+            "status",
+            "NOT_STARTED",
+        )
+
+        item.setdefault(
+            "completed",
+            False,
+        )
+
         result.append(
             _serialize(item)
         )
@@ -212,39 +232,42 @@ def get_dviajeros_modules() -> List[Dict[str, Any]]:
             "id": "personal_information",
             "name": "PERSONAL_INFORMATION",
             "status": "NOT_STARTED",
+            "completed": False,
         },
         {
             "id": "migration",
             "name": "MIGRATION",
             "status": "NOT_STARTED",
+            "completed": False,
         },
         {
             "id": "health",
             "name": "HEALTH",
             "status": "NOT_STARTED",
+            "completed": False,
         },
         {
             "id": "customs",
             "name": "CUSTOMS",
             "status": "NOT_STARTED",
+            "completed": False,
         },
         {
             "id": "review",
             "name": "REVIEW",
             "status": "NOT_STARTED",
+            "completed": False,
         },
         {
             "id": "submission_or_official_portal",
             "name": "SUBMISSION_OR_OFFICIAL_PORTAL",
             "status": "NOT_STARTED",
+            "completed": False,
         },
     ]
 
 
 def dviajeros_modules() -> List[Dict[str, Any]]:
-    """
-    Alias de compatibilidad utilizado por main.py.
-    """
     return get_dviajeros_modules()
 
 
@@ -304,7 +327,7 @@ def _normalize_rule(
 ) -> Dict[str, Any]:
 
     if isinstance(item, dict):
-        status = (
+        source_status = (
             item.get("status")
             or item.get("rule_status")
             or "UNKNOWN"
@@ -336,7 +359,7 @@ def _normalize_rule(
         )
 
     else:
-        status = getattr(
+        source_status = getattr(
             item,
             "status",
             None,
@@ -370,7 +393,7 @@ def _normalize_rule(
         "id": str(rule_id),
         "title": str(title),
         "description": str(description),
-        "status": _status(status),
+        "status": _status(source_status),
         "source": _serialize(source),
     }
 
@@ -419,21 +442,32 @@ def evaluate_dviajeros(
         "profile": data,
         "rules": rules,
         "modules": get_dviajeros_modules(),
+        "workflow": dviajeros_workflow(),
         "confirmed": confirmed,
         "verification": verification,
         "unknown": unknown,
         "requires_verification": bool(
             verification or unknown
         ),
-        "official_portal": (
-            "https://dviajeros.mitrans.gob.cu/"
-        ),
+        "official_portal": OFFICIAL_PORTAL,
         "official_qr_generated": False,
         "app_issues_official_document": False,
     }
 
 
 def evaluate_dviajeros_profile(
+    profile: Any,
+) -> Dict[str, Any]:
+    return evaluate_dviajeros(profile)
+
+
+def dviajeros_status(
+    profile: Any,
+) -> Dict[str, Any]:
+    return evaluate_dviajeros(profile)
+
+
+def get_dviajeros_status(
     profile: Any,
 ) -> Dict[str, Any]:
     return evaluate_dviajeros(profile)
@@ -471,6 +505,12 @@ def get_dviajeros_checklist(
     return result
 
 
+def build_dviajeros_checklist(
+    profile: Any,
+) -> Dict[str, Any]:
+    return get_dviajeros_checklist(profile)
+
+
 def dviajeros_statuses() -> List[str]:
     return [
         "NOT_STARTED",
@@ -497,16 +537,25 @@ def dviajeros_workflow() -> List[str]:
         value = data.get(key)
 
         if isinstance(value, list):
-            return [
-                str(
-                    item.get("name")
-                    or item.get("id")
-                    or item
-                )
-                if isinstance(item, dict)
-                else str(item)
-                for item in value
-            ]
+            result = []
+
+            for item in value:
+                if isinstance(item, dict):
+                    result.append(
+                        str(
+                            item.get("name")
+                            or item.get("id")
+                            or item.get("title")
+                            or item
+                        )
+                    )
+                else:
+                    result.append(
+                        str(item)
+                    )
+
+            if result:
+                return result
 
     return [
         "PERSONAL_INFORMATION",
@@ -522,6 +571,43 @@ def get_dviajeros_workflow() -> List[str]:
     return dviajeros_workflow()
 
 
+def complete_dviajeros_module(
+    profile: Any,
+    module_id: str,
+) -> Dict[str, Any]:
+
+    result = get_dviajeros_checklist(
+        profile
+    )
+
+    target = str(
+        module_id
+    ).strip().lower()
+
+    for module in result.get(
+        "modules",
+        [],
+    ):
+        current = str(
+            module.get("id", "")
+        ).strip().lower()
+
+        name = str(
+            module.get("name", "")
+        ).strip().lower()
+
+        if current == target or name == target:
+            if module.get("status") != "VERIFY":
+                module["completed"] = True
+                module["status"] = "COMPLETED"
+
+    result["checklist"] = result[
+        "modules"
+    ]
+
+    return result
+
+
 def dviajeros_summary(
     profile: Any,
 ) -> Dict[str, Any]:
@@ -531,7 +617,9 @@ def dviajeros_summary(
     )
 
     return {
-        "status": result.get("status"),
+        "status": result.get(
+            "status"
+        ),
         "confirmed": result.get(
             "confirmed",
             0,
@@ -554,6 +642,7 @@ def dviajeros_summary(
             "requires_verification",
             True,
         ),
+        "official_portal": OFFICIAL_PORTAL,
     }
 
 
@@ -563,10 +652,14 @@ __all__ = [
     "dviajeros_modules",
     "evaluate_dviajeros",
     "evaluate_dviajeros_profile",
+    "dviajeros_status",
+    "get_dviajeros_status",
     "get_dviajeros_checklist",
+    "build_dviajeros_checklist",
     "dviajeros_statuses",
     "get_dviajeros_statuses",
     "dviajeros_workflow",
     "get_dviajeros_workflow",
+    "complete_dviajeros_module",
     "dviajeros_summary",
 ]
