@@ -1,19 +1,14 @@
 # services/dviajeros_service.py
 # Cuba Travel & Consular Assistant
-# Servicio para D'Viajeros.
-#
-# IMPORTANTE:
-# - Este archivo NO contiene requisitos oficiales hardcodeados.
-# - Las reglas proceden de rules_engine.py y data/dviajeros.json.
-# - VERIFY / UNKNOWN se mantienen cuando la información no puede
-#   confirmarse de forma segura.
-# - Este servicio prepara y evalúa información.
-# - NO genera ni falsifica códigos QR oficiales.
-# - NO presenta una solicitud oficial en nombre del viajero.
+# Servicio D'Viajeros.
+# No inventa requisitos oficiales.
+# VERIFY / UNKNOWN se conservan como estados de verificación.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from rules_engine import (
     RuleCategory,
@@ -21,47 +16,52 @@ from rules_engine import (
     evaluate_category,
 )
 
+DATA_FILE = (
+    Path(__file__).resolve().parent.parent
+    / "data"
+    / "dviajeros.json"
+)
 
-CATEGORY = RuleCategory.DVIAJEROS
 
-OFFICIAL_PORTAL = "https://dviajeros.mitrans.gob.cu/"
-
-
-def _status_value(value: Any) -> str:
-    """Convierte Enum u otros valores de estado a texto."""
+def _value(value: Any) -> str:
     if value is None:
-        return RuleStatus.UNKNOWN.value
-
-    if isinstance(value, RuleStatus):
-        return value.value
-
-    return str(getattr(value, "value", value)).lower()
+        return ""
+    return str(
+        getattr(value, "value", value)
+    ).lower().strip()
 
 
 def _serialize(value: Any) -> Any:
-    """Serialización defensiva para respuestas JSON."""
-    if value is None:
-        return None
-
-    if isinstance(value, (str, int, float, bool)):
+    if value is None or isinstance(
+        value,
+        (str, int, float, bool),
+    ):
         return value
 
     if isinstance(value, dict):
-        return {str(k): _serialize(v) for k, v in value.items()}
+        return {
+            str(k): _serialize(v)
+            for k, v in value.items()
+        }
 
-    if isinstance(value, (list, tuple, set)):
-        return [_serialize(v) for v in value]
+    if isinstance(
+        value,
+        (list, tuple, set),
+    ):
+        return [
+            _serialize(v)
+            for v in value
+        ]
 
     if hasattr(value, "model_dump"):
-        return _serialize(value.model_dump())
+        return _serialize(
+            value.model_dump()
+        )
 
     if hasattr(value, "to_dict"):
-        return _serialize(value.to_dict())
-
-    if hasattr(value, "__dataclass_fields__"):
-        from dataclasses import asdict
-
-        return _serialize(asdict(value))
+        return _serialize(
+            value.to_dict()
+        )
 
     if hasattr(value, "__dict__"):
         return {
@@ -73,8 +73,7 @@ def _serialize(value: Any) -> Any:
     return str(value)
 
 
-def _profile_dict(profile: Any) -> Dict[str, Any]:
-    """Normaliza dict, Pydantic, dataclass u objeto compatible."""
+def _profile(profile: Any) -> Dict[str, Any]:
     if profile is None:
         return {}
 
@@ -82,372 +81,492 @@ def _profile_dict(profile: Any) -> Dict[str, Any]:
         return dict(profile)
 
     if hasattr(profile, "model_dump"):
-        return profile.model_dump(exclude_none=True)
+        return profile.model_dump(
+            exclude_none=True
+        )
 
     if hasattr(profile, "to_dict"):
-        value = profile.to_dict()
-        return value if isinstance(value, dict) else {}
+        data = profile.to_dict()
+        return (
+            data
+            if isinstance(data, dict)
+            else {}
+        )
 
     if hasattr(profile, "__dict__"):
         return {
-            key: value
-            for key, value in vars(profile).items()
-            if not key.startswith("_")
+            str(k): v
+            for k, v in vars(profile).items()
+            if not str(k).startswith("_")
         }
 
     return {}
 
 
-def _result_status(result: Any) -> str:
-    if isinstance(result, dict):
-        return _status_value(result.get("status"))
-
-    return _status_value(getattr(result, "status", None))
-
-
-def _result_source(result: Any) -> Any:
-    if isinstance(result, dict):
-        return result.get("source") or result.get("sources")
-
-    return getattr(result, "source", None) or getattr(result, "sources", None)
-
-
-def _evaluate(profile: Any) -> List[Any]:
-    """Evalúa las reglas D'Viajeros mediante el motor central."""
-    data = _profile_dict(profile)
-
+def _load_data() -> Dict[str, Any]:
     try:
-        results = evaluate_category(data, CATEGORY)
-    except TypeError:
-        results = evaluate_category(
-            profile=data,
-            category=CATEGORY,
+        if not DATA_FILE.exists():
+            return {}
+
+        with DATA_FILE.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
+            data = json.load(file)
+
+        return (
+            data
+            if isinstance(data, dict)
+            else {}
         )
 
-    if results is None:
-        return []
+    except (
+        OSError,
+        ValueError,
+        TypeError,
+    ):
+        return {}
 
-    if isinstance(results, (list, tuple)):
-        return list(results)
 
-    return [results]
+def get_dviajeros_data() -> Dict[str, Any]:
+    return _load_data()
 
 
-def evaluate_dviajeros(profile: Any) -> Dict[str, Any]:
-    """
-    Evaluación completa del flujo D'Viajeros.
+def _find_modules(
+    data: Dict[str, Any],
+) -> List[Any]:
 
-    Las reglas y condiciones se obtienen del repositorio central.
-    """
-    profile_data = _profile_dict(profile)
-    results = _evaluate(profile_data)
+    for key in (
+        "modules",
+        "modulos",
+        "dviajeros_modules",
+        "workflow",
+        "steps",
+    ):
+        value = data.get(key)
 
-    serialized_results = [_serialize(item) for item in results]
+        if isinstance(value, list):
+            return value
 
-    confirmed: List[Any] = []
-    conditional: List[Any] = []
-    verify: List[Any] = []
-    unknown: List[Any] = []
-    expired: List[Any] = []
+        if isinstance(value, dict):
+            return [
+                {
+                    "id": str(k),
+                    **(
+                        v
+                        if isinstance(v, dict)
+                        else {"value": v}
+                    ),
+                }
+                for k, v in value.items()
+            ]
 
-    for result in results:
-        serialized = _serialize(result)
-        status = _result_status(result)
+    return []
 
-        if status == RuleStatus.ACTIVE.value:
-            confirmed.append(serialized)
 
-        elif status == RuleStatus.CONDITIONAL.value:
-            conditional.append(serialized)
+def get_dviajeros_modules() -> List[Dict[str, Any]]:
+    data = _load_data()
+    raw = _find_modules(data)
 
-        elif status == RuleStatus.VERIFY.value:
-            verify.append(serialized)
+    result: List[Dict[str, Any]] = []
 
-        elif status == RuleStatus.EXPIRED.value:
-            expired.append(serialized)
+    for index, module in enumerate(
+        raw,
+        1,
+    ):
+        if isinstance(module, dict):
+            item = dict(module)
+
+            module_id = (
+                item.get("id")
+                or item.get("module_id")
+                or item.get("key")
+                or f"module-{index}"
+            )
+
+            name = (
+                item.get("name")
+                or item.get("title")
+                or item.get("module")
+                or str(module_id)
+            )
+
+            item["id"] = str(module_id)
+            item["name"] = str(name)
 
         else:
-            unknown.append(serialized)
+            item = {
+                "id": f"module-{index}",
+                "name": str(module),
+            }
 
-    if unknown:
-        overall_status = RuleStatus.UNKNOWN.value
-    elif verify or conditional:
-        overall_status = RuleStatus.VERIFY.value
-    elif expired:
-        overall_status = RuleStatus.VERIFY.value
-    else:
-        overall_status = RuleStatus.ACTIVE.value
+        result.append(
+            _serialize(item)
+        )
 
-    return {
-        "category": (
-            CATEGORY.value
-            if hasattr(CATEGORY, "value")
-            else str(CATEGORY)
-        ),
-        "status": overall_status,
-        "profile": profile_data,
-        "results": serialized_results,
-        "confirmed": confirmed,
-        "conditional": conditional,
-        "verify": verify,
-        "unknown": unknown,
-        "expired": expired,
-        "requires_verification": bool(
-            verify or conditional or unknown or expired
-        ),
-        "can_continue": not bool(unknown),
-        "official_portal": OFFICIAL_PORTAL,
-        "official_action": "VERIFY_WITH_OFFICIAL_DVIAJEROS_PORTAL",
-        "modules": [
-            "MIGRATION",
-            "HEALTH",
-            "CUSTOMS",
-        ],
-        "workflow": [
-            "PERSONAL_INFORMATION",
-            "MIGRATION",
-            "HEALTH",
-            "CUSTOMS",
-            "REVIEW",
-            "SUBMISSION_OR_OFFICIAL_PORTAL",
-        ],
-        "does_not_generate_official_qr": True,
-    }
+    if result:
+        return result
+
+    return [
+        {
+            "id": "personal_information",
+            "name": "PERSONAL_INFORMATION",
+            "status": "NOT_STARTED",
+        },
+        {
+            "id": "migration",
+            "name": "MIGRATION",
+            "status": "NOT_STARTED",
+        },
+        {
+            "id": "health",
+            "name": "HEALTH",
+            "status": "NOT_STARTED",
+        },
+        {
+            "id": "customs",
+            "name": "CUSTOMS",
+            "status": "NOT_STARTED",
+        },
+        {
+            "id": "review",
+            "name": "REVIEW",
+            "status": "NOT_STARTED",
+        },
+        {
+            "id": "submission_or_official_portal",
+            "name": "SUBMISSION_OR_OFFICIAL_PORTAL",
+            "status": "NOT_STARTED",
+        },
+    ]
 
 
-def check_dviajeros(profile: Any) -> Dict[str, Any]:
-    """Alias de compatibilidad para la API."""
-    return evaluate_dviajeros(profile)
-
-
-def evaluate(profile: Any) -> Dict[str, Any]:
-    """Alias corto para consumidores internos."""
-    return evaluate_dviajeros(profile)
-
-
-def get_dviajeros_status(profile: Any) -> Dict[str, Any]:
-    """Devuelve el estado general del flujo."""
-    result = evaluate_dviajeros(profile)
-
-    return {
-        "category": result["category"],
-        "status": result["status"],
-        "requires_verification": result["requires_verification"],
-        "can_continue": result["can_continue"],
-        "official_portal": result["official_portal"],
-        "official_action": result["official_action"],
-        "does_not_generate_official_qr": True,
-    }
-
-
-def get_dviajeros_modules(profile: Any = None) -> Dict[str, Any]:
+def dviajeros_modules() -> List[Dict[str, Any]]:
     """
-    Devuelve los módulos que componen el flujo.
-
-    No agrega requisitos específicos no presentes en las reglas.
+    Alias de compatibilidad utilizado por main.py.
     """
-    result = evaluate_dviajeros(profile)
-
-    return {
-        "modules": result["modules"],
-        "workflow": result["workflow"],
-        "status": result["status"],
-        "requires_verification": result["requires_verification"],
-        "official_portal": result["official_portal"],
-    }
+    return get_dviajeros_modules()
 
 
-def get_dviajeros_checklist(profile: Any) -> Dict[str, Any]:
-    """
-    Construye checklist a partir de las reglas evaluadas.
-    """
-    result = evaluate_dviajeros(profile)
+def _status(value: Any) -> str:
+    raw = _value(value)
 
-    items: List[Dict[str, Any]] = []
+    if raw == RuleStatus.ACTIVE.value:
+        return "CONFIRMED"
 
-    for index, rule in enumerate(result["results"], start=1):
-        if not isinstance(rule, dict):
-            continue
+    if raw in {
+        RuleStatus.CONDITIONAL.value,
+        RuleStatus.VERIFY.value,
+        RuleStatus.EXPIRED.value,
+    }:
+        return "VERIFY"
 
-        status = _status_value(rule.get("status"))
+    return "UNKNOWN"
 
-        item_id = (
-            rule.get("rule_id")
-            or rule.get("id")
-            or f"dviajeros-{index}"
+
+def _evaluate_rules(
+    profile: Dict[str, Any],
+) -> List[Any]:
+
+    try:
+        result = evaluate_category(
+            profile,
+            RuleCategory.DVIAJEROS,
+        )
+
+    except TypeError:
+        try:
+            result = evaluate_category(
+                profile=profile,
+                category=RuleCategory.DVIAJEROS,
+            )
+        except Exception:
+            result = []
+
+    except Exception:
+        result = []
+
+    if result is None:
+        return []
+
+    if isinstance(
+        result,
+        (list, tuple),
+    ):
+        return list(result)
+
+    return [result]
+
+
+def _normalize_rule(
+    item: Any,
+    index: int,
+) -> Dict[str, Any]:
+
+    if isinstance(item, dict):
+        status = (
+            item.get("status")
+            or item.get("rule_status")
+            or "UNKNOWN"
+        )
+
+        rule_id = (
+            item.get("id")
+            or item.get("rule_id")
+            or item.get("key")
+            or f"dviajeros-rule-{index}"
         )
 
         title = (
-            rule.get("title")
-            or rule.get("name")
-            or rule.get("description")
+            item.get("title")
+            or item.get("name")
+            or item.get("description")
             or "D'Viajeros requirement"
         )
 
         description = (
-            rule.get("message")
-            or rule.get("description")
+            item.get("description")
+            or item.get("message")
             or title
         )
 
-        source = rule.get("source") or rule.get("sources")
+        source = (
+            item.get("source")
+            or item.get("sources")
+        )
 
-        if status == RuleStatus.ACTIVE.value:
-            item_status = "CONFIRMED"
+    else:
+        status = getattr(
+            item,
+            "status",
+            None,
+        )
 
-        elif status in {
-            RuleStatus.CONDITIONAL.value,
-            RuleStatus.VERIFY.value,
-            RuleStatus.EXPIRED.value,
-        }:
-            item_status = "VERIFY"
+        rule_id = (
+            getattr(item, "id", None)
+            or getattr(item, "rule_id", None)
+            or f"dviajeros-rule-{index}"
+        )
 
-        else:
-            item_status = "UNKNOWN"
+        title = (
+            getattr(item, "title", None)
+            or getattr(item, "name", None)
+            or getattr(item, "description", None)
+            or "D'Viajeros requirement"
+        )
 
-        items.append(
-            {
-                "id": str(item_id),
-                "title": str(title),
-                "description": str(description),
-                "status": item_status,
-                "completed": False,
-                "source": _serialize(source),
-            }
+        description = (
+            getattr(item, "description", None)
+            or getattr(item, "message", None)
+            or title
+        )
+
+        source = (
+            getattr(item, "source", None)
+            or getattr(item, "sources", None)
         )
 
     return {
-        "category": result["category"],
-        "status": result["status"],
-        "items": items,
-        "total": len(items),
-        "confirmed": sum(
-            1
-            for item in items
-            if item["status"] == "CONFIRMED"
-        ),
-        "requires_verification": sum(
-            1
-            for item in items
-            if item["status"] in {"VERIFY", "UNKNOWN"}
-        ),
-        "official_portal": OFFICIAL_PORTAL,
-        "does_not_generate_official_qr": True,
+        "id": str(rule_id),
+        "title": str(title),
+        "description": str(description),
+        "status": _status(status),
+        "source": _serialize(source),
     }
 
 
-def get_dviajeros_official_sources(profile: Any = None) -> List[Any]:
-    """
-    Obtiene las fuentes asociadas a las reglas D'Viajeros.
-    """
-    results = _evaluate(_profile_dict(profile))
+def evaluate_dviajeros(
+    profile: Any,
+) -> Dict[str, Any]:
 
-    sources: List[Any] = []
-    seen = set()
+    data = _profile(profile)
 
-    for result in results:
-        source = _result_source(result)
+    rules = [
+        _normalize_rule(
+            item,
+            index,
+        )
+        for index, item in enumerate(
+            _evaluate_rules(data),
+            1,
+        )
+    ]
 
-        if source is None:
-            continue
+    confirmed = sum(
+        item["status"] == "CONFIRMED"
+        for item in rules
+    )
 
-        values = source if isinstance(source, list) else [source]
+    verification = sum(
+        item["status"] == "VERIFY"
+        for item in rules
+    )
 
-        for value in values:
-            serialized = _serialize(value)
+    unknown = sum(
+        item["status"] == "UNKNOWN"
+        for item in rules
+    )
 
-            if isinstance(serialized, dict):
-                key = (
-                    serialized.get("url")
-                    or serialized.get("id")
-                    or serialized.get("name")
-                    or repr(serialized)
+    if unknown:
+        status = RuleStatus.UNKNOWN.value
+    elif verification:
+        status = RuleStatus.VERIFY.value
+    else:
+        status = RuleStatus.ACTIVE.value
+
+    return {
+        "status": status,
+        "profile": data,
+        "rules": rules,
+        "modules": get_dviajeros_modules(),
+        "confirmed": confirmed,
+        "verification": verification,
+        "unknown": unknown,
+        "requires_verification": bool(
+            verification or unknown
+        ),
+        "official_portal": (
+            "https://dviajeros.mitrans.gob.cu/"
+        ),
+        "official_qr_generated": False,
+        "app_issues_official_document": False,
+    }
+
+
+def evaluate_dviajeros_profile(
+    profile: Any,
+) -> Dict[str, Any]:
+    return evaluate_dviajeros(profile)
+
+
+def get_dviajeros_checklist(
+    profile: Any,
+) -> Dict[str, Any]:
+
+    result = evaluate_dviajeros(
+        profile
+    )
+
+    modules = []
+
+    for module in result.get(
+        "modules",
+        [],
+    ):
+        item = dict(module)
+
+        item.setdefault(
+            "status",
+            "NOT_STARTED",
+        )
+
+        item.setdefault(
+            "completed",
+            False,
+        )
+
+        modules.append(item)
+
+    result["checklist"] = modules
+    return result
+
+
+def dviajeros_statuses() -> List[str]:
+    return [
+        "NOT_STARTED",
+        "IN_PROGRESS",
+        "READY_FOR_OFFICIAL_FORM",
+        "COMPLETED",
+        "VERIFY",
+        "INCOMPLETE",
+    ]
+
+
+def get_dviajeros_statuses() -> List[str]:
+    return dviajeros_statuses()
+
+
+def dviajeros_workflow() -> List[str]:
+    data = _load_data()
+
+    for key in (
+        "workflow",
+        "flujo",
+        "steps",
+    ):
+        value = data.get(key)
+
+        if isinstance(value, list):
+            return [
+                str(
+                    item.get("name")
+                    or item.get("id")
+                    or item
                 )
-            else:
-                key = str(serialized)
+                if isinstance(item, dict)
+                else str(item)
+                for item in value
+            ]
 
-            if key in seen:
-                continue
-
-            seen.add(key)
-            sources.append(serialized)
-
-    return sources
-
-
-def get_official_dviajeros_portal() -> Dict[str, Any]:
-    """Devuelve la dirección del portal oficial configurado."""
-    return {
-        "name": "D'Viajeros",
-        "url": OFFICIAL_PORTAL,
-        "official": True,
-        "purpose": "OFFICIAL_TRAVELER_FORM_PORTAL",
-        "does_not_generate_official_qr": True,
-    }
+    return [
+        "PERSONAL_INFORMATION",
+        "MIGRATION",
+        "HEALTH",
+        "CUSTOMS",
+        "REVIEW",
+        "SUBMISSION_OR_OFFICIAL_PORTAL",
+    ]
 
 
-def validate_dviajeros_input(profile: Any) -> Dict[str, Any]:
-    """
-    Validación mínima de entrada.
+def get_dviajeros_workflow() -> List[str]:
+    return dviajeros_workflow()
 
-    No determina por sí sola si el viajero puede entrar o salir de Cuba.
-    """
-    data = _profile_dict(profile)
-    missing: List[str] = []
 
-    if not data:
-        missing.append("profile")
+def dviajeros_summary(
+    profile: Any,
+) -> Dict[str, Any]:
 
-    if not data.get("nationality"):
-        missing.append("nationality")
-
-    if not data.get("passport_number"):
-        missing.append("passport_number")
-
-    if not data.get("travel_date"):
-        missing.append("travel_date")
-
-    if not data.get("entry_method"):
-        missing.append("entry_method")
+    result = evaluate_dviajeros(
+        profile
+    )
 
     return {
-        "valid": not missing,
-        "missing": missing,
-        "status": (
-            RuleStatus.UNKNOWN.value
-            if missing
-            else RuleStatus.ACTIVE.value
+        "status": result.get("status"),
+        "confirmed": result.get(
+            "confirmed",
+            0,
         ),
-    }
-
-
-def dviajeros_summary(profile: Any) -> Dict[str, Any]:
-    """Resumen compacto para frontend/API."""
-    result = evaluate_dviajeros(profile)
-
-    return {
-        "status": result["status"],
-        "requires_verification": result["requires_verification"],
-        "can_continue": result["can_continue"],
-        "confirmed_count": len(result["confirmed"]),
-        "verification_count": len(result["verify"]),
-        "unknown_count": len(result["unknown"]),
-        "conditional_count": len(result["conditional"]),
-        "expired_count": len(result["expired"]),
-        "official_portal": result["official_portal"],
-        "modules": result["modules"],
+        "verification": result.get(
+            "verification",
+            0,
+        ),
+        "unknown": result.get(
+            "unknown",
+            0,
+        ),
+        "modules": len(
+            result.get(
+                "modules",
+                [],
+            )
+        ),
+        "requires_verification": result.get(
+            "requires_verification",
+            True,
+        ),
     }
 
 
 __all__ = [
-    "evaluate_dviajeros",
-    "check_dviajeros",
-    "evaluate",
-    "get_dviajeros_status",
+    "get_dviajeros_data",
     "get_dviajeros_modules",
+    "dviajeros_modules",
+    "evaluate_dviajeros",
+    "evaluate_dviajeros_profile",
     "get_dviajeros_checklist",
-    "get_dviajeros_official_sources",
-    "get_official_dviajeros_portal",
-    "validate_dviajeros_input",
+    "dviajeros_statuses",
+    "get_dviajeros_statuses",
+    "dviajeros_workflow",
+    "get_dviajeros_workflow",
     "dviajeros_summary",
 ]
