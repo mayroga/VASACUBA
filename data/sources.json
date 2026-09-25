@@ -1,0 +1,372 @@
+{
+"metadata": {
+"file": "sources.json",
+"version": "1.0.0",
+"language": "es",
+"description": "Registro central de fuentes oficiales utilizadas por el sistema para verificar reglas de viaje, pasaporte, visa, D'Viajeros, menores, jurisdicciones consulares y requisitos relacionados con Estados Unidos.",
+"last_reviewed": "2026-09-24",
+"source_policy": "official_first",
+"app_role": "guidance_only",
+"warning": "Una fuente oficial puede cambiar su contenido, URL, procedimiento, jurisdicción, tarifas, horarios o requisitos. La aplicación debe verificar la vigencia antes de presentar una regla como actual.",
+"source_priority": [
+"CUBAN_GOVERNMENT",
+"US_GOVERNMENT",
+"OFFICIAL_TRAVEL_SYSTEM",
+"OFFICIAL_CARRIER",
+"SECONDARY_SOURCE"
+]
+},
+"source_rules": {
+"official_government": {
+"priority": 1,
+"can_create_active_rule": true,
+"can_override_secondary_source": true
+},
+"official_travel_system": {
+"priority": 1,
+"can_create_active_rule": true,
+"can_override_secondary_source": true
+},
+"official_carrier": {
+"priority": 2,
+"can_create_active_rule": true,
+"scope": "carrier_specific"
+},
+"secondary_source": {
+"priority": 3,
+"can_create_active_rule": false,
+"default_status": "VERIFY",
+"can_be_used_for_navigation": true,
+"can_not_override_official_source": true
+},
+"unknown_source": {
+"priority": 99,
+"can_create_active_rule": false,
+"default_status": "UNKNOWN"
+}
+},
+"sources": [
+{
+"id": "SRC-001",
+"name": "Ministerio de Relaciones Exteriores de Cuba",
+"short_name": "MINREX",
+"country": "CUBA",
+"type": "CUBAN_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://www.minrex.gob.cu/",
+"topics": [
+"CONSULAR",
+"PASSPORT",
+"TRAVEL",
+"CUBAN_NATIONALITY",
+"MINORS",
+"MISSIONS"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-002",
+"name": "Misiones de Cuba en el exterior",
+"short_name": "MISIÓNES MINREX",
+"country": "CUBA",
+"type": "CUBAN_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://misiones.minrex.gob.cu/",
+"topics": [
+"CONSULAR",
+"CONSULAR_JURISDICTION",
+"CONTACTS",
+"APPOINTMENTS",
+"PASSPORT",
+"CIVIL_REGISTRY",
+"NOTARIAL"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-003",
+"name": "eVisa Cuba",
+"short_name": "CUBA EVISA",
+"country": "CUBA",
+"type": "OFFICIAL_TRAVEL_SYSTEM",
+"authority_level": 1,
+"official": true,
+"base_url": "https://evisacuba.cu/",
+"topics": [
+"VISA",
+"EVISA",
+"FOREIGN_TRAVELERS",
+"PASSPORT"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-004",
+"name": "D'Viajeros",
+"short_name": "D'VIAJEROS",
+"country": "CUBA",
+"type": "OFFICIAL_TRAVEL_SYSTEM",
+"authority_level": 1,
+"official": true,
+"base_url": "https://dviajeros.mitrans.gob.cu/",
+"topics": [
+"TRAVEL_FORM",
+"MIGRATION",
+"HEALTH",
+"CUSTOMS",
+"ENTRY"
+],
+"verification_required": true,
+"status": "VERIFY"
+},
+{
+"id": "SRC-005",
+"name": "U.S. Department of the Treasury - Office of Foreign Assets Control",
+"short_name": "OFAC",
+"country": "UNITED_STATES",
+"type": "US_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://ofac.treasury.gov/",
+"topics": [
+"CUBA",
+"SANCTIONS",
+"TRAVEL",
+"TRANSACTIONS",
+"AUTHORIZATIONS"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-006",
+"name": "U.S. Department of State",
+"short_name": "US STATE DEPARTMENT",
+"country": "UNITED_STATES",
+"type": "US_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://travel.state.gov/",
+"topics": [
+"TRAVEL",
+"CUBA",
+"PASSPORT",
+"TRAVEL_ADVISORIES",
+"CONSULAR"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-007",
+"name": "U.S. Customs and Border Protection",
+"short_name": "CBP",
+"country": "UNITED_STATES",
+"type": "US_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://www.cbp.gov/",
+"topics": [
+"ENTRY",
+"RETURN_TO_US",
+"CUSTOMS",
+"TRAVEL_DOCUMENTS"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-008",
+"name": "U.S. Department of Homeland Security",
+"short_name": "DHS",
+"country": "UNITED_STATES",
+"type": "US_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://www.dhs.gov/",
+"topics": [
+"TRAVEL",
+"BORDER",
+"IMMIGRATION"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-009",
+"name": "U.S. Citizenship and Immigration Services",
+"short_name": "USCIS",
+"country": "UNITED_STATES",
+"type": "US_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://www.uscis.gov/",
+"topics": [
+"IMMIGRATION",
+"STATUS",
+"TRAVEL_DOCUMENTS",
+"RESIDENCY"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-010",
+"name": "U.S. Department of Agriculture - APHIS",
+"short_name": "USDA APHIS",
+"country": "UNITED_STATES",
+"type": "US_GOVERNMENT",
+"authority_level": 1,
+"official": true,
+"base_url": "https://www.aphis.usda.gov/",
+"topics": [
+"AGRICULTURE",
+"FOOD",
+"PLANTS",
+"ANIMALS",
+"CUSTOMS"
+],
+"verification_required": true,
+"status": "ACTIVE"
+},
+{
+"id": "SRC-011",
+"name": "International Air Transport Association",
+"short_name": "IATA",
+"country": "INTERNATIONAL",
+"type": "INDUSTRY_REFERENCE",
+"authority_level": 2,
+"official": false,
+"base_url": "https://www.iata.org/",
+"topics": [
+"AIR_TRAVEL",
+"TRAVEL_DOCUMENTS",
+"AIRLINE_PROCEDURES"
+],
+"verification_required": true,
+"status": "VERIFY",
+"note": "IATA no sustituye a las autoridades gubernamentales. No debe utilizarse para override de una regla oficial."
+},
+{
+"id": "SRC-012",
+"name": "International Maritime Organization",
+"short_name": "IMO",
+"country": "INTERNATIONAL",
+"type": "INTERNATIONAL_ORGANIZATION",
+"authority_level": 2,
+"official": false,
+"base_url": "https://www.imo.org/",
+"topics": [
+"MARITIME_TRAVEL",
+"SHIPPING"
+],
+"verification_required": true,
+"status": "VERIFY",
+"note": "La información internacional debe contrastarse con las autoridades cubanas y del país correspondiente."
+}
+],
+"topic_source_priority": {
+"PASSPORT": [
+"SRC-001",
+"SRC-002"
+],
+"VISA": [
+"SRC-003",
+"SRC-001",
+"SRC-002"
+],
+"EVISA": [
+"SRC-003"
+],
+"DVIAJEROS": [
+"SRC-004"
+],
+"CONSULAR": [
+"SRC-002",
+"SRC-001"
+],
+"MINORS": [
+"SRC-001",
+"SRC-002",
+"SRC-004"
+],
+"US_CUBA": [
+"SRC-005",
+"SRC-006"
+],
+"US_ENTRY": [
+"SRC-007",
+"SRC-006"
+],
+"IMMIGRATION_US": [
+"SRC-009",
+"SRC-007",
+"SRC-008"
+],
+"AGRICULTURE": [
+"SRC-010",
+"SRC-004"
+],
+"AIR_TRAVEL": [
+"SRC-006",
+"SRC-011",
+"OFFICIAL_CARRIER"
+],
+"MARITIME_TRAVEL": [
+"SRC-001",
+"SRC-002",
+"SRC-012"
+]
+},
+"verification_status": {
+"ACTIVE": {
+"meaning": "La fuente oficial está identificada como fuente vigente de referencia, pero el contenido concreto debe verificarse antes de usarlo para una decisión individual.",
+"allowed_for_engine": true
+},
+"VERIFY": {
+"meaning": "La fuente o información requiere comprobación directa antes de presentarse como requisito vigente.",
+"allowed_for_engine": true
+},
+"EXPIRED": {
+"meaning": "La información ya no debe utilizarse como requisito actual.",
+"allowed_for_engine": false
+},
+"UNKNOWN": {
+"meaning": "No existe información suficiente para determinar la vigencia.",
+"allowed_for_engine": false
+}
+},
+"rule_evaluation_policy": {
+"official_source_required_for_active": true,
+"secondary_source_default": "VERIFY",
+"conflicting_official_sources": "VERIFY_AND_ESCALATE",
+"missing_source": "UNKNOWN",
+"historical_source": "EXPIRED",
+"never_invent_requirement": true,
+"never_invent_fee": true,
+"never_invent_deadline": true,
+"never_invent_jurisdiction": true,
+"never_invent_appointment": true,
+"never_invent_approval": true,
+"never_generate_official_qr": true,
+"never_claim_government_affiliation": true
+},
+"display_policy": {
+"show_source_name": true,
+"show_official_link": true,
+"show_last_reviewed": true,
+"show_verification_status": true,
+"show_warning_for_verify": true,
+"show_secondary_sources_as_official": false,
+"allow_user_to_open_source": true
+},
+"app_disclaimer": {
+"short": "Esta aplicación es informativa y de preparación. No pertenece a ningún gobierno, consulado, embajada, OFAC, Departamento de Estado ni otra autoridad.",
+"long": "La información se organiza a partir de fuentes oficiales y debe verificarse directamente antes de viajar o realizar un trámite. La aplicación no emite pasaportes, visas, permisos, autorizaciones, citas, documentos oficiales ni decisiones gubernamentales."
+}
+}
