@@ -8,6 +8,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from schemas import VisaRequest, DViajerosRequest, PassportRequest
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 APP_NAME = "CUBA AUTO TRAVEL 2026"
 APP_VERSION = "2026.5"
 BASE_DIR = Path(__file__).resolve().parent
