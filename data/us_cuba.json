@@ -1,0 +1,616 @@
+{
+"metadata": {
+"file": "us_cuba.json",
+"version": "1.0.0",
+"country": "Cuba",
+"related_country": "United States",
+"language": "es",
+"description": "Reglas de verificación para viajeros con conexión con Estados Unidos que viajan a Cuba.",
+"source_of_truth": "official_us_government_and_cuban_authorities",
+"last_reviewed": "2026-09-24",
+"warning": "Las reglas estadounidenses aplicables a Cuba pueden depender de ciudadanía, residencia, propósito del viaje, jurisdicción y situación individual. Este archivo no sustituye asesoría legal ni las fuentes oficiales.",
+"app_role": "guidance_only",
+"does_not_issue_authorizations": true,
+"does_not_determine_legal_compliance": true,
+"does_not_replace_ofac": true,
+"does_not_replace_us_state_department": true,
+"does_not_replace_cuban_authorities": true
+},
+"sources": [
+{
+"id": "SRC-USCUBA-OFAC",
+"name": "U.S. Department of the Treasury - Office of Foreign Assets Control",
+"type": "government",
+"url": "https://ofac.treasury.gov/",
+"official": true
+},
+{
+"id": "SRC-USCUBA-STATE",
+"name": "U.S. Department of State",
+"type": "government",
+"url": "https://travel.state.gov/",
+"official": true
+},
+{
+"id": "SRC-USCUBA-CUBA",
+"name": "Ministerio de Relaciones Exteriores de Cuba",
+"type": "government",
+"url": "https://www.minrex.gob.cu/",
+"official": true
+},
+{
+"id": "SRC-USCUBA-EVISA",
+"name": "eVisa Cuba",
+"type": "official_visa_portal",
+"url": "https://evisacuba.cu/",
+"official": true
+},
+{
+"id": "SRC-USCUBA-DVIAJEROS",
+"name": "D'Viajeros",
+"type": "government_travel_form",
+"url": "https://dviajeros.mitrans.gob.cu/",
+"official": true
+}
+],
+"rules": [
+{
+"id": "USCUBA-001",
+"category": "US_CUBA",
+"name": "Conexión con Estados Unidos",
+"description": "El sistema debe identificar cuando el viajero tiene ciudadanía, residencia, salida o conexión relevante con Estados Unidos.",
+"condition": {
+"ANY": [
+{
+"EQUALS": {
+"field": "traveler.citizenship_country",
+"value": "UNITED_STATES"
+}
+},
+{
+"EQUALS": {
+"field": "traveler.residence_country",
+"value": "UNITED_STATES"
+}
+},
+{
+"EQUALS": {
+"field": "traveler.departure_country",
+"value": "UNITED_STATES"
+}
+}
+]
+},
+"result": {
+"status": "ACTIVE",
+"action": "ACTIVATE_US_CUBA_REVIEW",
+"message": "Activa la revisión de las reglas estadounidenses aplicables al viaje a Cuba."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC",
+"SRC-USCUBA-STATE"
+]
+},
+{
+"id": "USCUBA-002",
+"category": "US_CUBA",
+"name": "Revisión de OFAC",
+"description": "Los viajes sujetos a jurisdicción estadounidense deben evaluarse bajo las reglas administradas por OFAC.",
+"condition": {
+"EQUALS": {
+"field": "traveler.us_jurisdiction",
+"value": true
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "REVIEW_OFAC_RULES",
+"message": "Verifica las reglas actuales de OFAC aplicables a tu situación y propósito de viaje."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-003",
+"category": "US_CUBA",
+"name": "Propósito del viaje",
+"description": "El propósito del viaje es un dato fundamental para determinar qué reglas estadounidenses pueden resultar aplicables.",
+"condition": {
+"NOT": {
+"FIELD_EXISTS": "traveler.travel_purpose"
+}
+},
+"result": {
+"status": "UNKNOWN",
+"action": "REQUEST_TRAVEL_PURPOSE",
+"message": "Indica el propósito de tu viaje a Cuba."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-004",
+"category": "US_CUBA",
+"name": "Categoría de viaje",
+"description": "El sistema debe identificar la categoría aplicable antes de presentar conclusiones.",
+"condition": {
+"FIELD_EXISTS": "traveler.travel_purpose"
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_TRAVEL_CATEGORY",
+"message": "Verifica que el propósito declarado corresponda a una categoría autorizada aplicable a tu situación."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-005",
+"category": "US_CUBA",
+"name": "Visita familiar",
+"description": "El viaje relacionado con visita familiar debe evaluarse conforme a la categoría aplicable y sus condiciones vigentes.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_purpose",
+"value": "FAMILY_VISIT"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_FAMILY_TRAVEL_CATEGORY",
+"message": "Verifica las condiciones actuales de la categoría de viaje relacionada con familiares."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-006",
+"category": "US_CUBA",
+"name": "Actividad profesional",
+"description": "Los viajes relacionados con actividades profesionales requieren verificar la categoría y condiciones aplicables.",
+"condition": {
+"IN": {
+"field": "traveler.travel_purpose",
+"values": [
+"PROFESSIONAL",
+"BUSINESS",
+"JOURNALISM",
+"RESEARCH",
+"EDUCATIONAL"
+]
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_PROFESSIONAL_TRAVEL_CATEGORY",
+"message": "Verifica la categoría específica y las condiciones aplicables antes de viajar."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-007",
+"category": "US_CUBA",
+"name": "Actividad religiosa",
+"description": "Los viajes con finalidad religiosa deben evaluarse según las reglas estadounidenses vigentes.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_purpose",
+"value": "RELIGIOUS"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_RELIGIOUS_TRAVEL_CATEGORY",
+"message": "Verifica las condiciones vigentes para viajes de carácter religioso."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-008",
+"category": "US_CUBA",
+"name": "Actividad educativa",
+"description": "Los viajes educativos requieren revisión de la categoría correspondiente y sus condiciones.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_purpose",
+"value": "EDUCATIONAL"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_EDUCATIONAL_TRAVEL_CATEGORY",
+"message": "Verifica los requisitos vigentes para la categoría educativa correspondiente."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-009",
+"category": "US_CUBA",
+"name": "Actividad humanitaria",
+"description": "Los viajes relacionados con actividades humanitarias deben evaluarse conforme a la categoría aplicable.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_purpose",
+"value": "HUMANITARIAN"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_HUMANITARIAN_TRAVEL_CATEGORY",
+"message": "Verifica las condiciones vigentes de la categoría humanitaria."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-010",
+"category": "US_CUBA",
+"name": "Actividad periodística",
+"description": "Los viajes de carácter periodístico deben revisarse bajo la categoría correspondiente.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_purpose",
+"value": "JOURNALISM"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_JOURNALISM_CATEGORY",
+"message": "Verifica las condiciones actuales aplicables a actividades periodísticas."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-011",
+"category": "US_CUBA",
+"name": "Actividad investigativa",
+"description": "Los viajes de investigación deben evaluarse según la categoría estadounidense aplicable.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_purpose",
+"value": "RESEARCH"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_RESEARCH_CATEGORY",
+"message": "Verifica las condiciones vigentes para la actividad investigativa."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-012",
+"category": "US_CUBA",
+"name": "Viaje turístico",
+"description": "La aplicación no debe presentar un viaje turístico como automáticamente autorizado bajo las reglas estadounidenses.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_purpose",
+"value": "TOURISM"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "REVIEW_OFAC_CATEGORY",
+"message": "Verifica las reglas estadounidenses vigentes. La aplicación no debe asumir autorización por el solo hecho de seleccionar turismo."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-013",
+"category": "US_CUBA",
+"name": "Categoría no identificada",
+"description": "Si el propósito no puede relacionarse con una categoría suficientemente determinada, el sistema debe detener la conclusión.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_category_known",
+"value": false
+}
+},
+"result": {
+"status": "UNKNOWN",
+"action": "REQUEST_CLARIFICATION",
+"message": "No se puede determinar la categoría del viaje con la información disponible."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-014",
+"category": "US_CUBA",
+"name": "Transacciones financieras",
+"description": "Las transacciones relacionadas con Cuba pueden estar sujetas a reglas estadounidenses específicas.",
+"condition": {
+"EQUALS": {
+"field": "traveler.us_jurisdiction",
+"value": true
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "REVIEW_FINANCIAL_RULES",
+"message": "Verifica las reglas actuales aplicables a pagos, bancos, tarjetas y otras transacciones relacionadas con Cuba."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-015",
+"category": "US_CUBA",
+"name": "Transportación",
+"description": "Las reglas estadounidenses aplicables al viaje pueden interactuar con las reglas del transportista y las autoridades migratorias.",
+"condition": {
+"FIELD_EXISTS": "traveler.departure_country"
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_CARRIER_AND_US_RULES",
+"message": "Verifica las reglas estadounidenses y los requisitos actuales del transportista."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC",
+"SRC-USCUBA-STATE"
+]
+},
+{
+"id": "USCUBA-016",
+"category": "US_CUBA",
+"name": "Documentación cubana",
+"description": "Cumplir las reglas estadounidenses no sustituye los requisitos de entrada, visa, pasaporte o formularios exigidos por Cuba.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_to_cuba",
+"value": true
+}
+},
+"result": {
+"status": "ACTIVE",
+"action": "RUN_CUBAN_ENTRY_FLOW",
+"message": "Además de las reglas estadounidenses, verifica los requisitos cubanos de entrada y documentación."
+},
+"source_ids": [
+"SRC-USCUBA-CUBA",
+"SRC-USCUBA-EVISA",
+"SRC-USCUBA-DVIAJEROS"
+]
+},
+{
+"id": "USCUBA-017",
+"category": "US_CUBA",
+"name": "D'Viajeros",
+"description": "El viajero debe revisar el formulario oficial D'Viajeros cuando corresponda a su entrada a Cuba.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_to_cuba",
+"value": true
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "CHECK_DVIAJEROS",
+"message": "Completa o verifica el formulario oficial D'Viajeros según las instrucciones vigentes."
+},
+"source_ids": [
+"SRC-USCUBA-DVIAJEROS"
+]
+},
+{
+"id": "USCUBA-018",
+"category": "US_CUBA",
+"name": "eVisa",
+"description": "Los viajeros extranjeros deben verificar si su nacionalidad y situación requieren una eVisa cubana.",
+"condition": {
+"EQUALS": {
+"field": "traveler.nationality_type",
+"value": "FOREIGN"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "CHECK_CUBA_EVISA",
+"message": "Verifica el requisito de eVisa en el portal oficial de Cuba."
+},
+"source_ids": [
+"SRC-USCUBA-EVISA"
+]
+},
+{
+"id": "USCUBA-019",
+"category": "US_CUBA",
+"name": "Ciudadanía cubana",
+"description": "La nacionalidad cubana puede cambiar el análisis documental y migratorio cubano.",
+"condition": {
+"EQUALS": {
+"field": "traveler.nationality",
+"value": "CUBAN"
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "RUN_CUBAN_NATIONAL_FLOW",
+"message": "Activa el flujo específico para ciudadanos cubanos y verifica su documentación vigente."
+},
+"source_ids": [
+"SRC-USCUBA-CUBA"
+]
+},
+{
+"id": "USCUBA-020",
+"category": "US_CUBA",
+"name": "Doble nacionalidad",
+"description": "Los viajeros con doble nacionalidad deben identificar qué documento utilizarán y revisar las reglas de ambas jurisdicciones cuando corresponda.",
+"condition": {
+"EQUALS": {
+"field": "traveler.dual_nationality",
+"value": true
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "VERIFY_DUAL_NATIONALITY",
+"message": "Indica las nacionalidades y el documento de viaje que utilizarás para que puedan verificarse las reglas aplicables."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC",
+"SRC-USCUBA-CUBA"
+]
+},
+{
+"id": "USCUBA-021",
+"category": "US_CUBA",
+"name": "Menor con conexión estadounidense",
+"description": "Los menores sujetos a jurisdicción estadounidense requieren revisión adicional del propósito del viaje y documentación.",
+"condition": {
+"ALL": [
+{
+"EQUALS": {
+"field": "traveler.is_minor",
+"value": true
+}
+},
+{
+"EQUALS": {
+"field": "traveler.us_jurisdiction",
+"value": true
+}
+}
+]
+},
+"result": {
+"status": "VERIFY",
+"action": "RUN_MINOR_AND_US_CUBA_REVIEW",
+"message": "Revisa conjuntamente las reglas aplicables al menor y las reglas estadounidenses sobre viajes a Cuba."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-022",
+"category": "US_CUBA",
+"name": "Sanciones y restricciones",
+"description": "La aplicación no debe determinar por sí sola que una persona o transacción está permitida o prohibida bajo sanciones estadounidenses.",
+"condition": {
+"EQUALS": {
+"field": "traveler.us_jurisdiction",
+"value": true
+}
+},
+"result": {
+"status": "VERIFY",
+"action": "REFER_TO_OFAC",
+"message": "Para una determinación jurídica específica, consulta la información y orientación oficial de OFAC."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-023",
+"category": "US_CUBA",
+"name": "No emitir licencia",
+"description": "La aplicación no emite una licencia específica de OFAC ni una autorización gubernamental estadounidense.",
+"condition": {
+"EQUALS": {
+"field": "traveler.us_jurisdiction",
+"value": true
+}
+},
+"result": {
+"status": "ACTIVE",
+"action": "DO_NOT_CLAIM_GOVERNMENT_AUTHORIZATION",
+"message": "La aplicación no emite ni sustituye una licencia o autorización gubernamental."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC"
+]
+},
+{
+"id": "USCUBA-024",
+"category": "US_CUBA",
+"name": "Fuente oficial actual",
+"description": "Las reglas estadounidenses sobre Cuba deben verificarse contra la información oficial vigente.",
+"condition": {
+"EQUALS": {
+"field": "traveler.us_jurisdiction",
+"value": true
+}
+},
+"result": {
+"status": "ACTIVE",
+"action": "DISPLAY_OFFICIAL_US_SOURCES",
+"message": "Consulta OFAC y el Departamento de Estado para verificar la información vigente."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC",
+"SRC-USCUBA-STATE"
+]
+},
+{
+"id": "USCUBA-025",
+"category": "US_CUBA",
+"name": "No asumir cumplimiento",
+"description": "Completar el flujo de la aplicación no significa que el viaje cumpla automáticamente todas las leyes o regulaciones aplicables.",
+"condition": {
+"EQUALS": {
+"field": "traveler.travel_to_cuba",
+"value": true
+}
+},
+"result": {
+"status": "ACTIVE",
+"action": "DISPLAY_COMPLIANCE_WARNING",
+"message": "La aplicación ayuda a preparar y verificar información; no determina por sí sola el cumplimiento legal."
+},
+"source_ids": [
+"SRC-USCUBA-OFAC",
+"SRC-USCUBA-STATE"
+]
+}
+],
+"travel_purpose_values": [
+"FAMILY_VISIT",
+"OFFICIAL_BUSINESS",
+"PROFESSIONAL",
+"JOURNALISM",
+"RESEARCH",
+"EDUCATIONAL",
+"RELIGIOUS",
+"HUMANITARIAN",
+"PUBLIC_PERFORMANCE",
+"ATHLETIC",
+"ARTISTIC",
+"OTHER_AUTHORIZED_CATEGORY",
+"TOURISM",
+"UNKNOWN"
+],
+"final_status_logic": {
+"missing_us_jurisdiction_information": "UNKNOWN",
+"missing_travel_purpose": "UNKNOWN",
+"us_rules_require_verification": "VERIFY",
+"cuban_requirements_require_verification": "VERIFY",
+"official_source_confirms_current_rule": "ACTIVE",
+"historical_rule_only": "EXPIRED",
+"insufficient_information": "INCOMPLETE",
+"never_claim_legal_compliance_automatically": true
+}
+}
