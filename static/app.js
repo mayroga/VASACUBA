@@ -1,591 +1,676 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", function () {
+    const VISA_URL = "https://evisacuba.cu/";
+    const DVIJEROS_URL = "https://dviajeros.mitrans.gob.cu/";
 
-    var visaSection = document.getElementById("visa-section");
-    var dviajerosSection = document.getElementById("dviajeros-section");
+    const VISA_STORAGE_KEY = "cuba_auto_travel_2026_visa";
+    const DVIJEROS_STORAGE_KEY = "cuba_auto_travel_2026_dviajeros";
 
-    var intro = document.querySelector(".intro");
-    var modules = document.querySelector(".modules");
+    const homeSection = document.getElementById("home-section");
+    const visaSection = document.getElementById("visa-section");
+    const dviajerosSection = document.getElementById("dviajeros-section");
 
-    var visaButton = document.getElementById("visa-button");
-    var dviajerosButton = document.getElementById("dviajeros-button");
+    const visaButton = document.getElementById("visa-button");
+    const dviajerosButton = document.getElementById("dviajeros-button");
 
-    var backButtons = document.querySelectorAll(".back-button");
+    const visaBack = document.getElementById("visa-back");
+    const dviajerosBack = document.getElementById("dviajeros-back");
 
+    const visaForm = document.getElementById("visa-form");
+    const dviajerosForm = document.getElementById("dviajeros-form");
 
-    function hideAll() {
-        if (intro) {
-            intro.classList.add("hidden");
-        }
-
-        if (modules) {
-            modules.classList.add("hidden");
-        }
-
-        if (visaSection) {
-            visaSection.classList.add("hidden");
-        }
-
-        if (dviajerosSection) {
-            dviajerosSection.classList.add("hidden");
-        }
+    function hideAllSections() {
+        homeSection.classList.add("hidden");
+        visaSection.classList.add("hidden");
+        dviajerosSection.classList.add("hidden");
     }
 
-
-    function goHome() {
-        hideAll();
-
-        if (intro) {
-            intro.classList.remove("hidden");
-        }
-
-        if (modules) {
-            modules.classList.remove("hidden");
-        }
+    function showHome() {
+        hideAllSections();
+        homeSection.classList.remove("hidden");
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
-
 
     function showVisa() {
-        hideAll();
-
-        if (visaSection) {
-            visaSection.classList.remove("hidden");
-        }
+        hideAllSections();
+        visaSection.classList.remove("hidden");
+        loadForm(
+            visaForm,
+            VISA_STORAGE_KEY
+        );
+        updateProgress(
+            visaForm,
+            "visa-progress",
+            "visa-progress-bar"
+        );
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
-
 
     function showDViajeros() {
-        hideAll();
-
-        if (dviajerosSection) {
-            dviajerosSection.classList.remove("hidden");
-        }
+        hideAllSections();
+        dviajerosSection.classList.remove("hidden");
+        loadForm(
+            dviajerosForm,
+            DVIJEROS_STORAGE_KEY
+        );
+        updateProgress(
+            dviajerosForm,
+            "dviajeros-progress",
+            "dviajeros-progress-bar"
+        );
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
+    function getFormData(form) {
+        const data = {};
 
-    if (visaButton) {
-        visaButton.addEventListener(
-            "click",
-            showVisa
-        );
-    }
-
-
-    if (dviajerosButton) {
-        dviajerosButton.addEventListener(
-            "click",
-            showDViajeros
-        );
-    }
-
-
-    backButtons.forEach(function (button) {
-        button.addEventListener(
-            "click",
-            goHome
-        );
-    });
-
-
-    function formToObject(form) {
-        var data = {};
-
-        var elements = form.querySelectorAll(
+        form.querySelectorAll(
             "input, textarea, select"
-        );
-
-        elements.forEach(function (element) {
-
-            if (!element.name) {
+        ).forEach(function (field) {
+            if (!field.name) {
                 return;
             }
 
-            if (element.type === "checkbox") {
-                data[element.name] = element.checked;
+            if (field.type === "checkbox") {
+                data[field.name] = field.checked;
             } else {
-                data[element.name] =
-                    element.value.trim();
+                data[field.name] = field.value;
             }
         });
 
         return data;
     }
 
+    function saveForm(form, storageKey) {
+        try {
+            const data = getFormData(form);
 
-    function escapeHtml(value) {
-        return String(
-            value == null ? "" : value
-        )
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify(data)
+            );
+        } catch (error) {
+            console.warn(
+                "No se pudo guardar la información localmente.",
+                error
+            );
+        }
     }
 
+    function loadForm(form, storageKey) {
+        try {
+            const saved = localStorage.getItem(storageKey);
 
-    function statusClass(status) {
+            if (!saved) {
+                return;
+            }
 
-        var value = String(
-            status || ""
-        ).toUpperCase();
+            const data = JSON.parse(saved);
 
-        if (value === "READY") {
-            return "status-ready";
+            if (
+                !data ||
+                typeof data !== "object"
+            ) {
+                return;
+            }
+
+            form.querySelectorAll(
+                "input, textarea, select"
+            ).forEach(function (field) {
+                if (!field.name) {
+                    return;
+                }
+
+                if (
+                    !Object.prototype.hasOwnProperty.call(
+                        data,
+                        field.name
+                    )
+                ) {
+                    return;
+                }
+
+                if (field.type === "checkbox") {
+                    field.checked = Boolean(
+                        data[field.name]
+                    );
+                } else {
+                    field.value =
+                        data[field.name] ?? "";
+                }
+            });
+        } catch (error) {
+            console.warn(
+                "No se pudo cargar la información guardada.",
+                error
+            );
         }
-
-        if (value === "VERIFY") {
-            return "status-verify";
-        }
-
-        if (value === "INCOMPLETE") {
-            return "status-incomplete";
-        }
-
-        return "";
     }
 
+    function updateProgress(
+        form,
+        textId,
+        barId
+    ) {
+        const fields = Array.from(
+            form.querySelectorAll(
+                "input:not([type='checkbox']), textarea, select"
+            )
+        );
 
-    function showError(element, message) {
+        const checkboxes = Array.from(
+            form.querySelectorAll(
+                "input[type='checkbox']"
+            )
+        );
+
+        const total =
+            fields.length + checkboxes.length;
+
+        if (!total) {
+            return;
+        }
+
+        let completed = 0;
+
+        fields.forEach(function (field) {
+            if (
+                String(field.value || "").trim()
+            ) {
+                completed += 1;
+            }
+        });
+
+        checkboxes.forEach(function (field) {
+            if (field.checked) {
+                completed += 1;
+            }
+        });
+
+        const percentage = Math.round(
+            (completed / total) * 100
+        );
+
+        const textElement =
+            document.getElementById(textId);
+
+        const barElement =
+            document.getElementById(barId);
+
+        if (textElement) {
+            textElement.textContent =
+                percentage + "% completado";
+        }
+
+        if (barElement) {
+            barElement.style.width =
+                percentage + "%";
+        }
+    }
+
+    function showStatus(
+        elementId,
+        message,
+        type
+    ) {
+        const element =
+            document.getElementById(elementId);
 
         if (!element) {
             return;
         }
 
-        element.classList.remove("hidden");
+        element.className =
+            "status-message " + type;
 
-        element.innerHTML =
-            "<h3>Error</h3>" +
-            "<p>" +
-            escapeHtml(message) +
-            "</p>";
+        element.textContent = message;
     }
 
+    function getMissingFields(
+        form,
+        requiredNames
+    ) {
+        const missing = [];
 
-    var visaForm =
-        document.getElementById("visa-form");
+        requiredNames.forEach(function (name) {
+            const field = form.elements[name];
 
+            if (!field) {
+                return;
+            }
 
-    if (visaForm) {
-
-        visaForm.addEventListener(
-            "submit",
-            async function (event) {
-
-                event.preventDefault();
-
-                var result =
-                    document.getElementById(
-                        "visa-result"
-                    );
-
-                if (!result) {
-                    return;
+            if (
+                field.type === "checkbox"
+            ) {
+                if (!field.checked) {
+                    missing.push(name);
                 }
+                return;
+            }
 
-                result.classList.remove("hidden");
+            if (
+                !String(field.value || "").trim()
+            ) {
+                missing.push(name);
+            }
+        });
 
-                result.innerHTML =
-                    "<p>Revisando información...</p>";
+        return missing;
+    }
 
+    function reviewVisa() {
+        saveForm(
+            visaForm,
+            VISA_STORAGE_KEY
+        );
 
-                try {
+        const required = [
+            "nationality",
+            "country_of_residence",
+            "passport_country",
+            "travel_purpose",
+            "email"
+        ];
 
-                    var response =
-                        await fetch(
-                            "/api/visa/evaluate",
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type":
-                                        "application/json"
-                                },
-                                body:
-                                    JSON.stringify(
-                                        formToObject(
-                                            event.target
-                                        )
-                                    )
-                            }
-                        );
+        const missing =
+            getMissingFields(
+                visaForm,
+                required
+            );
 
+        const hasPassport =
+            document.getElementById(
+                "visa-has-passport"
+            ).checked;
 
-                    var data =
-                        await response.json();
+        const passportValid =
+            document.getElementById(
+                "visa-passport-valid"
+            ).checked;
 
+        if (missing.length > 0) {
+            showStatus(
+                "visa-status",
+                "FALTA INFORMACIÓN. Completa los campos principales antes de continuar.",
+                "warning"
+            );
+            return;
+        }
 
-                    if (!response.ok) {
+        if (!hasPassport) {
+            showStatus(
+                "visa-status",
+                "REVISAR. Debes tener tu pasaporte disponible antes de continuar.",
+                "warning"
+            );
+            return;
+        }
 
-                        throw new Error(
-                            data.detail ||
-                            "No se pudo procesar la solicitud."
-                        );
-                    }
+        if (!passportValid) {
+            showStatus(
+                "visa-status",
+                "REVISAR. Verifica la vigencia de tu pasaporte según las instrucciones oficiales.",
+                "warning"
+            );
+            return;
+        }
 
+        showStatus(
+            "visa-status",
+            "LISTO PARA CONTINUAR. Revisa nuevamente tus datos y, cuando estés preparado, abre el portal oficial.",
+            "success"
+        );
+    }
 
-                    var html =
-                        "<h3>Resultado de la revisión</h3>" +
-                        "<p>" +
-                        "Estado: " +
-                        "<span class=\"status " +
-                        statusClass(
-                            data.status
-                        ) +
-                        "\">" +
-                        escapeHtml(
-                            data.status
-                        ) +
-                        "</span>" +
-                        "</p>";
+    function reviewDViajeros() {
+        saveForm(
+            dviajerosForm,
+            DVIJEROS_STORAGE_KEY
+        );
 
+        const required = [
+            "first_name",
+            "last_name",
+            "nationality",
+            "date_of_birth",
+            "passport_number",
+            "passport_country",
+            "arrival_date",
+            "flight_number",
+            "airline"
+        ];
 
-                    if (
-                        data.missing_fields &&
-                        data.missing_fields.length
-                    ) {
+        const missing =
+            getMissingFields(
+                dviajerosForm,
+                required
+            );
 
-                        html +=
-                            "<div class=\"result-item\">" +
-                            "<strong>" +
-                            "Datos faltantes" +
-                            "</strong>" +
-                            "<ul>";
+        if (missing.length > 0) {
+            showStatus(
+                "dviajeros-status",
+                "FALTA INFORMACIÓN. Completa los datos principales del viajero y del viaje antes de continuar.",
+                "warning"
+            );
+            return;
+        }
 
+        showStatus(
+            "dviajeros-status",
+            "LISTO PARA CONTINUAR. Revisa nuevamente tus datos y abre D'Viajeros cuando estés preparado.",
+            "success"
+        );
+    }
 
-                        data.missing_fields.forEach(
-                            function (field) {
+    function clearForm(
+        form,
+        storageKey,
+        statusId
+    ) {
+        form.reset();
 
-                                html +=
-                                    "<li>" +
-                                    escapeHtml(
-                                        field
-                                    ) +
-                                    "</li>";
-                            }
-                        );
+        try {
+            localStorage.removeItem(
+                storageKey
+            );
+        } catch (error) {
+            console.warn(
+                "No se pudo eliminar la información local.",
+                error
+            );
+        }
 
+        const status =
+            document.getElementById(statusId);
 
-                        html +=
-                            "</ul></div>";
-                    }
+        if (status) {
+            status.className =
+                "status-message hidden";
+            status.textContent = "";
+        }
+    }
 
+    async function copyField(fieldId, button) {
+        const field =
+            document.getElementById(fieldId);
 
-                    if (
-                        data.checks &&
-                        data.checks.length
-                    ) {
+        if (!field) {
+            return;
+        }
 
-                        html +=
-                            "<div class=\"result-item\">" +
-                            "<strong>" +
-                            "Revisión" +
-                            "</strong>";
+        const value =
+            String(field.value || "").trim();
 
+        if (!value) {
+            button.textContent =
+                "Vacío";
 
-                        data.checks.forEach(
-                            function (check) {
+            setTimeout(function () {
+                button.textContent =
+                    "Copiar";
+            }, 1200);
 
-                                html +=
-                                    "<div class=\"result-item\">" +
-                                    "<strong>" +
-                                    escapeHtml(
-                                        check.id
-                                    ) +
-                                    "</strong>" +
-                                    "<div class=\"status " +
-                                    statusClass(
-                                        check.status
-                                    ) +
-                                    "\">" +
-                                    escapeHtml(
-                                        check.status
-                                    ) +
-                                    "</div>" +
-                                    "<div>" +
-                                    escapeHtml(
-                                        check.message
-                                    ) +
-                                    "</div>" +
-                                    "</div>";
-                            }
-                        );
+            return;
+        }
 
+        try {
+            await navigator.clipboard.writeText(
+                value
+            );
 
-                        html += "</div>";
-                    }
+            button.textContent =
+                "Copiado";
 
+            setTimeout(function () {
+                button.textContent =
+                    "Copiar";
+            }, 1200);
 
-                    if (data.official_portal) {
+        } catch (error) {
+            const temporary =
+                document.createElement("textarea");
 
-                        html +=
-                            "<a " +
-                            "class=\"official-link\" " +
-                            "href=\"" +
-                            escapeHtml(
-                                data.official_portal
-                            ) +
-                            "\" " +
-                            "target=\"_blank\" " +
-                            "rel=\"noopener noreferrer\">" +
-                            "Abrir portal oficial →" +
-                            "</a>";
-                    }
+            temporary.value = value;
+            temporary.style.position = "fixed";
+            temporary.style.opacity = "0";
 
+            document.body.appendChild(
+                temporary
+            );
 
-                    result.innerHTML = html;
+            temporary.focus();
+            temporary.select();
 
+            try {
+                document.execCommand("copy");
 
-                } catch (error) {
+                button.textContent =
+                    "Copiado";
+            } catch (copyError) {
+                button.textContent =
+                    "No se pudo copiar";
+            }
 
-                    showError(
-                        result,
-                        error.message
-                    );
-                }
+            document.body.removeChild(
+                temporary
+            );
+
+            setTimeout(function () {
+                button.textContent =
+                    "Copiar";
+            }, 1400);
+        }
+    }
+
+    function openOfficialPortal(url) {
+        window.open(
+            url,
+            "_blank",
+            "noopener,noreferrer"
+        );
+    }
+
+    visaButton.addEventListener(
+        "click",
+        showVisa
+    );
+
+    dviajerosButton.addEventListener(
+        "click",
+        showDViajeros
+    );
+
+    visaBack.addEventListener(
+        "click",
+        showHome
+    );
+
+    dviajerosBack.addEventListener(
+        "click",
+        showHome
+    );
+
+    document.getElementById(
+        "visa-review"
+    ).addEventListener(
+        "click",
+        reviewVisa
+    );
+
+    document.getElementById(
+        "dviajeros-review"
+    ).addEventListener(
+        "click",
+        reviewDViajeros
+    );
+
+    document.getElementById(
+        "visa-clear"
+    ).addEventListener(
+        "click",
+        function () {
+            clearForm(
+                visaForm,
+                VISA_STORAGE_KEY,
+                "visa-status"
+            );
+
+            updateProgress(
+                visaForm,
+                "visa-progress",
+                "visa-progress-bar"
+            );
+        }
+    );
+
+    document.getElementById(
+        "dviajeros-clear"
+    ).addEventListener(
+        "click",
+        function () {
+            clearForm(
+                dviajerosForm,
+                DVIJEROS_STORAGE_KEY,
+                "dviajeros-status"
+            );
+
+            updateProgress(
+                dviajerosForm,
+                "dviajeros-progress",
+                "dviajeros-progress-bar"
+            );
+        }
+    );
+
+    document.getElementById(
+        "open-visa"
+    ).addEventListener(
+        "click",
+        function () {
+            openOfficialPortal(
+                VISA_URL
+            );
+        }
+    );
+
+    document.getElementById(
+        "open-dviajeros"
+    ).addEventListener(
+        "click",
+        function () {
+            openOfficialPortal(
+                DVIJEROS_URL
+            );
+        }
+    );
+
+    document.querySelectorAll(
+        "[data-copy]"
+    ).forEach(function (button) {
+        button.addEventListener(
+            "click",
+            function () {
+                copyField(
+                    button.dataset.copy,
+                    button
+                );
             }
         );
-    }
-
-
-    var dviajerosForm =
-        document.getElementById(
-            "dviajeros-form"
-        );
-
-
-    if (dviajerosForm) {
-
-        dviajerosForm.addEventListener(
-            "submit",
-            async function (event) {
-
-                event.preventDefault();
-
-                var result =
-                    document.getElementById(
-                        "dviajeros-result"
-                    );
-
-
-                if (!result) {
-                    return;
-                }
-
-
-                result.classList.remove("hidden");
-
-                result.innerHTML =
-                    "<p>Revisando información...</p>";
-
-
-                var data =
-                    formToObject(
-                        event.target
-                    );
-
-
-                if (data.health_information) {
-
-                    data.health_information = {
-                        declaration:
-                            data.health_information
-                    };
-
-                } else {
-
-                    data.health_information = {};
-                }
-
-
-                if (data.customs_information) {
-
-                    data.customs_information = {
-                        declaration:
-                            data.customs_information
-                    };
-
-                } else {
-
-                    data.customs_information = {};
-                }
-
-
-                try {
-
-                    var response =
-                        await fetch(
-                            "/api/dviajeros/evaluate",
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type":
-                                        "application/json"
-                                },
-                                body:
-                                    JSON.stringify(
-                                        data
-                                    )
-                            }
-                        );
-
-
-                    var resultData =
-                        await response.json();
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            resultData.detail ||
-                            "No se pudo procesar la solicitud."
-                        );
-                    }
-
-
-                    var html =
-                        "<h3>" +
-                        "Resultado de la revisión" +
-                        "</h3>" +
-
-                        "<p>" +
-                        "Estado: " +
-
-                        "<span class=\"status " +
-                        statusClass(
-                            resultData.status
-                        ) +
-                        "\">" +
-
-                        escapeHtml(
-                            resultData.status
-                        ) +
-
-                        "</span>" +
-                        "</p>" +
-
-                        "<p>" +
-                        "Preparación: " +
-
-                        "<strong>" +
-
-                        escapeHtml(
-                            resultData.submission_status
-                        ) +
-
-                        "</strong>" +
-
-                        "</p>";
-
-
-                    if (
-                        resultData.missing_fields &&
-                        resultData.missing_fields.length
-                    ) {
-
-                        html +=
-                            "<div class=\"result-item\">" +
-                            "<strong>" +
-                            "Datos faltantes" +
-                            "</strong>" +
-                            "<ul>";
-
-
-                        resultData.missing_fields.forEach(
-                            function (field) {
-
-                                html +=
-                                    "<li>" +
-                                    escapeHtml(
-                                        field
-                                    ) +
-                                    "</li>";
-                            }
-                        );
-
-
-                        html +=
-                            "</ul></div>";
-                    }
-
-
-                    if (
-                        resultData.modules &&
-                        resultData.modules.length
-                    ) {
-
-                        html +=
-                            "<div class=\"result-item\">" +
-                            "<strong>" +
-                            "Módulos" +
-                            "</strong>";
-
-
-                        resultData.modules.forEach(
-                            function (module) {
-
-                                html +=
-                                    "<div class=\"result-item\">" +
-
-                                    "<strong>" +
-                                    escapeHtml(
-                                        module.title
-                                    ) +
-                                    "</strong>" +
-
-                                    "<div class=\"status " +
-                                    statusClass(
-                                        module.status
-                                    ) +
-                                    "\">" +
-
-                                    escapeHtml(
-                                        module.status
-                                    ) +
-
-                                    "</div>" +
-
-                                    "</div>";
-                            }
-                        );
-
-
-                        html += "</div>";
-                    }
-
-
-                    if (resultData.official_portal) {
-
-                        html +=
-                            "<a " +
-                            "class=\"official-link\" " +
-                            "href=\"" +
-                            escapeHtml(
-                                resultData.official_portal
-                            ) +
-                            "\" " +
-                            "target=\"_blank\" " +
-                            "rel=\"noopener noreferrer\">" +
-
-                            "Abrir portal oficial " +
-                            "D'Viajeros →" +
-
-                            "</a>";
-                    }
-
-
-                    result.innerHTML = html;
-
-
-                } catch (error) {
-
-                    showError(
-                        result,
-                        error.message
-                    );
-                }
-            }
-        );
-    }
-
+    });
+
+    visaForm.addEventListener(
+        "input",
+        function () {
+            saveForm(
+                visaForm,
+                VISA_STORAGE_KEY
+            );
+
+            updateProgress(
+                visaForm,
+                "visa-progress",
+                "visa-progress-bar"
+            );
+        }
+    );
+
+    visaForm.addEventListener(
+        "change",
+        function () {
+            saveForm(
+                visaForm,
+                VISA_STORAGE_KEY
+            );
+
+            updateProgress(
+                visaForm,
+                "visa-progress",
+                "visa-progress-bar"
+            );
+        }
+    );
+
+    dviajerosForm.addEventListener(
+        "input",
+        function () {
+            saveForm(
+                dviajerosForm,
+                DVIJEROS_STORAGE_KEY
+            );
+
+            updateProgress(
+                dviajerosForm,
+                "dviajeros-progress",
+                "dviajeros-progress-bar"
+            );
+        }
+    );
+
+    dviajerosForm.addEventListener(
+        "change",
+        function () {
+            saveForm(
+                dviajerosForm,
+                DVIJEROS_STORAGE_KEY
+            );
+
+            updateProgress(
+                dviajerosForm,
+                "dviajeros-progress",
+                "dviajeros-progress-bar"
+            );
+        }
+    );
+
+    loadForm(
+        visaForm,
+        VISA_STORAGE_KEY
+    );
+
+    loadForm(
+        dviajerosForm,
+        DVIJEROS_STORAGE_KEY
+    );
+
+    updateProgress(
+        visaForm,
+        "visa-progress",
+        "visa-progress-bar"
+    );
+
+    updateProgress(
+        dviajerosForm,
+        "dviajeros-progress",
+        "dviajeros-progress-bar"
+    );
 });
