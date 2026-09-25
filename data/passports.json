@@ -1,0 +1,89 @@
+{
+"module": "passports",
+"version": "2026.2",
+"purpose": "Datos internos para apoyar la preparación y revisión básica de la información del pasaporte.",
+"default": {
+"min_number_length": 5,
+"max_number_length": 20,
+"allow_letters": true,
+"allow_numbers": true,
+"allow_hyphen": true,
+"require_expiration": true
+},
+"countries": [
+{
+"code": "CU",
+"name": "Cuba"
+},
+{
+"code": "US",
+"name": "Estados Unidos"
+},
+{
+"code": "ES",
+"name": "España"
+},
+{
+"code": "CA",
+"name": "Canadá"
+},
+{
+"code": "MX",
+"name": "México"
+},
+{
+"code": "IT",
+"name": "Italia"
+},
+{
+"code": "FR",
+"name": "Francia"
+},
+{
+"code": "DE",
+"name": "Alemania"
+},
+{
+"code": "GB",
+"name": "Reino Unido"
+},
+{
+"code": "VE",
+"name": "Venezuela"
+},
+{
+"code": "CO",
+"name": "Colombia"
+},
+{
+"code": "AR",
+"name": "Argentina"
+},
+{
+"code": "CL",
+"name": "Chile"
+},
+{
+"code": "BR",
+"name": "Brasil"
+}
+],
+"internal_checks": [
+"country_present",
+"number_present",
+"number_length_reasonable",
+"first_name_present",
+"last_name_present",
+"date_of_birth_present",
+"expiration_date_present",
+"expiration_after_birth",
+"expiration_not_before_travel"
+],
+"user_message": {
+"ready": "Información del pasaporte preparada.",
+"missing": "Falta un dato del pasaporte.",
+"review": "Revisa un dato del pasaporte.",
+"expired": "La fecha de vencimiento debe revisarse antes de continuar."
+},
+"important": "Estos datos solamente apoyan una revisión básica dentro de CUBA AUTO TRAVEL 2026. No determinan la validez oficial del pasaporte, no sustituyen los controles de la autoridad correspondiente y no deben utilizarse como una lista oficial de requisitos de ningún país."
+}
