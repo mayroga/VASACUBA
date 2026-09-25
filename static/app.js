@@ -1,227 +1,176 @@
 "use strict";
 document.addEventListener("DOMContentLoaded",()=>{
-const $=id=>document.getElementById(id),API={visa:"/api/visa/practice",dviajeros:"/api/dviajeros/practice"},STORE="cuba_auto_travel_2026_practice";
+
+const $=id=>document.getElementById(id),STORE="cuba_auto_travel_2026_practice",API={visa:"/api/visa/practice",dviajeros:"/api/dviajeros/practice"};
+let db=(()=>{try{return JSON.parse(localStorage.getItem(STORE)||"{}")}catch{return{}}})(),moduleName="",practice=null,screen=0;
+
 const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-const getStore=()=>{try{return JSON.parse(localStorage.getItem(STORE)||"{}")}catch{return{}}};
-const setStore=x=>localStorage.setItem(STORE,JSON.stringify(x));
-const statusClass=s=>{s=String(s||"").toUpperCase();return s==="READY"||s==="CONFIRMED"?"status-ready":s==="VERIFY"?"status-verify":s==="INCOMPLETE"?"status-incomplete":""};
-const statusText=s=>({READY:"PREPARADO",CONFIRMED:"CONFIRMADO",VERIFY:"VERIFICAR",INCOMPLETE:"INCOMPLETO"})[String(s||"").toUpperCase()]||String(s||"");
-const state=getStore();
-let practice={visa:null,dviajeros:null},module="",screen=0;
+const attr=v=>esc(v).replace(/`/g,"&#096;");
+const clean=v=>String(v??"").trim();
+const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(db))}catch{}};
+const saveCurrent=()=>{if(!moduleName||!practice)return;db[moduleName]={answers:practice.answers||{},screen,completed:!!practice.completed};save()};
+const hide=()=>document.querySelectorAll(".app-section").forEach(e=>e.classList.add("hidden"));
+const home=()=>{hide();$("intro")?.classList.remove("hidden");$("modules")?.classList.remove("hidden");scrollTo({top:0,behavior:"smooth"})};
+const section=()=>{hide();ensure().classList.remove("hidden");scrollTo({top:0,behavior:"smooth"})};
+const ensure=()=>{let e=$("practice-section");if(e)return e;e=document.createElement("section");e.id="practice-section";e.className="app-section hidden";(document.querySelector("main")||document.body).appendChild(e);return e};
+const value=n=>practice?.answers?.[n]??"";
+const answer=(n,v)=>{practice.answers||(practice.answers={});practice.answers[n]=v;saveCurrent()};
 
-const hideAll=()=>document.querySelectorAll(".app-section").forEach(x=>x.classList.add("hidden"));
-const showIntro=()=>{hideAll();$("intro")?.classList.remove("hidden");$("modules")?.classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};
-const setText=(id,t)=>{const e=$(id);if(e)e.textContent=t};
-const section=()=>{hideAll();$("practice-section")?.classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})};
-
-async function get(url){
- const r=await fetch(url);
- const j=await r.json().catch(()=>({}));
- if(!r.ok)throw new Error(j.detail||"No se pudo cargar la información.");
+const get=async url=>{
+ const r=await fetch(url,{headers:{Accept:"application/json"}});
+ let j={};try{j=await r.json()}catch{}
+ if(!r.ok)throw Error(j.detail||j.message||"No se pudo cargar la práctica.");
  return j
-}
+};
 
-function save(){
- state[module]={screen,answers:practice[module]?.answers||{},completed:practice[module]?.completed||false};
- setStore(state)
-}
+const image=s=>{
+ const src=s?.image||s?.image_url||s?.illustration||s?.screenshot||"";
+ return src?`<div class="practice-visual"><img src="${attr(src)}" alt="${attr(s.image_alt||s.title||"Ejemplo de práctica")}" loading="lazy" onerror="this.closest('.practice-visual')?.remove()"><div class="visual-label">PRÁCTICA · CUBA AUTO TRAVEL 2026</div></div>`:""
+};
 
-function answers(){
- return practice[module]?.answers||{}
-}
+const gallery=s=>{
+ const a=Array.isArray(s?.images)?s.images:[];
+ if(!a.length)return"";
+ return`<div class="practice-gallery">${a.map((x,i)=>{
+  const src=typeof x==="string"?x:(x?.url||x?.image||x?.image_url||"");
+  if(!src)return"";
+  const alt=typeof x==="object"?(x.alt||s.title||`Ejemplo ${i+1}`):(s.title||`Ejemplo ${i+1}`);
+  const cap=typeof x==="object"?(x.caption||`Ejemplo ${i+1}`):`Ejemplo ${i+1}`;
+  return`<figure><img src="${attr(src)}" alt="${attr(alt)}" loading="lazy" onerror="this.closest('figure')?.remove()"><figcaption>${esc(cap)}</figcaption></figure>`
+ }).join("")}</div>`
+};
 
-function inputValue(field){
- const a=answers();
- return a[field.name]??""
-}
+const choices=f=>{
+ const a=f.options||f.choices||f.values||[];
+ if(!Array.isArray(a)||!a.length)return"";
+ const cur=String(value(f.name));
+ return`<div class="choice-grid" data-choice="${attr(f.name)}">${a.map(x=>{
+  const o=typeof x==="string"?{value:x,label:x}:x||{};
+  const v=o.value??o.id??o.code??o.label??"",label=o.label??o.name??v,desc=o.description||"",img=o.image||o.image_url||"";
+  const sel=String(v)===cur;
+  return`<button type="button" class="choice-card ${sel?"selected":""}" data-field="${attr(f.name)}" data-value="${attr(v)}">${img?`<span class="choice-image"><img src="${attr(img)}" alt="${attr(label)}" loading="lazy" onerror="this.closest('.choice-image')?.remove()"></span>`:""}<strong>${esc(label)}</strong>${desc?`<span>${esc(desc)}</span>`:""}<span class="choice-check">${sel?"✓":"○"}</span></button>`
+ }).join("")}</div>`
+};
 
-function fieldHTML(f){
- const value=esc(inputValue(f));
- const req=f.required?" required":"";
- const example=f.example?`<div class="practice-example"><strong>Ejemplo:</strong> ${esc(f.example)}</div>`:"";
- const help=f.help?`<div class="help-text">${esc(f.help)}</div>`:"";
- return `<div class="form-group ${f.required?"required":""}">
-<label for="practice-${esc(f.name)}">${esc(f.label)}${f.required?" *":""}</label>
-<input id="practice-${esc(f.name)}" name="${esc(f.name)}" value="${value}"${req} autocomplete="off">
-${help}${example}
-</div>`
-}
+const field=f=>{
+ const type=String(f.type||f.input_type||"text").toLowerCase();
+ if(type==="choice"||type==="select"||type==="radio"||type==="boolean"||Array.isArray(f.options)||Array.isArray(f.choices))
+  return`<div class="practice-field choice-field ${f.required?"required":""}"><div class="field-label">${esc(f.label||f.question||f.name)}${f.required?" *":""}</div>${f.help?`<div class="field-help">${esc(f.help)}</div>`:""}${choices(f)}${f.example?`<div class="practice-example"><strong>Ejemplo:</strong> ${esc(f.example)}</div>`:""}</div>`;
+ const multi=type==="textarea"||f.multiline===true;
+ return`<div class="practice-field ${f.required?"required":""}"><label for="practice-${attr(f.name)}">${esc(f.label||f.question||f.name)}${f.required?" *":""}</label>${f.help?`<div class="field-help">${esc(f.help)}</div>`:""}${multi?`<textarea id="practice-${attr(f.name)}" name="${attr(f.name)}" rows="3" placeholder="${attr(f.placeholder||"Escribe solamente lo necesario")}">${esc(value(f.name))}</textarea>`:`<input id="practice-${attr(f.name)}" name="${attr(f.name)}" type="${type==="date"?"date":"text"}" value="${attr(value(f.name))}" placeholder="${attr(f.placeholder||"")}" autocomplete="off">`}${f.example?`<div class="practice-example"><strong>Ejemplo:</strong> ${esc(f.example)}</div>`:""}</div>`
+};
 
-function prepareHTML(items){
- return items?.length?`<div class="info-box"><strong>Antes de continuar</strong><ul>${items.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""
-}
+const prepare=a=>Array.isArray(a)&&a.length?`<div class="prepare-box"><strong>Antes de continuar</strong><ul>${a.map(x=>`<li>${esc(typeof x==="string"?x:(x.text||x.label||""))}</li>`).join("")}</ul></div>`:"";
 
-function screenHTML(s,index,total){
- const isLast=index===total-1;
- const a=answers();
- let fields=(s.fields||[]).map(fieldHTML).join("");
- if(!fields&&s.id==="intro")fields=`<div class="info-box"><strong>Esta es una práctica.</strong><p>Lee la explicación y continúa cuando estés listo.</p></div>`;
- if(!fields&&s.id==="review"){
-  const all=[];
-  Object.keys(a).forEach(k=>all.push(`<div class="review-row"><strong>${esc(k)}</strong><span>${esc(a[k])}</span></div>`));
-  fields=all.length?`<div class="practice-review">${all.join("")}</div>`:`<div class="info-box">Todavía no hay respuestas guardadas.</div>`
- }
- const warning=s.warning?`<div class="warning"><strong>Importante</strong><p>${esc(s.warning)}</p></div>`:"";
- const important=s.important?`<div class="info-box"><strong>Recuerda</strong><p>${esc(s.important)}</p></div>`:"";
- const prepare=prepareHTML(s.prepare);
- return `<div class="practice-card">
-<div class="practice-top"><span>PRÁCTICA · ${index+1} / ${total}</span><div class="progress"><i style="width:${Math.round((index+1)/total*100)}%"></i></div></div>
-<h2>${esc(s.title)}</h2>
-${s.explanation?`<p class="practice-explanation">${esc(s.explanation)}</p>`:""}
-${prepare}
-${fields?`<div class="form-grid practice-fields">${fields}</div>`:""}
-${s.review?`<div class="info-box"><strong>Revisa</strong><p>${esc(s.review)}</p></div>`:""}
-${warning}${important}
-<div class="practice-actions">
-<button type="button" class="back-button" id="practice-back"${index===0?" disabled":""}>← Anterior</button>
-<button type="button" class="primary-button" id="practice-next">${isLast?"Terminar práctica":"Guardar y continuar →"}</button>
-</div>
-</div>`
-}
+const notice=(text,type="info")=>text?`<div class="practice-notice ${type}"><strong>${type==="warning"?"Importante":"Recuerda"}</strong><p>${esc(text)}</p></div>`:"";
 
-function ensurePracticeBox(){
- let box=$("practice-section");
- if(!box){
-  box=document.createElement("section");
-  box.id="practice-section";
-  box.className="app-section hidden";
-  const main=document.querySelector("main");
-  (main||document.body).appendChild(box)
- }
- return box
-}
+const review=()=>{
+ const rows=[];
+ (practice?.screens||[]).forEach(s=>(s.fields||[]).forEach(f=>{
+  const v=value(f.name);
+  if(v!==undefined&&v!==null&&clean(v))rows.push(`<div class="review-row"><div><strong>${esc(f.label||f.name)}</strong>${f.help?`<small>${esc(f.help)}</small>`:""}</div><span>${esc(v)}</span></div>`)
+ }));
+ return rows.length?`<div class="practice-review">${rows.join("")}</div>`:`<div class="practice-notice info"><strong>Aún no hay respuestas</strong><p>Comienza la práctica y tus respuestas quedarán guardadas en este dispositivo.</p></div>`
+};
 
-function render(){
- const p=practice[module];
- if(!p)return;
- const screens=p.screens||[];
- if(!screens.length)return;
- screen=Math.max(0,Math.min(screen,screens.length-1));
- const box=ensurePracticeBox();
- const s=screens[screen];
- box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button>${screenHTML(s,screen,screens.length)}`;
- section();
- $("practice-home")?.addEventListener("click",showIntro);
- $("practice-back")?.addEventListener("click",()=>{collect();if(screen>0){screen--;save();render()}});
- $("practice-next")?.addEventListener("click",()=>{if(!collect())return;if(screen<screens.length-1){screen++;save();render()}else finish()});
-}
+const bindChoices=()=>document.querySelectorAll(".choice-card").forEach(b=>b.onclick=()=>{
+ const f=b.dataset.field,v=b.dataset.value;
+ answer(f,v);
+ document.querySelectorAll(`.choice-card[data-field="${CSS.escape(f)}"]`).forEach(x=>{x.classList.remove("selected");const c=x.querySelector(".choice-check");if(c)c.textContent="○"});
+ b.classList.add("selected");const c=b.querySelector(".choice-check");if(c)c.textContent="✓";
+});
 
-function collect(){
- const p=practice[module];
- const s=p?.screens?.[screen];
- if(!s)return true;
- const box=$("practice-section");
- if(!box)return true;
- const data={...answers()};
- let valid=true;
+const collect=()=>{
+ const s=practice?.screens?.[screen];if(!s)return true;
+ const box=ensure();let ok=true,first=null;
  (s.fields||[]).forEach(f=>{
+  const cs=box.querySelectorAll(`.choice-card[data-field="${CSS.escape(f.name)}"]`);
+  if(cs.length){if(f.required&&!clean(value(f.name))){ok=false;first=first||cs[0]}return}
   const el=box.querySelector(`[name="${CSS.escape(f.name)}"]`);
-  if(el){
-   const v=el.value.trim();
-   data[f.name]=v;
-   if(f.required&&!v){el.focus();el.style.borderColor="#b3261e";valid=false}else el.style.borderColor="";
-  }
+  if(!el)return;
+  const v=clean(el.value);
+  if(f.required&&!v){ok=false;first=first||el;el.classList.add("field-error")}else{el.classList.remove("field-error");answer(f.name,v)}
  });
- if(!valid){
+ if(!ok){
   let e=box.querySelector(".practice-error");
-  if(!e){e=document.createElement("div");e.className="error-box practice-error";e.innerHTML="<strong>Falta información</strong><p>Completa los campos obligatorios antes de continuar.</p>";box.querySelector(".practice-card")?.prepend(e)}
-  return false
+  if(!e){e=document.createElement("div");e.className="practice-error";e.innerHTML="<strong>Falta una respuesta</strong><p>Selecciona o completa los datos obligatorios para continuar.</p>";box.querySelector(".practice-card")?.prepend(e)}
+  first?.focus();return false
  }
- p.answers=data;
- p.current_screen=screen+1;
- save();
  return true
-}
+};
 
-function finish(){
- const p=practice[module],screens=p.screens||[];
- p.completed=true;
- p.current_screen=screens.length;
- save();
- const box=ensurePracticeBox();
- box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button>
-<div class="practice-card">
-<div class="practice-top"><span>PRÁCTICA COMPLETA</span><div class="progress"><i style="width:100%"></i></div></div>
-<h2>Tu práctica está completa</h2>
-<p class="practice-explanation">Ya puedes revisar lo que preparaste y después transcribirlo en el portal oficial.</p>
-<div class="info-box"><strong>Importante</strong><p>Esta práctica no fue enviada a las autoridades. No generó una visa, no realizó un pago y no generó un QR oficial.</p></div>
-<div class="practice-review">${Object.entries(p.answers||{}).map(([k,v])=>`<div class="review-row"><strong>${esc(k)}</strong><span>${esc(v)}</span></div>`).join("")||"<p>No hay respuestas guardadas.</p>"}</div>
-<div class="practice-actions">
-<button type="button" class="back-button" id="practice-edit">← Revisar práctica</button>
-<a class="official-link" href="${module==="visa"?"https://evisacuba.cu/":"https://dviajeros.mitrans.gob.cu/"}" target="_blank" rel="noopener noreferrer">Abrir portal oficial →</a>
-</div>
-</div>`;
+const render=()=>{
+ const ss=practice?.screens||[];
+ if(!ss.length)return error("El módulo no contiene pasos de práctica.");
+ screen=Math.max(0,Math.min(screen,ss.length-1));
+ const s=ss[screen],last=screen===ss.length-1,p=Math.round((screen+1)/ss.length*100),box=ensure();
+ box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button><div class="practice-card"><div class="practice-progress"><div class="progress-title"><span>PRÁCTICA</span><span>PASO ${screen+1} DE ${ss.length}</span></div><div class="progress"><i style="width:${p}%"></i></div></div>${s.badge?`<div class="practice-badge">${esc(s.badge)}</div>`:""}<h2>${esc(s.title||"Paso de práctica")}</h2>${s.question?`<div class="practice-question">${esc(s.question)}</div>`:""}${s.explanation?`<p class="practice-explanation">${esc(s.explanation)}</p>`:""}${image(s)}${gallery(s)}${prepare(s.prepare)}${s.fields?.length?`<div class="practice-fields">${s.fields.map(field).join("")}</div>`:""}${s.review===true||s.id==="review"?review():""}${notice(s.warning,"warning")}${notice(s.important,"info")}${s.portal_note?`<div class="portal-note"><strong>En el portal oficial</strong><p>${esc(s.portal_note)}</p></div>`:""}<div class="practice-actions"><button type="button" class="back-button" id="practice-back" ${screen===0?"disabled":""}>← Anterior</button><button type="button" class="primary-button" id="practice-next">${last?"Terminar práctica":"Guardar y continuar →"}</button></div></div>`;
+ section();bindChoices();
+ $("practice-home")?.addEventListener("click",home);
+ $("practice-back")?.addEventListener("click",()=>{if(screen>0){collect();screen--;saveCurrent();render()}});
+ $("practice-next")?.addEventListener("click",()=>{if(!collect())return;if(!last){screen++;saveCurrent();render()}else finish()});
+};
+
+const finish=()=>{
+ practice.completed=true;saveCurrent();
+ const official=moduleName==="visa"?"https://evisacuba.cu/":"https://dviajeros.mitrans.gob.cu/";
+ const title=moduleName==="visa"?"Práctica de Visa completada":"Práctica de D'Viajeros completada";
+ const box=ensure();
+ box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button><div class="practice-card practice-complete"><div class="practice-badge">PRÁCTICA COMPLETADA</div><h2>${esc(title)}</h2><p class="practice-explanation">Ahora puedes revisar lo que practicaste y utilizarlo como referencia al completar el proceso oficial.</p><div class="practice-notice info"><strong>Importante</strong><p>Esta práctica no fue enviada a las autoridades. No realiza pagos, no solicita ni aprueba una visa, no presenta D'Viajeros y no genera un QR oficial.</p></div><h3>Lo que practicaste</h3>${review()}<div class="practice-actions"><button type="button" class="back-button" id="practice-edit">← Volver a practicar</button><a class="primary-button official-link-button" href="${official}" target="_blank" rel="noopener noreferrer">Ir al portal oficial →</a></div><div class="portal-note"><strong>Ahora sí</strong><p>Usa esta práctica como referencia y completa directamente el trámite oficial.</p></div></div>`;
  section();
- $("practice-home")?.addEventListener("click",showIntro);
- $("practice-edit")?.addEventListener("click",()=>{screen=0;render()});
-}
+ $("practice-home")?.addEventListener("click",home);
+ $("practice-edit")?.addEventListener("click",()=>{practice.completed=false;screen=0;saveCurrent();render()});
+};
 
-async function start(type){
+const error=m=>{
+ const box=ensure();
+ box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button><div class="practice-card"><div class="practice-error"><strong>No se pudo abrir la práctica</strong><p>${esc(m)}</p></div></div>`;
+ section();$("practice-home")?.addEventListener("click",home)
+};
+
+const start=async type=>{
+ moduleName=type;
  try{
-  module=type;
-  const data=await get(API[type]);
-  practice[type]=data;
-  const saved=state[type];
-  practice[type].answers=saved?.answers||{};
-  practice[type].completed=false;
-  screen=saved?.completed?0:(saved?.screen||0);
+  practice=await get(API[type])||{};
+  practice.answers={...(db[type]?.answers||{})};
+  practice.completed=false;
+  screen=Number(db[type]?.completed?0:db[type]?.screen||0);
   render()
- }catch(e){
-  const box=ensurePracticeBox();
-  box.innerHTML=`<div class="error-box"><strong>Error</strong><p>${esc(e.message)}</p></div>`;
-  section()
- }
-}
+ }catch(e){error(e.message||"No se pudo cargar el módulo.")}
+};
 
-function bindExisting(){
- $("visa-button")?.addEventListener("click",()=>start("visa"));
- $("dviajeros-button")?.addEventListener("click",()=>start("dviajeros"));
- $("passport-button")?.addEventListener("click",()=>showPassport());
- document.querySelectorAll(".back-button").forEach(b=>{
-  if(b.id!=="practice-back"&&b.id!=="practice-home")b.addEventListener("click",showIntro)
- });
- $("clear-all")?.addEventListener("click",()=>{
-  localStorage.removeItem(STORE);
-  Object.keys(state).forEach(k=>delete state[k]);
-  practice={visa:null,dviajeros:null};
-  showIntro()
- });
-}
+$("visa-button")?.addEventListener("click",()=>start("visa"));
+$("dviajeros-button")?.addEventListener("click",()=>start("dviajeros"));
 
-function showPassport(){
- hideAll();
- const s=$("passport-section");
- if(s)s.classList.remove("hidden");
- else{
-  const box=ensurePracticeBox();
-  box.innerHTML=`<div class="practice-card"><h2>Preparación del pasaporte</h2><p>Usa el módulo de pasaporte para revisar y preparar tus datos antes de continuar.</p><a class="official-link" href="#passport-section">Ir al módulo de pasaporte →</a></div>`;
-  box.classList.remove("hidden")
- }
- window.scrollTo({top:0,behavior:"smooth"})
-}
+document.querySelectorAll("[data-module]").forEach(b=>b.addEventListener("click",()=>{
+ const t=b.dataset.module;if(t==="visa"||t==="dviajeros")start(t)
+}));
 
-function injectPracticeStyle(){
- if(document.getElementById("practice-inline-style"))return;
- const s=document.createElement("style");
- s.id="practice-inline-style";
- s.textContent=`
-.practice-card{background:#fff;border:1px solid #dbe3ec;border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(20,45,70,.07)}
-.practice-top{color:#526173;font-size:12px;font-weight:800;letter-spacing:.5px;margin-bottom:20px}
-.progress{height:7px;background:#e7edf3;border-radius:10px;margin-top:8px;overflow:hidden}
-.progress i{display:block;height:100%;background:#1261a0;border-radius:10px}
-.practice-explanation{font-size:17px;color:#46576a;max-width:850px}
-.practice-example{margin-top:6px;padding:7px 9px;background:#f5f8fb;border-radius:6px;color:#5b6878;font-size:13px}
-.practice-review{border:1px solid #dce4ec;border-radius:9px;overflow:hidden;margin:18px 0}
-.review-row{display:grid;grid-template-columns:minmax(150px,30%) 1fr;gap:15px;padding:11px 13px;border-bottom:1px solid #e4eaf0}
-.review-row:last-child{border-bottom:0}
-.review-row span{overflow-wrap:anywhere}
-.practice-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.practice-actions button,.practice-actions a{flex:0 0 auto}
-@media(max-width:600px){.review-row{grid-template-columns:1fr;gap:3px}.practice-card{padding:17px}}
+$("clear-all")?.addEventListener("click",()=>{
+ if(moduleName)delete db[moduleName];
+ save();practice=null;screen=0;home()
+});
+
+if(!document.getElementById("cuba-practice-style")){
+ const st=document.createElement("style");
+ st.id="cuba-practice-style";
+ st.textContent=`
+.practice-card{background:#fff;border:1px solid #dce4ec;border-radius:18px;padding:24px;margin:20px 0 35px;box-shadow:0 5px 20px rgba(0,0,0,.07)}
+.practice-progress{margin-bottom:22px}.progress-title{display:flex;justify-content:space-between;color:#586779;font-size:12px;font-weight:800}.progress{height:7px;background:#e8edf2;border-radius:10px;overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:#123c69;border-radius:10px;transition:width .25s}
+.practice-badge{display:inline-block;background:#eef4f9;color:#123c69;border-radius:20px;padding:7px 12px;font-size:12px;font-weight:800;margin-bottom:12px}
+.practice-question{font-size:21px;font-weight:700;line-height:1.35;margin:15px 0}.practice-explanation{color:#526173;font-size:16px;line-height:1.6}
+.practice-visual{margin:20px 0;border:1px solid #dbe3eb;border-radius:14px;overflow:hidden;background:#f7f9fb}.practice-visual img{display:block;width:100%;max-height:560px;object-fit:contain;background:#f7f9fb}.visual-label{padding:8px 12px;background:#eef3f7;color:#526173;font-size:11px;font-weight:800}
+.practice-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0}.practice-gallery figure{margin:0;border:1px solid #dce4ec;border-radius:12px;overflow:hidden;background:#fafbfd}.practice-gallery img{display:block;width:100%;height:220px;object-fit:contain;background:#f4f7fa}.practice-gallery figcaption{padding:9px;font-size:13px;color:#566475}
+.prepare-box,.practice-notice,.portal-note{margin:18px 0;padding:15px 17px;border-radius:11px;background:#f3f7fa;border:1px solid #dce5ec;color:#384858;line-height:1.55}.prepare-box ul{margin:9px 0 0;padding-left:20px}.practice-notice.warning{background:#fff8e7;border-color:#ead9a5}.practice-notice p,.portal-note p{margin:6px 0 0}
+.practice-fields{display:flex;flex-direction:column;gap:18px;margin-top:20px}.practice-field label,.field-label{display:block;font-weight:700;margin-bottom:7px}.field-help{color:#657384;font-size:14px;margin-bottom:8px}
+.practice-field input,.practice-field textarea{width:100%;border:1px solid #cbd5df;border-radius:9px;padding:12px;font-size:16px;font-family:inherit;background:#fff}.practice-field input:focus,.practice-field textarea:focus{outline:2px solid #a9c8e5;border-color:#4c89c7}.field-error{border-color:#b3261e!important;background:#fff8f7!important}
+.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.choice-card{position:relative;border:2px solid #d7e0e8;border-radius:13px;background:#fff;padding:16px;min-height:100px;cursor:pointer;text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;font-family:inherit;transition:.15s}.choice-card:hover{border-color:#7ca7cb;transform:translateY(-1px)}.choice-card.selected{border-color:#123c69;background:#f2f7fb}.choice-card strong{font-size:16px;color:#172033}.choice-card>span:not(.choice-image):not(.choice-check){color:#617082;font-size:13px;line-height:1.35}.choice-image{width:100%;height:90px;display:flex;align-items:center;justify-content:center}.choice-image img{max-width:100%;max-height:90px;object-fit:contain}.choice-check{position:absolute;top:9px;right:10px;font-weight:900;color:#123c69}
+.practice-example{margin-top:7px;padding:8px 10px;border-radius:7px;background:#f6f8fa;color:#5e6c7c;font-size:13px}.practice-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:25px}.practice-actions a{text-decoration:none}
+.practice-review{border:1px solid #dce4ec;border-radius:11px;overflow:hidden;margin:18px 0}.review-row{display:grid;grid-template-columns:minmax(150px,32%) 1fr;gap:15px;padding:12px 14px;border-bottom:1px solid #e5eaf0}.review-row:last-child{border-bottom:0}.review-row strong{display:block}.review-row small{display:block;color:#6a7786;margin-top:3px}.review-row span{overflow-wrap:anywhere}
+.practice-error{margin-bottom:18px;padding:15px 17px;border-radius:11px;border:1px solid #e2b6b3;background:#fff5f4;color:#7c211c}.practice-error p{margin:5px 0 0}
+@media(max-width:650px){.practice-card{padding:17px}.practice-question{font-size:18px}.choice-grid{grid-template-columns:1fr}.review-row{grid-template-columns:1fr;gap:4px}.practice-actions{flex-direction:column;align-items:stretch}.practice-actions button,.practice-actions a{width:100%;text-align:center}}
 `;
- document.head.appendChild(s)
+ document.head.appendChild(st)
 }
 
-injectPracticeStyle();
-bindExisting();
 });
