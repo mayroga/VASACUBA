@@ -9,7 +9,7 @@ from schemas import VisaRequest,DViajerosRequest,PassportRequest
 
 APP_NAME="CUBA AUTO TRAVEL 2026"
 APP_VERSION="2026.5"
-BASE_DIR=Path(**file**).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR=BASE_DIR/"data"
 STATIC_DIR=BASE_DIR/"static"
 VISA_FILE=DATA_DIR/"cuba_visa.json"
