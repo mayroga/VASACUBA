@@ -1,40 +1,125 @@
-CUBA AUTO TRAVEL 2026
-Plataforma Independiente de Preparación y Práctica
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b3d91">
+<title>CUBA AUTO TRAVEL 2026</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="header">
+<div class="container">
+<h1>CUBA AUTO TRAVEL 2026</h1>
+<p>Guía práctica para viajeros a Cuba</p>
+</div>
+</header>
 
-Módulos de Asesoría y Práctica
-Selecciona una opción para comenzar a organizar tu información de viaje de forma segura, reduciendo dudas y ganando tranquilidad antes de realizar tus trámites.
+<main class="container">
+<section class="intro">
+<h2>¿Qué necesitas consultar?</h2>
+<p>Selecciona una opción para consultar la información disponible.</p>
+</section>
 
-📄
+<nav class="tabs" aria-label="Opciones">
+<button class="tab active" data-section="visa">Visa</button>
+<button class="tab" data-section="dviajeros">D'Viajeros</button>
+<button class="tab" data-section="passport">Pasaporte</button>
+</nav>
 
-Visa Cubana / eVisa
-Preparación independiente y práctica guiada para el trámite de visado.
-Iniciar Práctica →
+<section id="visa" class="panel active">
+<h2>Consulta de visa</h2>
+<form id="visaForm">
+<label>Nacionalidad
+<input name="nationality" type="text" autocomplete="country-name">
+</label>
+<label>País de residencia
+<input name="residence" type="text" autocomplete="country-name">
+</label>
+<label>Motivo del viaje
+<input name="travel_purpose" type="text">
+</label>
+<label>Tipo de visa
+<input name="visa_type" type="text">
+</label>
+<label>Aerolínea
+<input name="airline" type="text">
+</label>
+<label>Origen
+<input name="origin" type="text">
+</label>
+<label>Destino
+<input name="destination" type="text" value="Cuba">
+</label>
+<button type="submit">Consultar visa</button>
+</form>
+<div id="visaResult" class="result"></div>
+</section>
 
-✈️
+<section id="dviajeros" class="panel">
+<h2>D'Viajeros</h2>
+<form id="dviajerosForm">
+<label>Nacionalidad
+<input name="nationality" type="text">
+</label>
+<label>País de residencia
+<input name="residence" type="text">
+</label>
+<label>Fecha de viaje
+<input name="travel_date" type="date">
+</label>
+<label>Origen
+<input name="origin" type="text">
+</label>
+<label>Destino
+<input name="destination" type="text" value="Cuba">
+</label>
+<label>Motivo del viaje
+<input name="purpose" type="text">
+</label>
+<button type="submit">Consultar D'Viajeros</button>
+</form>
+<div id="dviajerosResult" class="result"></div>
+</section>
 
-D'Viajeros
-Organización previa de datos para el formulario oficial de entrada a Cuba.
-Iniciar Práctica →
+<section id="passport" class="panel">
+<h2>Pasaporte</h2>
+<form id="passportForm">
+<label>Nacionalidad
+<input name="nationality" type="text">
+</label>
+<label>Tipo de pasaporte
+<input name="passport_type" type="text">
+</label>
+<label>Estado del pasaporte
+<input name="passport_status" type="text">
+</label>
+<label>Fecha de vencimiento
+<input name="expiration_date" type="date">
+</label>
+<label>Destino
+<input name="destination" type="text" value="Cuba">
+</label>
+<button type="submit">Consultar pasaporte</button>
+</form>
+<div id="passportResult" class="result"></div>
+</section>
 
-¿Cómo Funciona?
-1
-Selecciona
-Elige el trámite que deseas ensayar.
+<section class="notice">
+<h3>Información importante</h3>
+<p>Esta aplicación ofrece información de orientación para viajeros. Los requisitos pueden cambiar. Verifica siempre los requisitos oficiales antes de viajar.</p>
+</section>
+</main>
 
-2
-Practica
-Responde de forma guiada y sin presiones.
+<footer>
+<div class="container">
+<p>CUBA AUTO TRAVEL 2026</p>
+<p>Información independiente. No pertenece al Gobierno de Cuba ni a una aerolínea.</p>
+</div>
+</footer>
 
-3
-Revisa
-Verifica tus datos antes de ir al sitio oficial.
-
-4
-Viaja Seguro
-Reduce el margen de error y la incertidumbre.
-
-Aviso de Transparencia:
-
-CUBA AUTO TRAVEL 2026 es una herramienta independiente de preparación, simulación y práctica. No emite visas oficiales, no sustituye los portales gubernamentales ni genera documentos o códigos QR oficiales.
-
-© 2026 CUBA AUTO TRAVEL — Plataforma de Asesoría Independiente
+<script src="/static/app.js"></script>
+</body>
+</html>
+```
