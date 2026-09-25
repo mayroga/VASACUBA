@@ -1,195 +1,422 @@
-import json
-from datetime import date
-from pathlib import Path
-from typing import Any, Dict
+# main.py
+# CUBA AUTO TRAVEL 2026
+# Módulos:
+#   1. Visa cubana / eVisa
+#   2. D'Viajeros
+#
+# La aplicación informa, prepara y valida datos.
+# No emite visas, no emite documentos oficiales
+# y no genera códigos QR oficiales.
 
-from fastapi import FastAPI
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
-from schemas import VisaRequest, DViajerosRequest
+
+# ============================================================
+# CONFIGURACIÓN
+# ============================================================
 
 APP_NAME = "CUBA AUTO TRAVEL 2026"
-APP_VERSION = "4.0.2"
+APP_VERSION = "1.0.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 STATIC_DIR = BASE_DIR / "static"
 
 VISA_FILE = DATA_DIR / "cuba_visa.json"
-DVIAJEROS_FILE = DATA_DIR / "dviajeros.json"
-PASSPORTS_FILE = DATA_DIR / "passports.json"
+DVIJEROS_FILE = DATA_DIR / "dviajeros.json"
 
 OFFICIAL_VISA_URL = "https://evisacuba.cu/"
-OFFICIAL_DVIAJEROS_URL = "https://dviajeros.mitrans.gob.cu/"
+OFFICIAL_DVIAJEROS_URL = (
+    "https://dviajeros.mitrans.gob.cu/"
+)
+
+
+# ============================================================
+# APP
+# ============================================================
 
 app = FastAPI(
     title=APP_NAME,
     version=APP_VERSION,
     description=(
-        "Asistente independiente para preparar y acompañar al viajero "
-        "antes y durante el uso de los portales oficiales."
+        "Asistente informativo para Visa cubana "
+        "y D'Viajeros."
     ),
 )
 
+
+# ============================================================
+# MODELOS
+# ============================================================
+
+class VisaRequest(BaseModel):
+    nationality: str = ""
+    country_of_residence: str = ""
+    passport_country: str = ""
+    travel_purpose: str = ""
+    entry_type: str = ""
+    has_passport: bool = False
+    passport_valid: bool = False
+    email: str = ""
+    dual_nationality: bool = False
+
+
+class DViajerosRequest(BaseModel):
+    first_name: str = ""
+    last_name: str = ""
+    nationality: str = ""
+    date_of_birth: str = ""
+    passport_number: str = ""
+    passport_country: str = ""
+    arrival_date: str = ""
+    flight_number: str = ""
+    airline: str = ""
+    accommodation: str = ""
+    address_in_cuba: str = ""
+    purpose_of_trip: str = ""
+    health_information: Dict[str, Any] = Field(
+        default_factory=dict
+    )
+    customs_information: Dict[str, Any] = Field(
+        default_factory=dict
+    )
+
+
+# ============================================================
+# UTILIDADES
+# ============================================================
+
 def load_json(path: Path) -> Dict[str, Any]:
+    """
+    Carga un archivo JSON.
+    Si no existe o está dañado, devuelve {}.
+    """
     try:
         if not path.exists():
             return {}
 
-        with path.open("r", encoding="utf-8") as file:
+        with path.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
             data = json.load(file)
 
-        return data if isinstance(data, dict) else {}
+        return (
+            data
+            if isinstance(data, dict)
+            else {}
+        )
 
-    except (OSError, ValueError, TypeError):
+    except (
+        OSError,
+        ValueError,
+        TypeError,
+    ):
         return {}
+
+
+def clean(value: Any) -> str:
+    if value is None:
+        return ""
+
+    return str(value).strip()
+
+
+def missing_fields(
+    data: Dict[str, Any],
+    fields: List[str],
+) -> List[str]:
+
+    missing = []
+
+    for field in fields:
+        value = data.get(field)
+
+        if value is None:
+            missing.append(field)
+            continue
+
+        if isinstance(value, str):
+            if not value.strip():
+                missing.append(field)
+        elif value is False:
+            # False no se considera automáticamente
+            # un dato faltante.
+            continue
+
+    return missing
+
+
+def status_from_missing(
+    missing: List[str],
+) -> str:
+
+    if missing:
+        return "INCOMPLETE"
+
+    return "READY"
+
+
+# ============================================================
+# DATOS
+# ============================================================
 
 def get_visa_data() -> Dict[str, Any]:
     return load_json(VISA_FILE)
 
+
 def get_dviajeros_data() -> Dict[str, Any]:
-    return load_json(DVIAJEROS_FILE)
+    return load_json(DVIJEROS_FILE)
 
-def get_passports_data() -> Dict[str, Any]:
-    return load_json(PASSPORTS_FILE)
 
-def clean(value: Any) -> str:
-    return str(value or "").strip()
+# ============================================================
+# VISA CUBANA
+# ============================================================
 
-def valid_date(value: str) -> bool:
-    try:
-        date.fromisoformat(clean(value))
-        return True
-    except (ValueError, TypeError):
-        return False
-
-def email_valid(value: str) -> bool:
-    value = clean(value)
-
-    if not value or "@" not in value:
-        return False
-
-    domain = value.rsplit("@", 1)[-1]
-    return "." in domain
-
-def passport_number_valid(value: str) -> bool:
-    value = clean(value).replace(" ", "")
-
-    if not 5 <= len(value) <= 20:
-        return False
-
-    return all(
-        character.isalnum() or character == "-"
-        for character in value
-    )
-
-def passport_check(
-    country: str,
-    number: str,
-    first_name: str,
-    last_name: str,
-    birth_date: str,
-    expiration: str,
-    travel_date: str = "",
+def evaluate_visa(
+    request: VisaRequest,
 ) -> Dict[str, Any]:
 
-    missing = []
+    data = request.model_dump()
 
-    fields = {
-        "passport_country": country,
-        "passport_number": number,
-        "first_name": first_name,
-        "last_name": last_name,
-        "date_of_birth": birth_date,
-        "passport_expiration": expiration,
-    }
+    required = [
+        "nationality",
+        "country_of_residence",
+        "passport_country",
+        "travel_purpose",
+    ]
 
-    for field, value in fields.items():
-        if not clean(value):
-            missing.append(field)
+    missing = missing_fields(
+        data,
+        required,
+    )
 
     checks = []
 
-    if number and not passport_number_valid(number):
-        checks.append(
-            {
-                "id": "passport_number",
-                "status": "REVISA ESTO",
-                "message": "Revisa el número de pasaporte.",
-            }
-        )
+    if not request.has_passport:
+        checks.append({
+            "id": "passport",
+            "status": "INCOMPLETE",
+            "message": (
+                "Se necesita un pasaporte "
+                "válido para continuar."
+            ),
+        })
 
-    if birth_date and not valid_date(birth_date):
-        checks.append(
-            {
-                "id": "date_of_birth",
-                "status": "REVISA ESTO",
-                "message": "Revisa la fecha de nacimiento.",
-            }
-        )
+    elif not request.passport_valid:
+        checks.append({
+            "id": "passport_validity",
+            "status": "VERIFY",
+            "message": (
+                "Debe verificarse la validez "
+                "del pasaporte según las reglas "
+                "oficiales aplicables."
+            ),
+        })
 
-    if expiration and not valid_date(expiration):
-        checks.append(
-            {
-                "id": "passport_expiration",
-                "status": "REVISA ESTO",
-                "message": "Revisa la fecha de vencimiento.",
-            }
-        )
-
-    if (
-        valid_date(birth_date)
-        and valid_date(expiration)
-        and expiration < birth_date
-    ):
-        checks.append(
-            {
-                "id": "expiration_after_birth",
-                "status": "REVISA ESTO",
-                "message": (
-                    "La fecha de vencimiento no puede ser anterior "
-                    "a la fecha de nacimiento."
-                ),
-            }
-        )
-
-    if (
-        travel_date
-        and valid_date(travel_date)
-        and valid_date(expiration)
-        and expiration < travel_date
-    ):
-        checks.append(
-            {
-                "id": "expiration_before_travel",
-                "status": "REVISA ESTO",
-                "message": (
-                    "Revisa la fecha de vencimiento antes "
-                    "de tu viaje."
-                ),
-            }
-        )
-
-    if missing:
-        status = "FALTA ESTE DATO"
-        message = (
-            "Ten tu pasaporte delante y completa todos los datos."
-        )
-    elif checks:
-        status = "REVISA ESTO"
-        message = checks[0]["message"]
     else:
-        status = "LISTO"
-        message = "Información del pasaporte preparada."
+        checks.append({
+            "id": "passport",
+            "status": "READY",
+            "message": (
+                "Datos básicos del pasaporte "
+                "proporcionados."
+            ),
+        })
+
+    if not request.email:
+        checks.append({
+            "id": "email",
+            "status": "INCOMPLETE",
+            "message": (
+                "Se necesita un correo electrónico "
+                "para continuar con la preparación."
+            ),
+        })
+    else:
+        checks.append({
+            "id": "email",
+            "status": "READY",
+            "message": (
+                "Correo electrónico proporcionado."
+            ),
+        })
+
+    if request.dual_nationality:
+        checks.append({
+            "id": "dual_nationality",
+            "status": "VERIFY",
+            "message": (
+                "La situación de doble nacionalidad "
+                "debe verificarse con la fuente oficial."
+            ),
+        })
+
+    # La necesidad exacta de visa/eVisa depende de
+    # nacionalidad, propósito y demás circunstancias.
+    # No se inventa una determinación automática.
+    checks.append({
+        "id": "visa_requirement",
+        "status": "VERIFY",
+        "message": (
+            "La necesidad y modalidad de visa "
+            "deben verificarse según nacionalidad "
+            "y circunstancias del viaje."
+        ),
+    })
+
+    overall = (
+        "INCOMPLETE"
+        if missing
+        else "VERIFY"
+    )
 
     return {
-        "status": status,
-        "message": message,
+        "module": "visa",
+        "status": overall,
         "missing_fields": missing,
         "checks": checks,
-        "official_validity_confirmed": False,
+        "official_portal": OFFICIAL_VISA_URL,
+        "official_document_issued": False,
+        "app_issues_visa": False,
+        "source_data_loaded": bool(
+            get_visa_data()
+        ),
     }
+
+
+# ============================================================
+# D'VIAJEROS
+# ============================================================
+
+def evaluate_dviajeros(
+    request: DViajerosRequest,
+) -> Dict[str, Any]:
+
+    data = request.model_dump()
+
+    required = [
+        "first_name",
+        "last_name",
+        "nationality",
+        "date_of_birth",
+        "passport_number",
+        "passport_country",
+        "arrival_date",
+        "flight_number",
+        "airline",
+    ]
+
+    missing = missing_fields(
+        data,
+        required,
+    )
+
+    modules = [
+        {
+            "id": "personal_information",
+            "title": "Información personal",
+            "status": (
+                "INCOMPLETE"
+                if any(
+                    field in missing
+                    for field in [
+                        "first_name",
+                        "last_name",
+                        "nationality",
+                        "date_of_birth",
+                    ]
+                )
+                else "READY"
+            ),
+        },
+        {
+            "id": "migration",
+            "title": "Migración",
+            "status": (
+                "INCOMPLETE"
+                if any(
+                    field in missing
+                    for field in [
+                        "passport_number",
+                        "passport_country",
+                        "arrival_date",
+                        "flight_number",
+                        "airline",
+                    ]
+                )
+                else "READY"
+            ),
+        },
+        {
+            "id": "health",
+            "title": "Salud",
+            "status": (
+                "READY"
+                if request.health_information
+                else "VERIFY"
+            ),
+        },
+        {
+            "id": "customs",
+            "title": "Aduana",
+            "status": (
+                "READY"
+                if request.customs_information
+                else "VERIFY"
+            ),
+        },
+        {
+            "id": "review",
+            "title": "Revisión",
+            "status": (
+                "INCOMPLETE"
+                if missing
+                else "READY"
+            ),
+        },
+    ]
+
+    overall = status_from_missing(
+        missing
+    )
+
+    if overall == "READY":
+        submission_status = (
+            "READY_FOR_OFFICIAL_FORM"
+        )
+    else:
+        submission_status = "INCOMPLETE"
+
+    return {
+        "module": "dviajeros",
+        "status": overall,
+        "missing_fields": missing,
+        "modules": modules,
+        "submission_status": submission_status,
+        "official_portal": (
+            OFFICIAL_DVIAJEROS_URL
+        ),
+        "official_qr_generated": False,
+        "official_submission_completed": False,
+        "source_data_loaded": bool(
+            get_dviajeros_data()
+        ),
+    }
+
+
+# ============================================================
+# RUTAS GENERALES
+# ============================================================
 
 @app.get("/")
 def home():
@@ -201,8 +428,12 @@ def home():
     return {
         "app": APP_NAME,
         "version": APP_VERSION,
-        "status": "ok",
+        "modules": [
+            "visa",
+            "dviajeros",
+        ],
     }
+
 
 @app.get("/health")
 def health():
@@ -212,23 +443,20 @@ def health():
         "version": APP_VERSION,
     }
 
+
 @app.get("/api/health")
 def api_health():
     return health()
+
 
 @app.get("/api")
 def api_info():
     return {
         "app": APP_NAME,
         "version": APP_VERSION,
-        "purpose": (
-            "Preparar, revisar y acompañar al viajero "
-            "sin sustituir los trámites oficiales."
-        ),
         "modules": {
             "visa": True,
             "dviajeros": True,
-            "passport_check": True,
         },
         "official_portals": {
             "visa": OFFICIAL_VISA_URL,
@@ -236,8 +464,14 @@ def api_info():
         },
     }
 
+
+# ============================================================
+# VISA ROUTES
+# ============================================================
+
 @app.get("/api/visa")
 def visa_information():
+
     return {
         "module": "visa",
         "name": "Visa cubana / eVisa",
@@ -245,241 +479,90 @@ def visa_information():
         "data": get_visa_data(),
     }
 
+
+@app.post("/api/visa/evaluate")
+def visa_evaluate(
+    request: VisaRequest,
+):
+
+    return evaluate_visa(request)
+
+
+# ============================================================
+# D'VIAJEROS ROUTES
+# ============================================================
+
 @app.get("/api/dviajeros")
 def dviajeros_information():
+
     return {
         "module": "dviajeros",
         "name": "D'Viajeros",
-        "official_portal": OFFICIAL_DVIAJEROS_URL,
+        "official_portal": (
+            OFFICIAL_DVIAJEROS_URL
+        ),
         "data": get_dviajeros_data(),
     }
 
-@app.get("/api/passports")
-def passports_information():
-    return {
-        "module": "passports",
-        "data": get_passports_data(),
-    }
-
-@app.post("/api/visa/evaluate")
-def visa_evaluate(request: VisaRequest):
-    passport = passport_check(
-        country=request.passport_country,
-        number=request.passport_number,
-        first_name=request.first_name,
-        last_name=request.last_name,
-        birth_date=request.date_of_birth,
-        expiration=request.passport_expiration,
-        travel_date=request.arrival_date,
-    )
-
-    data = request.model_dump()
-
-    required = [
-        "nationality",
-        "country_of_residence",
-        "passport_country",
-        "passport_number",
-        "first_name",
-        "last_name",
-        "date_of_birth",
-        "passport_expiration",
-        "travel_purpose",
-        "email",
-    ]
-
-    missing = [
-        field
-        for field in required
-        if not clean(data.get(field))
-    ]
-
-    checks = list(passport["checks"])
-
-    if request.email and not email_valid(request.email):
-        checks.append(
-            {
-                "id": "email",
-                "status": "REVISA ESTO",
-                "message": "Escribe un correo electrónico válido.",
-            }
-        )
-
-    if request.dual_nationality:
-        checks.append(
-            {
-                "id": "dual_nationality",
-                "status": "REVISA ESTO",
-                "message": (
-                    "Revisa las instrucciones oficiales "
-                    "aplicables a tu situación."
-                ),
-            }
-        )
-
-    if passport["missing_fields"] or missing:
-        status = "FALTA ESTE DATO"
-    elif checks:
-        status = "REVISA ESTO"
-    else:
-        status = "LISTO"
-
-    return {
-        "module": "visa",
-        "status": status,
-        "missing_fields": missing,
-        "checks": checks,
-        "passport_check": passport,
-        "official_portal": OFFICIAL_VISA_URL,
-        "official_document_issued": False,
-        "app_issues_visa": False,
-        "official_submission_completed": False,
-        "payment_received_by_app": False,
-    }
 
 @app.post("/api/dviajeros/evaluate")
-def dviajeros_evaluate(request: DViajerosRequest):
-    data = request.model_dump()
+def dviajeros_evaluate(
+    request: DViajerosRequest,
+):
 
-    passport = passport_check(
-        country=request.passport_country,
-        number=request.passport_number,
-        first_name=request.first_name,
-        last_name=request.last_name,
-        birth_date=request.date_of_birth,
-        expiration=request.passport_expiration,
-        travel_date=request.arrival_date,
-    )
+    return evaluate_dviajeros(request)
 
-    required = [
-        "first_name",
-        "last_name",
-        "nationality",
-        "date_of_birth",
-        "passport_number",
-        "passport_country",
-        "passport_expiration",
-        "arrival_date",
-        "flight_number",
-        "airline",
-        "accommodation",
-    ]
 
-    missing = [
-        field
-        for field in required
-        if not clean(data.get(field))
-    ]
-
-    health_ok = bool(request.health_information)
-    customs_ok = bool(request.customs_information)
-
-    modules = [
-        {
-            "id": "passport",
-            "title": "Pasaporte",
-            "status": passport["status"],
-        },
-        {
-            "id": "travel",
-            "title": "Información del viaje",
-            "status": (
-                "LISTO"
-                if all(
-                    clean(data.get(field))
-                    for field in [
-                        "arrival_date",
-                        "flight_number",
-                        "airline",
-                    ]
-                )
-                else "FALTA ESTE DATO"
-            ),
-        },
-        {
-            "id": "accommodation",
-            "title": "Alojamiento",
-            "status": (
-                "LISTO"
-                if clean(request.accommodation)
-                else "FALTA ESTE DATO"
-            ),
-        },
-        {
-            "id": "health",
-            "title": "Salud",
-            "status": (
-                "LISTO"
-                if health_ok
-                else "REVISA ESTO"
-            ),
-        },
-        {
-            "id": "customs",
-            "title": "Aduana",
-            "status": (
-                "LISTO"
-                if customs_ok
-                else "REVISA ESTO"
-            ),
-        },
-    ]
-
-    if passport["status"] != "LISTO":
-        status = passport["status"]
-    elif missing:
-        status = "FALTA ESTE DATO"
-    elif not health_ok or not customs_ok:
-        status = "REVISA ESTO"
-    else:
-        status = "LISTO"
-
-    return {
-        "module": "dviajeros",
-        "status": status,
-        "missing_fields": missing,
-        "modules": modules,
-        "passport_check": passport,
-        "submission_status": (
-            "MUY BIEN. YA PODEMOS CONTINUAR."
-            if status == "LISTO"
-            else status
-        ),
-        "official_portal": OFFICIAL_DVIAJEROS_URL,
-        "official_qr_generated": False,
-        "official_submission_completed": False,
-    }
+# ============================================================
+# FUENTES
+# ============================================================
 
 @app.get("/api/sources")
 def sources():
+
     return {
         "visa": {
-            "name": "eVisa Cuba",
+            "name": "Portal oficial eVisa Cuba",
             "url": OFFICIAL_VISA_URL,
         },
         "dviajeros": {
-            "name": "D'Viajeros",
+            "name": "Portal oficial D'Viajeros",
             "url": OFFICIAL_DVIAJEROS_URL,
         },
     }
 
+
+# ============================================================
+# DISCLAIMER
+# ============================================================
+
 @app.get("/api/disclaimer")
 def disclaimer():
+
     return {
         "text": (
-            "CUBA AUTO TRAVEL 2026 es una aplicación independiente "
-            "de preparación y acompañamiento. No pertenece al Gobierno "
-            "de Cuba, MINREX ni a las autoridades migratorias, sanitarias "
-            "o aduanales. No emite visas, no presenta trámites oficiales, "
-            "no genera códigos QR oficiales y no sustituye los portales "
-            "oficiales. El trámite oficial se realiza directamente con "
-            "la autoridad correspondiente."
+            "CUBA AUTO TRAVEL 2026 es una aplicación "
+            "informativa y de preparación. No pertenece "
+            "al Gobierno de Cuba, MINREX, autoridad "
+            "migratoria, aduana ni otra entidad oficial. "
+            "No emite visas, pasaportes, autorizaciones "
+            "ni códigos QR oficiales. Los requisitos y "
+            "decisiones oficiales deben verificarse "
+            "directamente con las autoridades y portales "
+            "oficiales correspondientes."
         )
     }
+
+
+# ============================================================
+# STATIC
+# ============================================================
 
 if STATIC_DIR.exists():
     app.mount(
         "/static",
-        StaticFiles(directory=str(STATIC_DIR)),
+        StaticFiles(
+            directory=str(STATIC_DIR)
+        ),
         name="static",
     )
