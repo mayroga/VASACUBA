@@ -1,3 +1,4 @@
+```python id="w0s6az"
 # services/checklist_service.py
 # Cuba Travel & Consular Assistant
 # Servicio central de checklists.
@@ -392,6 +393,16 @@ def build_checklist(
     )
 
 
+def generate_checklist(
+    profile: Any,
+    category: Any = None,
+) -> Dict[str, Any]:
+    """
+    Alias de compatibilidad utilizado por main.py.
+    """
+    return build_checklist(profile, category)
+
+
 def get_checklist(
     profile: Any,
     category: Any = None,
@@ -410,6 +421,9 @@ def generate_category_checklist(
     profile: Any,
     category: Any,
 ) -> Dict[str, Any]:
+    """
+    Alias de compatibilidad utilizado por main.py.
+    """
     return build_category_checklist(profile, category)
 
 
@@ -630,7 +644,9 @@ def checklist_categories() -> List[str]:
     return get_checklist_categories()
 
 
-def checklist_progress(checklist: Any) -> Dict[str, Any]:
+def checklist_progress(
+    checklist: Any,
+) -> Dict[str, Any]:
     if isinstance(checklist, dict):
         items = checklist.get("items") or []
     elif isinstance(checklist, list):
@@ -687,16 +703,6 @@ def merge_checklist_state(
     checklist: Any,
     state: Any = None,
 ) -> Dict[str, Any]:
-    """
-    Compatible con:
-    - lista de IDs completados
-    - {id: true/false}
-    - {completed: [...]}
-    - {items: [...]}
-    - {checklist: [...], completed: [...]}
-    - {profile: {...}, checklist: [...]}
-    """
-
     if isinstance(checklist, dict) and state is None:
         if "checklist" in checklist:
             payload = checklist
@@ -797,6 +803,7 @@ def checklist_summary(
 
 __all__ = [
     "build_checklist",
+    "generate_checklist",
     "get_checklist",
     "build_category_checklist",
     "generate_category_checklist",
@@ -809,3 +816,4 @@ __all__ = [
     "merge_checklist_state",
     "checklist_summary",
 ]
+```
