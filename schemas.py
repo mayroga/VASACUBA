@@ -4,6 +4,36 @@ from pydantic import BaseModel,ConfigDict,Field
 class BaseSchema(BaseModel):
     model_config=ConfigDict(extra="ignore",str_strip_whitespace=True)
 
+class PracticeField(BaseSchema):
+    name:str
+    label:str
+    status:str="VERIFY"
+    required:bool=False
+    example:Optional[str]=None
+    help:Optional[str]=None
+
+class PracticeScreen(BaseSchema):
+    id:str
+    order:int
+    title:str
+    status:str="VERIFY"
+    explanation:Optional[str]=None
+    fields:List[PracticeField]=Field(default_factory=list)
+    prepare:List[str]=Field(default_factory=list)
+    review:Optional[str]=None
+    warning:Optional[str]=None
+    important:Optional[str]=None
+
+class PracticeAnswer(BaseSchema):
+    screen_id:str
+    answers:Dict[str,Any]=Field(default_factory=dict)
+
+class PracticeSession(BaseSchema):
+    module:str
+    current_screen:int=1
+    answers:Dict[str,Any]=Field(default_factory=dict)
+    completed:bool=False
+
 class VisaRequest(BaseSchema):
     nationality:str=""
     country_of_residence:str=""
@@ -22,6 +52,12 @@ class VisaRequest(BaseSchema):
     passport_valid:bool=False
     email:str=""
     dual_nationality:bool=False
+    extra_details:Dict[str,Any]=Field(default_factory=dict)
+
+class VisaPracticeRequest(BaseSchema):
+    session:PracticeSession
+    screen_id:str=""
+    answers:Dict[str,Any]=Field(default_factory=dict)
 
 class VisaCheck(BaseSchema):
     id:str
@@ -37,6 +73,7 @@ class VisaResponse(BaseSchema):
     official_document_issued:bool=False
     app_issues_visa:bool=False
     source_data_loaded:bool=False
+    practice_completed:bool=False
 
 class VisaInformation(BaseSchema):
     module:str
@@ -66,6 +103,11 @@ class DViajerosRequest(BaseSchema):
     health_information:Dict[str,Any]=Field(default_factory=dict)
     customs_information:Dict[str,Any]=Field(default_factory=dict)
 
+class DViajerosPracticeRequest(BaseSchema):
+    session:PracticeSession
+    screen_id:str=""
+    answers:Dict[str,Any]=Field(default_factory=dict)
+
 class DViajerosModule(BaseSchema):
     id:str
     title:str
@@ -81,6 +123,7 @@ class DViajerosResponse(BaseSchema):
     official_qr_generated:bool=False
     official_submission_completed:bool=False
     source_data_loaded:bool=False
+    practice_completed:bool=False
 
 class DViajerosInformation(BaseSchema):
     module:str
