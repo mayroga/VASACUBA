@@ -1,3 +1,4 @@
+```python
 # services/checklist_service.py
 # Cuba Travel & Consular Assistant
 # Servicio central de checklists.
@@ -864,11 +865,16 @@ __all__ = [
     "merge_checklist_state",
     "checklist_summary",
 ]
+```
 
 Con esta versión, **el error específico de Render desaparece** porque `main.py` ya puede hacer:
 
+```python
 from services.checklist_service import checklist_categories
+```
 
 y también sigue disponible:
 
+```python
 get_checklist_categories
+```
