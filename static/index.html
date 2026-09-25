@@ -3,693 +3,266 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="theme-color" content="#0b3d91">
-    <title>CU CUBA AUTO TRAVEL 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUBA AUTO TRAVEL 2026</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 
-<header class="topbar">
-    <div class="brand">
-        <div class="brand-mark">CU</div>
-        <div>
-            <div class="brand-name">CU CUBA AUTO TRAVEL</div>
-            <div class="brand-year">2026</div>
-        </div>
-    </div>
-    <div class="top-actions">
-        <button id="languageButton" class="language-button" type="button">EN</button>
+<header class="header">
+    <div class="container">
+        <h1>CUBA AUTO TRAVEL 2026</h1>
+        <p>Preparación de viaje a Cuba</p>
     </div>
 </header>
 
 <main class="container">
 
-<section id="homeSection" class="screen active">
-    <div class="hero">
-        <div class="hero-badge" data-i18n="independent_badge">APLICACIÓN INDEPENDIENTE</div>
-        <h1 data-i18n="hero_title">Prepárate para viajar a Cuba sin miedo a perderte.</h1>
-        <p class="hero-text" data-i18n="hero_text">
-            CU CUBA AUTO TRAVEL 2026 te explica, te prepara y te acompaña paso a paso antes de entrar a los portales oficiales.
-        </p>
-        <div class="hero-actions">
-            <button id="startVisaButton" class="primary-button" type="button">
-                <span data-i18n="visa_button">Preparar Visa / eVisa</span>
-            </button>
-            <button id="startDviajerosButton" class="secondary-button" type="button">
-                <span data-i18n="dviajeros_button">Preparar D'Viajeros</span>
-            </button>
-        </div>
-    </div>
-
 ```
-<section class="official-access">
-    <div class="section-heading">
-        <span class="section-kicker" data-i18n="official_kicker">PORTALES OFICIALES</span>
-        <h2 data-i18n="official_title">Tenlos siempre a mano</h2>
-        <p data-i18n="official_text">
-            Se abrirán en una nueva pestaña. CU CUBA AUTO TRAVEL permanecerá abierta para que puedas mirar, copiar, volver y continuar.
-        </p>
-    </div>
-
-    <div class="official-grid">
-        <a class="official-card" href="https://evisacuba.cu/" target="_blank" rel="noopener noreferrer">
-            <span class="official-icon">✈</span>
-            <span class="official-card-title">eVisa Cuba</span>
-            <span class="official-card-text" data-i18n="open_official_visa">Abrir portal oficial de Visa</span>
-            <span class="official-arrow">↗</span>
-        </a>
-
-        <a class="official-card" href="https://dviajeros.mitrans.gob.cu/" target="_blank" rel="noopener noreferrer">
-            <span class="official-icon">✈</span>
-            <span class="official-card-title">D'Viajeros</span>
-            <span class="official-card-text" data-i18n="open_official_dviajeros">Abrir portal oficial de D'Viajeros</span>
-            <span class="official-arrow">↗</span>
-        </a>
-    </div>
+<section class="intro">
+    <h2>¿Qué necesitas preparar?</h2>
+    <p>Selecciona una de las dos opciones.</p>
 </section>
 
-<section class="how-section">
-    <div class="section-heading">
-        <span class="section-kicker" data-i18n="how_kicker">CÓMO FUNCIONA</span>
-        <h2 data-i18n="how_title">Como tener un agente a tu lado</h2>
-    </div>
+<section class="modules">
 
-    <div class="how-grid">
-        <article class="how-card">
-            <div class="how-number">1</div>
-            <h3 data-i18n="how_1_title">Entender</h3>
-            <p data-i18n="how_1_text">Te explicamos qué vas a hacer antes de comenzar.</p>
-        </article>
-        <article class="how-card">
-            <div class="how-number">2</div>
-            <h3 data-i18n="how_2_title">Preparar</h3>
-            <p data-i18n="how_2_text">Organizas tus datos y tienes todo listo.</p>
-        </article>
-        <article class="how-card">
-            <div class="how-number">3</div>
-            <h3 data-i18n="how_3_title">Simular</h3>
-            <p data-i18n="how_3_text">Practicas el camino antes de entrar al sitio oficial.</p>
-        </article>
-        <article class="how-card">
-            <div class="how-number">4</div>
-            <h3 data-i18n="how_4_title">Continuar</h3>
-            <p data-i18n="how_4_text">Abres el portal oficial y vuelves aquí cuando necesites orientación.</p>
-        </article>
-    </div>
+<button
+    type="button"
+    id="visa-button"
+    class="module-card"
+>
+    <span class="module-icon">🇨🇺</span>
+    <strong>Visa Cubana</strong>
+    <span>
+        Revisa y prepara la información
+        relacionada con la visa cubana / eVisa.
+    </span>
+</button>
+
+<button
+    type="button"
+    id="dviajeros-button"
+    class="module-card"
+>
+    <span class="module-icon">🛬</span>
+    <strong>D'Viajeros</strong>
+    <span>
+        Prepara y revisa la información
+        necesaria para D'Viajeros.
+    </span>
+</button>
+
+    <h2>🇨🇺 Visa Cubana</h2>
+
+    <p class="panel-description">
+        Completa la información básica para
+        preparar tu revisión.
+    </p>
+
+    <form id="visa-form">
+
+        <label>
+            Nacionalidad
+            <input type="text" name="nationality" required>
+        </label>
+
+        <label>
+            País de residencia
+            <input type="text" name="country_of_residence" required>
+        </label>
+
+        <label>
+            País que emitió el pasaporte
+            <input type="text" name="passport_country" required>
+        </label>
+
+        <label>
+            Motivo del viaje
+            <input type="text" name="travel_purpose" required>
+        </label>
+
+        <label>
+            Tipo de entrada
+            <input type="text" name="entry_type">
+        </label>
+
+        <label class="checkbox">
+            <input type="checkbox" name="has_passport">
+            Tengo pasaporte
+        </label>
+
+        <label class="checkbox">
+            <input type="checkbox" name="passport_valid">
+            Mi pasaporte está vigente
+        </label>
+
+        <label>
+            Correo electrónico
+            <input type="email" name="email">
+        </label>
+
+        <label class="checkbox">
+            <input type="checkbox" name="dual_nationality">
+            Tengo doble nacionalidad
+        </label>
+
+        <button type="submit" class="primary-button">
+            Revisar Visa
+        </button>
+
+    </form>
+
+    <div id="visa-result" class="result hidden"></div>
+
+    <a
+        class="official-link"
+        href="https://evisacuba.cu/"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        Ir al portal oficial eVisa Cuba →
+    </a>
+
 </section>
 
-<section class="notice-box">
-    <strong data-i18n="important_label">IMPORTANTE</strong>
-    <p data-i18n="disclaimer">
-        CU CUBA AUTO TRAVEL 2026 es independiente. No pertenece al Gobierno de Cuba ni a sus autoridades migratorias, consulares, sanitarias o aduanales. No emite visas, no presenta solicitudes oficiales y no genera QR oficiales.
+<section id="dviajeros-section" class="panel hidden">
+
+    <button class="back-button" onclick="goHome()">
+        ← Volver
+    </button>
+
+    <h2>🛬 D'Viajeros</h2>
+
+    <p class="panel-description">
+        Prepara tus datos antes de continuar
+        al portal oficial.
+    </p>
+
+    <form id="dviajeros-form">
+
+        <h3>Información personal</h3>
+
+        <label>
+            Nombre
+            <input type="text" name="first_name" required>
+        </label>
+
+        <label>
+            Apellidos
+            <input type="text" name="last_name" required>
+        </label>
+
+        <label>
+            Nacionalidad
+            <input type="text" name="nationality" required>
+        </label>
+
+        <label>
+            Fecha de nacimiento
+            <input type="date" name="date_of_birth" required>
+        </label>
+
+        <h3>Migración</h3>
+
+        <label>
+            Número de pasaporte
+            <input type="text" name="passport_number" required>
+        </label>
+
+        <label>
+            País emisor del pasaporte
+            <input type="text" name="passport_country" required>
+        </label>
+
+        <label>
+            Fecha de llegada
+            <input type="date" name="arrival_date" required>
+        </label>
+
+        <label>
+            Número de vuelo
+            <input type="text" name="flight_number" required>
+        </label>
+
+        <label>
+            Aerolínea
+            <input type="text" name="airline" required>
+        </label>
+
+        <h3>Información del viaje</h3>
+
+        <label>
+            Alojamiento
+            <input type="text" name="accommodation">
+        </label>
+
+        <label>
+            Dirección en Cuba
+            <input type="text" name="address_in_cuba">
+        </label>
+
+        <label>
+            Motivo del viaje
+            <input type="text" name="purpose_of_trip">
+        </label>
+
+        <h3>Salud</h3>
+
+        <label>
+            Información de salud
+            <textarea
+                name="health_information"
+                rows="3"
+                placeholder="Información que corresponda declarar"
+            ></textarea>
+        </label>
+
+        <h3>Aduana</h3>
+
+        <label>
+            Información aduanal
+            <textarea
+                name="customs_information"
+                rows="3"
+                placeholder="Información que corresponda declarar"
+            ></textarea>
+        </label>
+
+        <button type="submit" class="primary-button">
+            Revisar D'Viajeros
+        </button>
+
+    </form>
+
+    <div id="dviajeros-result" class="result hidden"></div>
+
+    <a
+        class="official-link"
+        href="https://dviajeros.mitrans.gob.cu/"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        Ir al portal oficial D'Viajeros →
+    </a>
+
+</section>
+
+<section class="disclaimer">
+    <strong>Importante</strong>
+
+    <p>
+        CUBA AUTO TRAVEL 2026 es una aplicación
+        informativa y de preparación. No pertenece
+        al Gobierno de Cuba ni a sus autoridades.
+        No emite visas, documentos oficiales ni
+        códigos QR oficiales. La información debe
+        verificarse con las fuentes oficiales.
     </p>
 </section>
 ```
 
-</section>
-
-<section id="visaSection" class="screen">
-    <div class="module-header">
-        <button class="back-button" type="button" data-back-home>
-            ← <span data-i18n="back">Volver</span>
-        </button>
-        <div>
-            <span class="module-kicker">CU / VISA</span>
-            <h1 data-i18n="visa_title">Visa cubana / eVisa</h1>
-            <p data-i18n="visa_intro">Vamos a prepararla juntos antes de abrir el portal oficial.</p>
-        </div>
-    </div>
-
-```
-<div class="agent-banner">
-    <div class="agent-icon">CU</div>
-    <div>
-        <strong data-i18n="agent_title">Te voy guiando paso a paso.</strong>
-        <p data-i18n="agent_text">
-            Primero entendemos el procedimiento. Después preparamos los datos, simulamos el recorrido y finalmente abrimos el sitio oficial.
-        </p>
-    </div>
-</div>
-
-<div class="stepper" id="visaStepper"></div>
-
-<div id="visaStepContainer">
-
-    <article class="guide-panel" data-visa-step="0">
-        <span class="step-label" data-i18n="step_1">PASO 1</span>
-        <h2 data-i18n="visa_step1_title">¿Qué vas a hacer?</h2>
-        <p data-i18n="visa_step1_text">
-            La eVisa es un procedimiento electrónico. CU CUBA AUTO TRAVEL no expide la visa: aquí preparas la información y después continúas directamente en el portal oficial.
-        </p>
-
-        <div class="explain-grid">
-            <div class="explain-card">
-                <strong data-i18n="what_we_do">Aquí hacemos</strong>
-                <p data-i18n="visa_here">Preparar, explicar, revisar y practicar.</p>
-            </div>
-            <div class="explain-card">
-                <strong data-i18n="official_does">En el portal oficial</strong>
-                <p data-i18n="visa_official">Presentas la solicitud y realizas el procedimiento oficial.</p>
-            </div>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-visa-step="1">
-        <span class="step-label" data-i18n="step_2">PASO 2</span>
-        <h2 data-i18n="visa_passport_title">Primero prepara tu pasaporte</h2>
-        <p data-i18n="visa_passport_text">
-            Ten tu pasaporte delante. Busca la página donde aparecen tu foto y tus datos y escribe la información exactamente como aparece.
-        </p>
-
-        <div class="form-grid">
-            <label class="field">
-                <span data-i18n="passport_country">País que emitió tu pasaporte</span>
-                <input id="visaPassportCountry" type="text" autocomplete="country-name">
-                <button class="copy-button" type="button" data-copy-target="visaPassportCountry">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="passport_number">Número de pasaporte</span>
-                <input id="visaPassportNumber" type="text" autocomplete="off">
-                <button class="copy-button" type="button" data-copy-target="visaPassportNumber">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="first_name">Nombre</span>
-                <input id="visaFirstName" type="text" autocomplete="given-name">
-                <button class="copy-button" type="button" data-copy-target="visaFirstName">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="last_name">Apellidos</span>
-                <input id="visaLastName" type="text" autocomplete="family-name">
-                <button class="copy-button" type="button" data-copy-target="visaLastName">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="birth_date">Fecha de nacimiento</span>
-                <input id="visaBirthDate" type="date">
-                <button class="copy-button" type="button" data-copy-target="visaBirthDate">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="passport_expiration">Fecha de vencimiento</span>
-                <input id="visaPassportExpiration" type="date">
-                <button class="copy-button" type="button" data-copy-target="visaPassportExpiration">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-        </div>
-
-        <div id="visaPassportStatus" class="tip-box">
-            <strong data-i18n="passport_ready_title">Prepara tu pasaporte</strong>
-            <p data-i18n="passport_ready_text">Completa los datos anteriores para poder continuar.</p>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-visa-step="2">
-        <span class="step-label" data-i18n="step_3">PASO 3</span>
-        <h2 data-i18n="visa_traveler_title">Completa los datos del viajero</h2>
-
-        <div class="form-grid">
-            <label class="field">
-                <span data-i18n="nationality">Nacionalidad</span>
-                <input id="visaNationality" type="text" autocomplete="country-name">
-                <button class="copy-button" type="button" data-copy-target="visaNationality">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="residence">País de residencia</span>
-                <input id="visaResidence" type="text" autocomplete="country-name">
-                <button class="copy-button" type="button" data-copy-target="visaResidence">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="travel_purpose">Motivo del viaje</span>
-                <input id="visaPurpose" type="text">
-                <button class="copy-button" type="button" data-copy-target="visaPurpose">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="arrival_date">Fecha prevista de llegada</span>
-                <input id="visaArrivalDate" type="date">
-                <button class="copy-button" type="button" data-copy-target="visaArrivalDate">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field field-full">
-                <span data-i18n="email">Correo electrónico</span>
-                <input id="visaEmail" type="email" autocomplete="email">
-                <button class="copy-button" type="button" data-copy-target="visaEmail">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-visa-step="3">
-        <span class="step-label" data-i18n="step_4">PASO 4</span>
-        <h2 data-i18n="visa_simulation_title">Así es el camino del trámite</h2>
-
-        <div class="simulation-list">
-            <div class="simulation-item">
-                <span>1</span>
-                <div>
-                    <strong data-i18n="visa_sim1_title">Detalles del trámite</strong>
-                    <p data-i18n="visa_sim1_text">Introduces la información solicitada por el portal.</p>
-                </div>
-            </div>
-
-            <div class="simulation-item">
-                <span>2</span>
-                <div>
-                    <strong data-i18n="visa_sim2_title">Trámites adicionales</strong>
-                    <p data-i18n="visa_sim2_text">Si el portal muestra procedimientos adicionales aplicables, los revisas antes de continuar.</p>
-                </div>
-            </div>
-
-            <div class="simulation-item">
-                <span>3</span>
-                <div>
-                    <strong data-i18n="visa_sim3_title">Pago</strong>
-                    <p data-i18n="visa_sim3_text">El método de pago no debe suponerse. El portal muestra las opciones correspondientes al trámite y al consulado.</p>
-                </div>
-            </div>
-
-            <div class="simulation-item">
-                <span>4</span>
-                <div>
-                    <strong data-i18n="visa_sim4_title">Revisar y confirmar</strong>
-                    <p data-i18n="visa_sim4_text">Compruebas los datos antes de confirmar y enviar.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="warning-box">
-            <strong data-i18n="payment_attention">ATENCIÓN AL PAGO</strong>
-            <p data-i18n="payment_text">
-                No vamos a decirte que existe un único método de pago para todos. Las opciones pueden depender del consulado. Mira siempre lo que indique el portal oficial para tu trámite.
-            </p>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-visa-step="4">
-        <span class="step-label" data-i18n="step_5">PASO 5</span>
-        <h2 data-i18n="visa_step5_title">Haz una última revisión</h2>
-        <div id="visaReview" class="review-list"></div>
-
-        <div class="review-actions">
-            <button id="clearVisaButton" class="danger-button" type="button">
-                <span data-i18n="clear">Borrar preparación</span>
-            </button>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-visa-step="5">
-        <span class="step-label" data-i18n="step_6">PASO 6</span>
-        <h2 data-i18n="visa_step6_title">Ahora sí: abre el portal oficial</h2>
-
-        <div class="portal-instruction">
-            <div class="portal-number">1</div>
-            <p data-i18n="portal_instruction1">Pulsa el botón. El portal oficial se abrirá en otra pestaña.</p>
-        </div>
-
-        <div class="portal-instruction">
-            <div class="portal-number">2</div>
-            <p data-i18n="portal_instruction2">Deja CU CUBA AUTO TRAVEL abierta.</p>
-        </div>
-
-        <div class="portal-instruction">
-            <div class="portal-number">3</div>
-            <p data-i18n="portal_instruction3">
-                Mira aquí, copia el dato que necesites, pégalo en el portal oficial y vuelve aquí cuando necesites continuar.
-            </p>
-        </div>
-
-        <a class="primary-button portal-button" href="https://evisacuba.cu/" target="_blank" rel="noopener noreferrer" data-i18n="open_visa_portal">
-            ABRIR eVISA OFICIAL ↗
-        </a>
-
-        <p class="small-note" data-i18n="official_note">Esta aplicación no presenta la solicitud ni emite la visa.</p>
-    </article>
-</div>
-
-<div class="navigation-buttons">
-    <button id="visaPreviousButton" class="secondary-button" type="button">
-        ← <span data-i18n="previous">Anterior</span>
-    </button>
-    <button id="visaNextButton" class="primary-button" type="button">
-        <span data-i18n="next">Siguiente</span> →
-    </button>
-</div>
-```
-
-</section>
-
-<section id="dviajerosSection" class="screen">
-    <div class="module-header">
-        <button class="back-button" type="button" data-back-home>
-            ← <span data-i18n="back">Volver</span>
-        </button>
-        <div>
-            <span class="module-kicker">CU / D'VIAJEROS</span>
-            <h1>D'Viajeros</h1>
-            <p data-i18n="dviajeros_intro">
-                Vamos a organizar la información para que el formulario oficial sea más fácil de completar.
-            </p>
-        </div>
-    </div>
-
-```
-<div class="agent-banner">
-    <div class="agent-icon">CU</div>
-    <div>
-        <strong data-i18n="dviajeros_agent_title">No tienes que recordar todo de golpe.</strong>
-        <p data-i18n="dviajeros_agent_text">
-            Avanzaremos por partes: pasaporte, viaje, alojamiento, salud, aduana y revisión.
-        </p>
-    </div>
-</div>
-
-<div class="stepper" id="dviajerosStepper"></div>
-
-<div id="dviajerosStepContainer">
-
-    <article class="guide-panel" data-dviajeros-step="0">
-        <span class="step-label" data-i18n="step_1">PASO 1</span>
-        <h2 data-i18n="dv_step1_title">Primero entendamos D'Viajeros</h2>
-        <p data-i18n="dv_step1_text">
-            D'Viajeros reúne información que el viajero debe proporcionar antes de su entrada a Cuba. Aquí no generamos el QR oficial. Preparamos contigo la información para que después puedas completar y revisar el procedimiento en el sitio oficial.
-        </p>
-
-        <div class="explain-grid">
-            <div class="explain-card">
-                <strong data-i18n="dv_personal">Pasaporte</strong>
-                <p data-i18n="dv_personal_text">Preparamos los datos de tu documento.</p>
-            </div>
-            <div class="explain-card">
-                <strong data-i18n="dv_trip">Información del viaje</strong>
-                <p data-i18n="dv_trip_text">Cuándo llegas, vuelo y aerolínea.</p>
-            </div>
-            <div class="explain-card">
-                <strong data-i18n="dv_health">Salud</strong>
-                <p data-i18n="dv_health_text">Respondes según tu situación real.</p>
-            </div>
-            <div class="explain-card">
-                <strong data-i18n="dv_customs">Aduana</strong>
-                <p data-i18n="dv_customs_text">Declaras lo que corresponda a tu caso.</p>
-            </div>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-dviajeros-step="1">
-        <span class="step-label" data-i18n="step_2">PASO 2</span>
-        <h2 data-i18n="dv_passport_title">Prepara tu pasaporte</h2>
-        <p data-i18n="dv_passport_text">
-            Ten tu pasaporte delante y escribe los datos exactamente como aparecen en la página de datos.
-        </p>
-
-        <div class="form-grid">
-            <label class="field">
-                <span data-i18n="first_name">Nombre</span>
-                <input id="dvFirstName" type="text" autocomplete="given-name">
-                <button class="copy-button" type="button" data-copy-target="dvFirstName">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="last_name">Apellidos</span>
-                <input id="dvLastName" type="text" autocomplete="family-name">
-                <button class="copy-button" type="button" data-copy-target="dvLastName">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="nationality">Nacionalidad</span>
-                <input id="dvNationality" type="text" autocomplete="country-name">
-                <button class="copy-button" type="button" data-copy-target="dvNationality">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="birth_date">Fecha de nacimiento</span>
-                <input id="dvBirthDate" type="date">
-                <button class="copy-button" type="button" data-copy-target="dvBirthDate">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="passport_number">Número de pasaporte</span>
-                <input id="dvPassportNumber" type="text" autocomplete="off">
-                <button class="copy-button" type="button" data-copy-target="dvPassportNumber">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="passport_country">País que emitió tu pasaporte</span>
-                <input id="dvPassportCountry" type="text" autocomplete="country-name">
-                <button class="copy-button" type="button" data-copy-target="dvPassportCountry">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="passport_expiration">Fecha de vencimiento</span>
-                <input id="dvPassportExpiration" type="date">
-                <button class="copy-button" type="button" data-copy-target="dvPassportExpiration">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-        </div>
-
-        <div id="dvPassportStatus" class="tip-box">
-            <strong data-i18n="passport_ready_title">Prepara tu pasaporte</strong>
-            <p data-i18n="passport_ready_text">Completa los datos anteriores para poder continuar.</p>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-dviajeros-step="2">
-        <span class="step-label" data-i18n="step_3">PASO 3</span>
-        <h2 data-i18n="dv_step3_title">Prepara tu viaje</h2>
-
-        <div class="form-grid">
-            <label class="field">
-                <span data-i18n="arrival_date">Fecha de llegada</span>
-                <input id="dvArrivalDate" type="date">
-                <button class="copy-button" type="button" data-copy-target="dvArrivalDate">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field">
-                <span data-i18n="flight_number">Número de vuelo</span>
-                <input id="dvFlightNumber" type="text">
-                <button class="copy-button" type="button" data-copy-target="dvFlightNumber">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field field-full">
-                <span data-i18n="airline">Aerolínea</span>
-                <input id="dvAirline" type="text">
-                <button class="copy-button" type="button" data-copy-target="dvAirline">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-        </div>
-
-        <div class="tip-box">
-            <strong data-i18n="travel_tip_title">Consejo del agente</strong>
-            <p data-i18n="travel_tip">
-                Ten a mano tu boleto o confirmación de vuelo. Ahí normalmente encontrarás el número de vuelo y la aerolínea.
-            </p>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-dviajeros-step="3">
-        <span class="step-label" data-i18n="step_4">PASO 4</span>
-        <h2 data-i18n="dv_step4_title">Alojamiento</h2>
-
-        <div class="form-grid">
-            <label class="field field-full">
-                <span data-i18n="accommodation">Alojamiento</span>
-                <input id="dvAccommodation" type="text">
-                <button class="copy-button" type="button" data-copy-target="dvAccommodation">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field field-full">
-                <span data-i18n="address_cuba">Dirección en Cuba</span>
-                <textarea id="dvAddressCuba" rows="3"></textarea>
-                <button class="copy-button" type="button" data-copy-target="dvAddressCuba">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-
-            <label class="field field-full">
-                <span data-i18n="trip_purpose">Motivo del viaje</span>
-                <input id="dvPurpose" type="text">
-                <button class="copy-button" type="button" data-copy-target="dvPurpose">
-                    <span data-i18n="copy">Copiar</span>
-                </button>
-            </label>
-        </div>
-
-        <div class="tip-box">
-            <strong data-i18n="extra_information">¿Tienes algo más?</strong>
-            <p data-i18n="extra_information_text">
-                Si el portal oficial te solicita un dato que no aparece aquí, no significa que estés perdido. Anótalo y podrás revisarlo nuevamente en esta aplicación.
-            </p>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-dviajeros-step="4">
-        <span class="step-label" data-i18n="step_5">PASO 5</span>
-        <h2 data-i18n="dv_step5_title">Salud: responde según tu realidad</h2>
-        <p data-i18n="dv_health_intro">
-            Esta parte no debe rellenarse por adivinación. CU CUBA AUTO TRAVEL te ayuda a organizar la respuesta, pero tú debes declarar la información verdadera que corresponda a tu situación.
-        </p>
-
-        <div class="question-card">
-            <label class="field">
-                <span data-i18n="health_declaration">Información de salud que deba declarar</span>
-                <select id="dvHealthAnswer">
-                    <option value="" data-i18n="select_option">Selecciona una opción</option>
-                    <option value="no" data-i18n="no_information">No tengo información adicional que declarar</option>
-                    <option value="yes" data-i18n="yes_information">Sí, tengo información que debo declarar</option>
-                </select>
-            </label>
-
-            <label class="field">
-                <span data-i18n="health_extra">Información adicional</span>
-                <textarea id="dvHealthExtra" rows="4" data-i18n-placeholder="health_placeholder" placeholder="Escribe aquí solamente información real que corresponda a tu caso."></textarea>
-            </label>
-        </div>
-
-        <div class="warning-box">
-            <strong data-i18n="do_not_guess">NO ADIVINES</strong>
-            <p data-i18n="health_warning">
-                Si una pregunta oficial no está clara, léela exactamente en el portal oficial y utiliza esta sección para organizar tu respuesta.
-            </p>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-dviajeros-step="5">
-        <span class="step-label" data-i18n="step_6">PASO 6</span>
-        <h2 data-i18n="dv_step6_title">Aduana: prepara lo que realmente corresponda</h2>
-        <p data-i18n="dv_customs_intro">
-            No vamos a inventar cantidades, valores ni categorías. Esta sección sirve para que pienses y organices la información antes de responder en el portal oficial.
-        </p>
-
-        <div class="question-card">
-            <label class="field">
-                <span data-i18n="customs_declaration">¿Tienes información que debas declarar?</span>
-                <select id="dvCustomsAnswer">
-                    <option value="" data-i18n="select_option">Selecciona una opción</option>
-                    <option value="no" data-i18n="nothing_to_declare">No tengo información adicional que declarar</option>
-                    <option value="yes" data-i18n="something_to_declare">Sí, tengo algo que declarar</option>
-                </select>
-            </label>
-
-            <label class="field">
-                <span data-i18n="customs_extra">Detalles que quieras preparar</span>
-                <textarea id="dvCustomsExtra" rows="5" data-i18n-placeholder="customs_placeholder" placeholder="Escribe aquí los detalles reales que necesites revisar."></textarea>
-            </label>
-        </div>
-
-        <div class="tip-box">
-            <strong data-i18n="customs_tip_title">Recuerda</strong>
-            <p data-i18n="customs_tip">
-                Si tienes una mercancía, cantidad, valor o situación especial, utiliza la información oficial aplicable para determinar cómo debe declararse.
-            </p>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-dviajeros-step="6">
-        <span class="step-label" data-i18n="step_7">PASO 7</span>
-        <h2 data-i18n="dv_step7_title">Revisión antes de abrir D'Viajeros</h2>
-        <div id="dviajerosReview" class="review-list"></div>
-
-        <div class="review-actions">
-            <button id="clearDviajerosButton" class="danger-button" type="button">
-                <span data-i18n="clear">Borrar preparación</span>
-            </button>
-        </div>
-    </article>
-
-    <article class="guide-panel hidden" data-dviajeros-step="7">
-        <span class="step-label" data-i18n="step_8">PASO 8</span>
-        <h2 data-i18n="dv_step8_title">Ahora abre D'Viajeros</h2>
-
-        <div class="portal-instruction">
-            <div class="portal-number">1</div>
-            <p data-i18n="portal_instruction1">Pulsa el botón. El portal oficial se abrirá en otra pestaña.</p>
-        </div>
-
-        <div class="portal-instruction">
-            <div class="portal-number">2</div>
-            <p data-i18n="portal_instruction2">Deja CU CUBA AUTO TRAVEL abierta.</p>
-        </div>
-
-        <div class="portal-instruction">
-            <div class="portal-number">3</div>
-            <p data-i18n="dv_portal_instruction3">
-                Completa el formulario oficial y vuelve aquí cuando necesites consultar o revisar un dato.
-            </p>
-        </div>
-
-        <a class="primary-button portal-button" href="https://dviajeros.mitrans.gob.cu/" target="_blank" rel="noopener noreferrer">
-            <span data-i18n="open_dviajeros_portal">ABRIR D'VIAJEROS OFICIAL ↗</span>
-        </a>
-
-        <p class="small-note" data-i18n="qr_note">
-            El QR oficial lo genera el sistema oficial después de completar el procedimiento correspondiente.
-        </p>
-    </article>
-</div>
-
-<div class="navigation-buttons">
-    <button id="dviajerosPreviousButton" class="secondary-button" type="button">
-        ← <span data-i18n="previous">Anterior</span>
-    </button>
-    <button id="dviajerosNextButton" class="primary-button" type="button">
-        <span data-i18n="next">Siguiente</span> →
-    </button>
-</div>
-```
-
-</section>
-
 </main>
-
-<footer class="footer">
-    <strong>CU CUBA AUTO TRAVEL 2026</strong>
-    <span data-i18n="footer_text">Aplicación independiente de preparación y acompañamiento.</span>
-</footer>
 
 <script src="/static/app.js"></script>
 
