@@ -1,270 +1,121 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CUBA AUTO TRAVEL 2026</title>
-    <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="CUBA AUTO TRAVEL 2026 - preparación y revisión informativa para Visa cubana, D'Viajeros y datos del pasaporte.">
+<title>CUBA AUTO TRAVEL 2026</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#172033;font-family:Arial,Helvetica,sans-serif;line-height:1.5}.container{width:min(940px,94%);margin:auto}header{background:#0f3d59;color:#fff;padding:24px 15px;text-align:center}header h1{margin:0;font-size:28px}header p{margin:6px 0 0;color:#dbeafe}.intro{background:#fff;margin:22px auto;padding:22px;border-radius:14px;box-shadow:0 3px 14px #00000010}.intro h2{margin-top:0;color:#0f3d59}.notice{background:#eff6ff;border-left:4px solid #2563eb;padding:12px;margin:15px 0;border-radius:6px}.modules{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}.module-card{background:#fff;border:1px solid #dbe3ec;border-radius:14px;padding:20px;box-shadow:0 3px 12px #0000000b}.module-card h3{margin-top:0;color:#0f3d59}.module-card p{font-size:14px;color:#475569}.module-card button,.primary{width:100%;background:#0f3d59;color:#fff;border:0;border-radius:8px;padding:12px;font-weight:bold;cursor:pointer}.module-card button:hover,.primary:hover{background:#15567c}.app-section{background:#fff;margin:20px auto;padding:22px;border-radius:14px;box-shadow:0 3px 14px #00000010}.hidden{display:none!important}.back-button{background:#e2e8f0;color:#172033;border:0;border-radius:7px;padding:9px 13px;cursor:pointer;margin-bottom:15px}h2{color:#0f3d59}h3{color:#0f3d59}label{display:block;font-weight:bold;margin:13px 0 5px}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;font:inherit}textarea{min-height:90px;resize:vertical}.check{display:flex;align-items:center;gap:8px;margin:12px 0}.check input{width:auto}.result{margin-top:20px;padding:15px;border-radius:10px;background:#f8fafc;border:1px solid #dbe3ec}.result-item{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:11px;margin:9px 0}.result-item p{margin:6px 0}.status{display:inline-block;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:bold;margin-left:6px}.status-ready{background:#dcfce7;color:#166534}.status-verify{background:#fef3c7;color:#92400e}.status-incomplete{background:#fee2e2;color:#991b1b}.official-link{display:inline-block;margin-top:14px;background:#2563eb;color:#fff;text-decoration:none;padding:11px 15px;border-radius:7px;font-weight:bold}.module-check{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #e2e8f0}.error-box{background:#fee2e2;color:#991b1b;padding:13px;border-radius:8px}.legal{margin:25px 0;padding:15px;background:#fff;border-top:1px solid #cbd5e1;color:#64748b;font-size:12px;text-align:center}.small{font-size:13px;color:#64748b}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.modules{grid-template-columns:1fr}.grid{grid-template-columns:1fr}header h1{font-size:23px}.app-section,.intro{padding:16px}}
+</style>
 </head>
-
 <body>
-
-<header class="header">
-    <div class="container">
-        <h1>CUBA AUTO TRAVEL 2026</h1>
-        <p>Preparación de viaje a Cuba</p>
-    </div>
-</header>
-
+<header><div class="container"><h1>CUBA AUTO TRAVEL 2026</h1><p>Preparación de viaje a Cuba</p></div></header>
 <main class="container">
-
-```
-<section class="intro">
-    <h2>¿Qué necesitas preparar?</h2>
-    <p>Selecciona una de las dos opciones.</p>
+<section id="intro" class="intro">
+<h2>¿Qué necesitas preparar?</h2>
+<p>Esta aplicación te ayuda a organizar y revisar la información que necesitarás para tu viaje a Cuba.</p>
+<div class="notice"><strong>Importante:</strong> aquí puedes preparar y revisar información, pero la solicitud oficial, el pago oficial, la aprobación de una visa y el QR oficial de D'Viajeros pertenecen a los sistemas correspondientes.</div>
+<p class="small"><strong>Cómo funciona:</strong> prepara tus datos → revisa lo que falta → verifica la información oficial → continúa en el portal correspondiente.</p>
+</section>
+<section id="modules" class="modules">
+<article class="module-card"><h3>🛂 Visa / eVisa</h3><p>Prepara tus datos y entiende las etapas que encontrarás en el proceso oficial.</p><button id="visa-button">Preparar Visa</button></article>
+<article class="module-card"><h3>📋 D'Viajeros</h3><p>Organiza la información personal, migratoria, de salud y aduana antes de entrar al formulario oficial.</p><button id="dviajeros-button">Preparar D'Viajeros</button></article>
+<article class="module-card"><h3>🛂 Pasaporte</h3><p>Revisa de forma básica los datos que debes copiar exactamente de tu pasaporte.</p><button id="passport-button">Revisar Pasaporte</button></article>
 </section>
 
-<section class="modules">
-
-<button
-    type="button"
-    id="visa-button"
-    class="module-card"
->
-    <span class="module-icon">🇨🇺</span>
-    <strong>Visa Cubana</strong>
-    <span>
-        Revisa y prepara la información
-        relacionada con la visa cubana / eVisa.
-    </span>
-</button>
-
-<button
-    type="button"
-    id="dviajeros-button"
-    class="module-card"
->
-    <span class="module-icon">🛬</span>
-    <strong>D'Viajeros</strong>
-    <span>
-        Prepara y revisa la información
-        necesaria para D'Viajeros.
-    </span>
-</button>
-
-    <h2>🇨🇺 Visa Cubana</h2>
-
-    <p class="panel-description">
-        Completa la información básica para
-        preparar tu revisión.
-    </p>
-
-    <form id="visa-form">
-
-        <label>
-            Nacionalidad
-            <input type="text" name="nationality" required>
-        </label>
-
-        <label>
-            País de residencia
-            <input type="text" name="country_of_residence" required>
-        </label>
-
-        <label>
-            País que emitió el pasaporte
-            <input type="text" name="passport_country" required>
-        </label>
-
-        <label>
-            Motivo del viaje
-            <input type="text" name="travel_purpose" required>
-        </label>
-
-        <label>
-            Tipo de entrada
-            <input type="text" name="entry_type">
-        </label>
-
-        <label class="checkbox">
-            <input type="checkbox" name="has_passport">
-            Tengo pasaporte
-        </label>
-
-        <label class="checkbox">
-            <input type="checkbox" name="passport_valid">
-            Mi pasaporte está vigente
-        </label>
-
-        <label>
-            Correo electrónico
-            <input type="email" name="email">
-        </label>
-
-        <label class="checkbox">
-            <input type="checkbox" name="dual_nationality">
-            Tengo doble nacionalidad
-        </label>
-
-        <button type="submit" class="primary-button">
-            Revisar Visa
-        </button>
-
-    </form>
-
-    <div id="visa-result" class="result hidden"></div>
-
-    <a
-        class="official-link"
-        href="https://evisacuba.cu/"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        Ir al portal oficial eVisa Cuba →
-    </a>
-
+<section id="visa-section" class="app-section hidden">
+<button class="back-button">← Volver</button>
+<h2>Visa cubana / eVisa</h2>
+<p>Primero prepara la información. Después revisa qué debe verificarse en el portal oficial.</p>
+<div class="notice"><strong>Antes de comenzar:</strong> ten a mano tu pasaporte, tus datos personales, correo electrónico y la información de tu viaje.</div>
+<form id="visa-form">
+<div class="grid">
+<div><label>Nacionalidad</label><input name="nationality" required></div>
+<div><label>País de residencia</label><input name="country_of_residence"></div>
+<div><label>País emisor del pasaporte</label><input name="passport_country" required></div>
+<div><label>Número de pasaporte</label><input name="passport_number"></div>
+<div><label>Nombre</label><input name="first_name"></div>
+<div><label>Segundo nombre <span class="small">(si corresponde)</span></label><input name="second_name"></div>
+<div><label>Primer apellido</label><input name="first_surname"></div>
+<div><label>Segundo apellido <span class="small">(si corresponde)</span></label><input name="second_surname"></div>
+<div><label>Fecha de nacimiento</label><input name="date_of_birth" type="date"></div>
+<div><label>Sexo / género</label><input name="gender"></div>
+<div><label>Teléfono <span class="small">(si corresponde)</span></label><input name="phone"></div>
+<div><label>Correo electrónico</label><input name="email" type="email"></div>
+</div>
+<label>Motivo del viaje</label><input name="travel_purpose" placeholder="Ej.: turismo">
+<label>Tipo de entrada</label><input name="entry_type">
+<label class="check"><input name="has_passport" type="checkbox"> Ya tengo el pasaporte disponible</label>
+<label class="check"><input name="passport_valid" type="checkbox"> He revisado la fecha de vencimiento del pasaporte</label>
+<label class="check"><input name="dual_nationality" type="checkbox"> Tengo doble nacionalidad</label>
+<button class="primary" type="submit">Revisar preparación</button>
+</form>
+<div id="visa-result" class="result hidden"></div>
+<a id="official-visa" class="official-link" href="https://evisacuba.cu/" target="_blank" rel="noopener noreferrer">Portal oficial eVisa Cuba →</a>
 </section>
 
-<section id="dviajeros-section" class="panel hidden">
-
-    <button class="back-button" onclick="goHome()">
-        ← Volver
-    </button>
-
-    <h2>🛬 D'Viajeros</h2>
-
-    <p class="panel-description">
-        Prepara tus datos antes de continuar
-        al portal oficial.
-    </p>
-
-    <form id="dviajeros-form">
-
-        <h3>Información personal</h3>
-
-        <label>
-            Nombre
-            <input type="text" name="first_name" required>
-        </label>
-
-        <label>
-            Apellidos
-            <input type="text" name="last_name" required>
-        </label>
-
-        <label>
-            Nacionalidad
-            <input type="text" name="nationality" required>
-        </label>
-
-        <label>
-            Fecha de nacimiento
-            <input type="date" name="date_of_birth" required>
-        </label>
-
-        <h3>Migración</h3>
-
-        <label>
-            Número de pasaporte
-            <input type="text" name="passport_number" required>
-        </label>
-
-        <label>
-            País emisor del pasaporte
-            <input type="text" name="passport_country" required>
-        </label>
-
-        <label>
-            Fecha de llegada
-            <input type="date" name="arrival_date" required>
-        </label>
-
-        <label>
-            Número de vuelo
-            <input type="text" name="flight_number" required>
-        </label>
-
-        <label>
-            Aerolínea
-            <input type="text" name="airline" required>
-        </label>
-
-        <h3>Información del viaje</h3>
-
-        <label>
-            Alojamiento
-            <input type="text" name="accommodation">
-        </label>
-
-        <label>
-            Dirección en Cuba
-            <input type="text" name="address_in_cuba">
-        </label>
-
-        <label>
-            Motivo del viaje
-            <input type="text" name="purpose_of_trip">
-        </label>
-
-        <h3>Salud</h3>
-
-        <label>
-            Información de salud
-            <textarea
-                name="health_information"
-                rows="3"
-                placeholder="Información que corresponda declarar"
-            ></textarea>
-        </label>
-
-        <h3>Aduana</h3>
-
-        <label>
-            Información aduanal
-            <textarea
-                name="customs_information"
-                rows="3"
-                placeholder="Información que corresponda declarar"
-            ></textarea>
-        </label>
-
-        <button type="submit" class="primary-button">
-            Revisar D'Viajeros
-        </button>
-
-    </form>
-
-    <div id="dviajeros-result" class="result hidden"></div>
-
-    <a
-        class="official-link"
-        href="https://dviajeros.mitrans.gob.cu/"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        Ir al portal oficial D'Viajeros →
-    </a>
-
+<section id="dviajeros-section" class="app-section hidden">
+<button class="back-button">← Volver</button>
+<h2>D'Viajeros</h2>
+<p>Organiza la información antes de entrar al formulario oficial. La aplicación no envía la declaración ni genera el QR oficial.</p>
+<div class="notice"><strong>El proceso se divide en:</strong> información personal → migración → salud → aduana → revisión.</div>
+<form id="dviajeros-form">
+<h3>1. Información personal</h3>
+<div class="grid">
+<div><label>Nombre</label><input name="first_name" required></div>
+<div><label>Apellido</label><input name="last_name" required></div>
+<div><label>Nacionalidad</label><input name="nationality" required></div>
+<div><label>Fecha de nacimiento</label><input name="date_of_birth" type="date" required></div>
+</div>
+<h3>2. Información migratoria</h3>
+<div class="grid">
+<div><label>Número de pasaporte</label><input name="passport_number" required></div>
+<div><label>País del pasaporte</label><input name="passport_country" required></div>
+<div><label>Fecha de llegada</label><input name="arrival_date" type="date" required></div>
+<div><label>Número de vuelo</label><input name="flight_number"></div>
+<div><label>Aerolínea</label><input name="airline"></div>
+<div><label>Alojamiento</label><input name="accommodation"></div>
+</div>
+<label>Dirección en Cuba</label><input name="address_in_cuba">
+<label>Motivo del viaje</label><input name="purpose_of_trip">
+<h3>3. Salud</h3>
+<p class="small">Escribe aquí la información que corresponda al formulario oficial. No inventamos preguntas ni requisitos que no estén verificados.</p>
+<textarea name="health_information" placeholder="Información que corresponda declarar..."></textarea>
+<h3>4. Aduana</h3>
+<p class="small">Prepara aquí la información que corresponda declarar en el formulario oficial.</p>
+<textarea name="customs_information" placeholder="Información que corresponda declarar..."></textarea>
+<h3>5. Revisión</h3>
+<p class="small">Antes de enviar el formulario oficial, comprueba nombres, fecha de nacimiento, pasaporte, llegada y demás datos.</p>
+<button class="primary" type="submit">Revisar preparación</button>
+</form>
+<div id="dviajeros-result" class="result hidden"></div>
+<a id="official-dviajeros" class="official-link" href="https://dviajeros.mitrans.gob.cu/" target="_blank" rel="noopener noreferrer">Portal oficial D'Viajeros →</a>
 </section>
 
-<section class="disclaimer">
-    <strong>Importante</strong>
-
-    <p>
-        CUBA AUTO TRAVEL 2026 es una aplicación
-        informativa y de preparación. No pertenece
-        al Gobierno de Cuba ni a sus autoridades.
-        No emite visas, documentos oficiales ni
-        códigos QR oficiales. La información debe
-        verificarse con las fuentes oficiales.
-    </p>
+<section id="passport-section" class="app-section hidden">
+<button class="back-button">← Volver</button>
+<h2>Revisión básica del pasaporte</h2>
+<p>Copia los datos exactamente como aparecen en el documento físico.</p>
+<div class="notice"><strong>Esta revisión no valida oficialmente el pasaporte.</strong> Solo ayuda a detectar datos faltantes o inconsistencias básicas antes de continuar con el viaje.</div>
+<form id="passport-form">
+<div class="grid">
+<div><label>Nombre</label><input name="first_name" required></div>
+<div><label>Segundo nombre <span class="small">(si corresponde)</span></label><input name="second_name"></div>
+<div><label>Primer apellido</label><input name="first_surname" required></div>
+<div><label>Segundo apellido <span class="small">(si corresponde)</span></label><input name="second_surname"></div>
+<div><label>Fecha de nacimiento</label><input name="date_of_birth" type="date" required></div>
+<div><label>Número de pasaporte</label><input name="passport_number" required></div>
+<div><label>País emisor</label><input name="passport_country" required></div>
+<div><label>Fecha de vencimiento</label><input name="expiration_date" type="date" required></div>
+<div><label>Fecha prevista de viaje <span class="small">(opcional)</span></label><input name="travel_date" type="date"></div>
+</div>
+<button class="primary" type="submit">Revisar pasaporte</button>
+</form>
+<div id="passport-result" class="result hidden"></div>
 </section>
-```
-
+<footer class="legal">CUBA AUTO TRAVEL 2026 es una herramienta independiente de preparación informativa. No pertenece al Gobierno de Cuba, MINREX, autoridad migratoria, aduana ni otra entidad oficial. No emite ni aprueba visas, pasaportes o autorizaciones, no procesa pagos oficiales, no realiza el envío del formulario oficial y no genera el QR oficial de D'Viajeros. Los requisitos y decisiones oficiales deben verificarse directamente con las autoridades y portales oficiales correspondientes.</footer>
 </main>
-
 <script src="/static/app.js"></script>
-
 </body>
 </html>
