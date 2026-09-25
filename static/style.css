@@ -37,7 +37,7 @@ main{padding:28px 0 50px}
 
 .panel{padding:24px;margin-bottom:22px}
 .back-button,.secondary-button{border:1px solid #bdc9d6;background:#fff;color:#234d73;border-radius:9px;padding:10px 15px;font-weight:700}
-.back-button:hover,.secondary-button:hover
+.back-button:hover,.secondary-button:hover{background:#f3f6f9}
 .back-button:disabled{opacity:.45;cursor:not-allowed}
 
 .section-heading{display:flex;align-items:center;gap:15px;margin:20px 0}
@@ -64,18 +64,18 @@ main{padding:28px 0 50px}
 
 .practice-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0}
 .practice-options button,.choice-card{border:2px solid #d7e0e8;background:#fff;border-radius:13px;padding:16px;text-align:left;min-height:90px;transition:.15s}
-.practice-options button:hover,.choice-card:hover
+.practice-options button:hover,.choice-card:hover{border-color:#8daeca;background:#f9fbfe}
 .practice-options button.selected,.choice-card.selected{border-color:#123b63;background:#f2f7fb}
 
 .practice-input-area{margin:18px 0}
 .practice-input-area label,.practice-field label,.field-label{font-weight:700;display:block;margin-bottom:7px}
 .practice-input-area input,.practice-input-area textarea,.practice-field input,.practice-field textarea{width:100%;border:1px solid #c4cfda;border-radius:9px;padding:12px;background:#fff}
 .practice-input-area textarea,.practice-field textarea{min-height:90px;resize:vertical}
-.practice-input-area input:focus,.practice-input-area textarea:focus,.practice-field input:focus,.practice-field textarea:focus
+.practice-input-area input:focus,.practice-input-area textarea:focus,.practice-field input:focus,.practice-field textarea:focus{outline:2px solid #8bb8e8;border-color:#4c89c7}
 
 .practice-actions,.review-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
 .primary-button,.official-button{display:inline-block;border:0;border-radius:9px;background:#1261a0;color:#fff;padding:11px 17px;font-weight:800;text-decoration:none}
-.primary-button:hover,.official-button:hover
+.primary-button:hover,.official-button:hover{opacity:.9}
 
 .practice-badge{display:inline-block;background:#eef4f9;color:#123b63;border-radius:20px;padding:7px 12px;font-size:12px;font-weight:800}
 .practice-visual{margin:20px 0;border:1px solid #dbe3eb;border-radius:14px;overflow:hidden;background:#f7f9fb}
@@ -103,7 +103,7 @@ main{padding:28px 0 50px}
 
 .practice-review{border:1px solid #dce4ec;border-radius:11px;overflow:hidden;margin:18px 0}
 .review-row{display:grid;grid-template-columns:minmax(160px,32%) 1fr;gap:15px;padding:12px 14px;border-bottom:1px solid #e5eaf0}
-.review-row:last-child
+.review-row:last-child{border-bottom:0}
 .review-row small{display:block;color:#6a7786}
 .review-row span{overflow-wrap:anywhere}
 
@@ -156,5 +156,3 @@ main{padding-top:18px}
 .traveler-guide{grid-template-columns:1fr}
 .large-icon{font-size:34px}
 }
-
-EOF
