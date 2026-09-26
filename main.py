@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from schemas import VisaRequest,DViajerosRequest,PassportRequest
 
-BASE_DIR=Path(**file**).resolve().parent
+BASE_DIR=Path(__file__).resolve().parent
 DATA_DIR=BASE_DIR/"data"
 STATIC_DIR=BASE_DIR/"static"
 
