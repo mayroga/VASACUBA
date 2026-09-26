@@ -1,218 +1,578 @@
-const state={lang:"es",page:"home",visaStep:0,dviajerosStep:0,visaSimStep:0,dSimStep:0,airport:"MIA",destination:"HAV",data:{},sim:{visa:{},d:{}},token:"",expiresAt:0,access:false,accessType:"",timer:null,config:null};
-const T={es:{brandSub:"Guía práctica para viajar preparado",heroTitle:"¿Vas a viajar a Cuba?",heroText:"No tengas miedo a la visa ni a D'Viajeros. Te mostramos qué revisar y dónde hacer cada trámite.",visaButton:"HACER / REVISAR MI VISA",dviajerosButton:"HACER D'VIAJEROS",privacyNote:"No necesitas guardar aquí los datos de tu pasaporte. Usa esta aplicación como guía y realiza los trámites en los sitios oficiales.",quickVisa:"Visa",quickVisaText:"Qué revisar antes de solicitarla",quickDviajerosText:"Formulario digital paso a paso",quickFlights:"Vuelos",quickFlightsText:"Busca vuelos y opciones a Cuba",trainingTitle:"APRENDE ANTES DE HACERLO",trainingText:"Practica primero con una simulación. Así llegarás al formulario oficial sabiendo qué vas a encontrar.",practiceVisa:"Practicar la Visa",practiceVisaText:"Mira y practica los campos antes de entrar a eVisa Cuba.",practiceD:"Practicar D'Viajeros",practiceDText:"Aprende el orden de los datos antes de abrir D'Viajeros.",startPractice:"COMENZAR PRÁCTICA →",back:"← Volver",important:"IMPORTANTE",tutorial:"GUÍA PASO A PASO",followSteps:"Sigue cada paso con calma.",previous:"ANTERIOR",next:"SIGUIENTE",checkBefore:"✓ Revisa antes de enviar",openOfficial:"ABRIR SITIO OFICIAL",openOfficialD:"ABRIR D'VIAJEROS",visaTitle:"Visa para viajar a Cuba",dviajerosTitle:"D' Viajeros paso a paso",visaWarning:"Revisa siempre los requisitos oficiales antes de enviar una solicitud.",dviajerosWarning:"Completa la información con cuidado y conserva el código QR.",officialVisaTitle:"Portal oficial eVisa Cuba",officialVisaText:"Realiza la solicitud directamente en el sitio oficial.",officialDTitle:"Sitio oficial D'Viajeros",officialDText:"Completa el formulario directamente en el sitio oficial.",flightsTitle:"Busca tu vuelo",flightsIntro:"Compara opciones y confirma siempre ruta, fecha, precio y condiciones directamente con el proveedor.",routeSearch:"Buscar ruta",searchFlights:"BUSCAR VUELOS",chartersTitle:"Opciones de vuelos charter",usWarningTitle:"SI VIAJAS DESDE EE. UU.",usWarningText:"Las reglas estadounidenses para viajar a Cuba desde o a través de EE. UU. tienen requisitos específicos. Verifica tu categoría autorizada y las condiciones actuales antes de comprar.",finalTitle:"Antes de viajar",finalIntro:"Haz una última revisión antes de salir.",final1:"Pasaporte revisado",final2:"Visa revisada",final3:"Seguro de viaje revisado",final4:"D'Viajeros completado",final5:"Código QR guardado",final6:"Vuelo y documentos revisados",reviewVisa:"REVISAR VISA",reviewD:"REVISAR D'VIAJEROS",legalTitle:"AVISO LEGAL",legalCompany:"MAY ROGA LLC — empresa de apoyo de CUBA AUTO TRAVEL 2026",legalCompanyShort:"MAY ROGA LLC — empresa de apoyo",legalText:"CUBA AUTO TRAVEL 2026 es una aplicación informativa independiente. MAY ROGA LLC proporciona apoyo para el desarrollo y funcionamiento de esta guía, pero no es una agencia gubernamental ni representa al Gobierno de Cuba, embajadas, consulados, autoridades migratorias, eVisa Cuba, D'Viajeros, aerolíneas ni otras entidades oficiales.",legalResponsibility:"MAY ROGA LLC y CUBA AUTO TRAVEL 2026 no emiten, aprueban ni garantizan visas, permisos de entrada, códigos QR, vuelos, reservas, precios, seguros ni admisión a Cuba. La información puede cambiar. El viajero debe verificar los requisitos directamente con las fuentes oficiales y proveedores correspondientes.",legalAdvice:"Esta aplicación ofrece información general y orientación práctica. No constituye asesoría legal, migratoria, consular, financiera, médica ni una garantía de viaje.",legalPrivacy:"No introduzcas aquí información sensible que no sea necesaria. Cuando un trámite requiera datos personales, utiliza directamente el sitio oficial correspondiente.",legalLinks:"Aviso legal",footerText:"Guía informativa independiente para pasajeros.",simulation:"SIMULACIÓN — NO ES EL FORMULARIO OFICIAL",simulationText:"Usa datos de ejemplo. No introduzcas aquí datos reales de tu pasaporte.",visaPracticeTitle:"Practica la Visa antes de solicitarla",visaPracticeIntro:"Esta pantalla es una simulación para que conozcas el orden de los campos. No es eVisa Cuba y no envía información.",watchVisa:"Mira primero",watchVisaText:"Conoce el proceso antes de comenzar.",visaVideoTitle:"Tutorial de Visa Cuba",visaVideoText:"Puedes consultar tutoriales y explicaciones sobre el proceso antes de entrar al portal oficial.",watchYoutube:"VER TUTORIALES EN YOUTUBE",visaSimTitle:"Solicitud de visa — práctica",stepWord:"PASO",tip:"CONSEJO:",practiceTip:"Cuando llegues al sitio oficial, ten tu pasaporte delante y escribe los datos exactamente como aparecen en él.",dPracticeTitle:"Practica D'Viajeros antes de abrirlo",dPracticeIntro:"Aprende el orden y el tipo de información que encontrarás. Esta es una simulación y no envía nada al sistema oficial.",watchD:"Mira primero",watchDText:"Observa el proceso antes de comenzar.",dVideoTitle:"Tutorial D'Viajeros",dVideoText:"Consulta videos explicativos y familiarízate con el formulario antes de completarlo.",dSimTitle:"D'Viajeros — práctica",dPracticeTip:"Ten a mano pasaporte, vuelo y datos del viaje. La práctica no guarda ni envía lo que escribas.",savePractice:"GUARDAR PRÁCTICA",clearPractice:"BORRAR PRÁCTICA",savedPractice:"Práctica guardada en este dispositivo.",clearedPractice:"Práctica borrada.",reviewPractice:"REVISAR DATOS",transcribePractice:"LISTO PARA PASAR AL OFICIAL",optional:"OPCIONAL",required:"OBLIGATORIO",homeDVideoTitle:"CÓMO HACER D'VIAJEROS",homeDVideoText:"Mira un tutorial paso a paso antes de completar el formulario.",homeVisaVideoTitle:"CÓMO HACER LA VISA",homeVisaVideoText:"Mira tutoriales sobre cómo completar la solicitud de visa antes de entrar a eVisa Cuba.",homeWatchVideo:"VER VIDEO →",accessTitle:"CUBA AUTO TRAVEL 2026",accessText:"Accede al servicio para utilizar la guía completa.",payTitle:"PAGO ÚNICO",payText:"Acceso al servicio por 18 minutos.",payButton:"PAGAR $20 Y ENTRAR",adminTitle:"Acceso",username:"Usuario",password:"Contraseña",login:"ENTRAR",close:"CERRAR",wrongLogin:"Usuario o contraseña incorrectos.",paymentChecking:"Verificando el pago...",paymentApproved:"Pago aprobado. Acceso activado.",paymentError:"No fue posible verificar el pago.",expired:"El acceso ha terminado.",remaining:"Tiempo restante"},en:{brandSub:"Practical guide to travel prepared",heroTitle:"Are you traveling to Cuba?",heroText:"Don't be afraid of the visa or D'Viajeros. We show you what to check and where to complete each process.",visaButton:"DO / REVIEW MY VISA",dviajerosButton:"DO D'VIAJEROS",privacyNote:"You do not need to store your passport information here. Use this app as a guide and complete official procedures on official websites.",quickVisa:"Visa",quickVisaText:"What to check before applying",quickDviajerosText:"Digital form step by step",quickFlights:"Flights",quickFlightsText:"Search flights and options to Cuba",trainingTitle:"LEARN BEFORE YOU DO IT",trainingText:"Practice first with a simulation so you know what to expect when you open the official form.",practiceVisa:"Practice the Visa",practiceVisaText:"See and practice the fields before opening Cuba eVisa.",practiceD:"Practice D'Viajeros",practiceDText:"Learn the order of the information before opening D'Viajeros.",startPractice:"START PRACTICE →",back:"← Back",important:"IMPORTANT",tutorial:"STEP-BY-STEP GUIDE",followSteps:"Follow each step calmly.",previous:"PREVIOUS",next:"NEXT",checkBefore:"✓ Check before submitting",openOfficial:"OPEN OFFICIAL SITE",openOfficialD:"OPEN D'VIAJEROS",visaTitle:"Visa to travel to Cuba",dviajerosTitle:"D'Viajeros step by step",visaWarning:"Always check official requirements before submitting an application.",dviajerosWarning:"Complete the information carefully and keep your QR code.",officialVisaTitle:"Official Cuba eVisa portal",officialVisaText:"Submit your application directly on the official website.",officialDTitle:"Official D'Viajeros website",officialDText:"Complete the form directly on the official website.",flightsTitle:"Find your flight",flightsIntro:"Compare options and always confirm route, date, price and conditions directly with the provider.",routeSearch:"Search route",searchFlights:"SEARCH FLIGHTS",chartersTitle:"Charter flight options",usWarningTitle:"IF YOU TRAVEL FROM THE U.S.",usWarningText:"U.S. rules for travel to Cuba from or through the U.S. have specific requirements. Verify your authorized category and current conditions before purchasing.",finalTitle:"Before traveling",finalIntro:"Do one final review before leaving.",final1:"Passport checked",final2:"Visa checked",final3:"Travel insurance checked",final4:"D'Viajeros completed",final5:"QR code saved",final6:"Flight and documents checked",reviewVisa:"REVIEW VISA",reviewD:"REVIEW D'VIAJEROS",legalTitle:"LEGAL NOTICE",legalCompany:"MAY ROGA LLC — support company for CUBA AUTO TRAVEL 2026",legalCompanyShort:"MAY ROGA LLC — support company",legalText:"CUBA AUTO TRAVEL 2026 is an independent informational application. MAY ROGA LLC provides support for the development and operation of this guide, but it is not a government agency and does not represent the Cuban Government, embassies, consulates, immigration authorities, Cuba eVisa, D'Viajeros, airlines or other official entities.",legalResponsibility:"MAY ROGA LLC and CUBA AUTO TRAVEL 2026 do not issue, approve or guarantee visas, entry permits, QR codes, flights, reservations, prices, insurance or admission to Cuba. Information may change. Travelers must verify requirements directly with official sources and the applicable providers.",legalAdvice:"This application provides general information and practical guidance. It is not legal, immigration, consular, financial or medical advice and does not guarantee travel.",legalPrivacy:"Do not enter unnecessary sensitive information here. When a procedure requires personal data, use the corresponding official website directly.",legalLinks:"Legal notice",footerText:"Independent informational guide for travelers.",simulation:"SIMULATION — NOT THE OFFICIAL FORM",simulationText:"Use example information. Do not enter real passport information here.",visaPracticeTitle:"Practice the Visa before applying",visaPracticeIntro:"This screen is a simulation so you can learn the order of the fields. It is not Cuba eVisa and sends no information.",watchVisa:"WATCH FIRST",watchVisaText:"Learn the process before starting.",visaVideoTitle:"Cuba Visa Tutorial",visaVideoText:"You can review tutorials and explanations before entering the official portal.",watchYoutube:"WATCH YOUTUBE TUTORIALS",visaSimTitle:"Visa application — practice",stepWord:"STEP",tip:"TIP:",practiceTip:"When you reach the official website, keep your passport in front of you and enter the information exactly as it appears.",dPracticeTitle:"Practice D'Viajeros before opening it",dPracticeIntro:"Learn the order and type of information you will find. This is a simulation and sends nothing to the official system.",watchD:"WATCH FIRST",watchDText:"Observe the process before starting.",dVideoTitle:"D'Viajeros Tutorial",dVideoText:"Review explanatory videos and become familiar with the form before completing it.",dSimTitle:"D'Viajeros — practice",dPracticeTip:"Have your passport, flight and trip information ready. The practice does not store or send what you enter.",savePractice:"SAVE PRACTICE",clearPractice:"CLEAR PRACTICE",savedPractice:"Practice saved on this device.",clearedPractice:"Practice cleared.",reviewPractice:"REVIEW DATA",transcribePractice:"READY FOR OFFICIAL FORM",optional:"OPTIONAL",required:"REQUIRED",homeDVideoTitle:"HOW TO COMPLETE D'VIAJEROS",homeDVideoText:"Watch a step-by-step tutorial before completing the form.",homeVisaVideoTitle:"HOW TO APPLY FOR THE VISA",homeVisaVideoText:"Watch tutorials on completing the visa application before opening Cuba eVisa.",homeWatchVideo:"WATCH VIDEO →",accessTitle:"CUBA AUTO TRAVEL 2026",accessText:"Access the service to use the complete guide.",payTitle:"ONE-TIME PAYMENT",payText:"Service access for 18 minutes.",payButton:"PAY $20 AND ENTER",adminTitle:"Access",username:"Username",password:"Password",login:"ENTER",close:"CLOSE",wrongLogin:"Incorrect username or password.",paymentChecking:"Checking payment...",paymentApproved:"Payment approved. Access activated.",paymentError:"Payment could not be verified.",expired:"Access has ended.",remaining:"Time remaining"}};
-const visaSim={es:[["country","País donde solicita","Ejemplo: Estados Unidos","select","required"],["consulate","Consulado","Ejemplo: Consulado correspondiente","select","required"],["nationality","Nacionalidad","Ejemplo: Estados Unidos","select","required"],["passport","Pasaporte","Ejemplo: X12345678","text","required"],["given","Nombre","Ejemplo: JUAN CARLOS","text","required"],["middle","Segundo nombre","Ejemplo: ANDRES","text","optional"],["surname","Primer apellido","Ejemplo: GARCIA","text","required"],["surname2","Segundo apellido","Ejemplo: RODRIGUEZ","text","optional"],["birth","Fecha de nacimiento","Ejemplo: 15/05/1985","text","required"],["email","Correo electrónico","Ejemplo: [ejemplo@email.com](mailto:ejemplo@email.com)","email","required"],["email2","Repita el correo electrónico","Ejemplo: [ejemplo@email.com](mailto:ejemplo@email.com)","email","required"],["sex","Sexo o género","Selecciona una opción","select","required"],["phone","Teléfono","Ejemplo: +1 305 555 0000","text","optional"]],en:[["country","Country where you apply","Example: United States","select","required"],["consulate","Consulate","Example: Corresponding consulate","select","required"],["nationality","Nationality","Example: United States","select","required"],["passport","Passport","Example: X12345678","text","required"],["given","First name","Example: JUAN CARLOS","text","required"],["middle","Middle name","Example: ANDRES","text","optional"],["surname","First surname","Example: GARCIA","text","required"],["surname2","Second surname","Example: RODRIGUEZ","text","optional"],["birth","Date of birth","Example: 05/15/1985","text","required"],["email","Email address","Example: [example@email.com](mailto:example@email.com)","email","required"],["email2","Repeat email address","Example: [example@email.com](mailto:example@email.com)","email","required"],["sex","Sex or gender","Select an option","select","required"],["phone","Phone number","Example: +1 305 555 0000","text","optional"]]};
-const dSim={es:[["name","Nombre","Ejemplo: JUAN","text","required"],["surname","Apellidos","Ejemplo: GARCIA","text","required"],["passport","Pasaporte","Ejemplo: X12345678","text","required"],["birth","Fecha de nacimiento","Ejemplo: 15/05/1985","text","required"],["nationality","Nacionalidad","Ejemplo: Estados Unidos","text","required"],["flight","Vuelo","Ejemplo: AA123","text","required"],["travelDate","Fecha del viaje","Ejemplo: 15/10/2026","text","required"],["destination","Destino","Ejemplo: La Habana","text","required"],["review","Revisión final","Comprueba todos los datos antes de finalizar","review","required"]],en:[["name","First name","Example: JUAN","text","required"],["surname","Surname","Example: GARCIA","text","required"],["passport","Passport","Example: X12345678","text","required"],["birth","Date of birth","Example: 05/15/1985","text","required"],["nationality","Nationality","Example: United States","text","required"],["flight","Flight","Example: AA123","text","required"],["travelDate","Travel date","Example: 10/15/2026","text","required"],["destination","Destination","Example: Havana","text","required"],["review","Final review","Check all information before finishing","review","required"]]};
+const state={lang:"es",page:"home",visaStep:0,dviajerosStep:0,visaSimStep:0,dSimStep:0,airport:"MIA",destination:"HAV",data:{},sim:{visa:{},d:{}}};
 
-function qs(s){return document.querySelector(s)}
-function qsa(s){return[...document.querySelectorAll(s)]}
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+const T={
+es:{
+homeTitle:"CUBA AUTO TRAVEL 2026",
+homeSubtitle:"Guía práctica para viajar a Cuba",
+homeText:"Revisa tu pasaporte, visa y D'Viajeros paso a paso. También puedes consultar vuelos y opciones de viaje.",
+visa:"VISA",
+dviajeros:"D'VIAJEROS",
+passport:"PASAPORTE",
+flights:"VUELOS",
+guides:"GUÍAS",
+official:"SITIO OFICIAL",
+how:"¿CÓMO SE HACE?",
+back:"VOLVER",
+next:"SIGUIENTE",
+previous:"ANTERIOR",
+finish:"TERMINAR",
+check:"REVISAR",
+open:"ABRIR",
+language:"ENGLISH",
+visaTitle:"Visa para viajar a Cuba",
+visaText:"Revisa los pasos antes de entrar al formulario oficial.",
+dviajerosTitle:"D'Viajeros paso a paso",
+dviajerosText:"Completa el formulario digital y conserva tu comprobante y código QR.",
+passportTitle:"Pasaporte para viajar a Cuba",
+passportText:"Revisa tus datos y la vigencia antes de comenzar.",
+flightTitle:"Vuelos a Cuba",
+flightText:"Consulta vuelos regulares, opciones charter y destinos.",
+guideTitle:"Guías paso a paso",
+guideText:"Información sencilla para revisar cada proceso.",
+requirements:"REQUISITOS",
+steps:"PASOS",
+checklist:"LISTA DE REVISIÓN",
+important:"IMPORTANTE",
+sources:"FUENTES",
+flightSearch:"BUSCAR VUELOS",
+airport:"SALIDA",
+destination:"DESTINO",
+providers:"OPCIONES DE VUELO",
+charters:"CHARTERS",
+legal:"AVISO",
+legalText:"CUBA AUTO TRAVEL 2026 es una guía informativa independiente. No pertenece al Gobierno de Cuba, a eVisa Cuba, a D'Viajeros ni a ninguna aerolínea. Verifica siempre la información vigente en las fuentes oficiales.",
+practice:"PRACTICAR",
+practiceVisa:"PRACTICAR VISA",
+practiceD:"PRACTICAR D'VIAJEROS",
+practiceText:"Practica la revisión de los datos antes de completar un formulario real.",
+first:"PRIMERO",
+answer:"RESPUESTA",
+correct:"CORRECTO",
+review:"REVISA DE NUEVO",
+done:"LISTO",
+homeButton:"EMPEZAR",
+noData:"No se pudo cargar la información.",
+officialVisa:"ABRIR VISA OFICIAL",
+officialD:"ABRIR D'VIAJEROS",
+officialCuba:"VER INFORMACIÓN OFICIAL",
+visaStep1:"Revisa tu pasaporte",
+visaStep2:"Prepara tus datos",
+visaStep3:"Entra al sitio oficial",
+visaStep4:"Completa la solicitud",
+visaStep5:"Revisa antes de enviar",
+visaStep6:"Conserva la información",
+dStep1:"Entra a D'Viajeros",
+dStep2:"Selecciona el idioma",
+dStep3:"Completa tus datos",
+dStep4:"Completa los datos del viaje",
+dStep5:"Revisa todo",
+dStep6:"Finaliza el formulario",
+dStep7:"Guarda el QR",
+},
+en:{
+homeTitle:"CUBA AUTO TRAVEL 2026",
+homeSubtitle:"Practical guide for traveling to Cuba",
+homeText:"Review your passport, visa and D'Viajeros step by step. You can also check flights and travel options.",
+visa:"VISA",
+dviajeros:"D'VIAJEROS",
+passport:"PASSPORT",
+flights:"FLIGHTS",
+guides:"GUIDES",
+official:"OFFICIAL WEBSITE",
+how:"HOW DO I DO IT?",
+back:"BACK",
+next:"NEXT",
+previous:"PREVIOUS",
+finish:"FINISH",
+check:"REVIEW",
+open:"OPEN",
+language:"ESPAÑOL",
+visaTitle:"Visa to travel to Cuba",
+visaText:"Review the steps before opening the official form.",
+dviajerosTitle:"D'Viajeros step by step",
+dviajerosText:"Complete the digital form and keep your confirmation and QR code.",
+passportTitle:"Passport for travel to Cuba",
+passportText:"Check your information and validity before starting.",
+flightTitle:"Flights to Cuba",
+flightText:"Check regular flights, charter options and destinations.",
+guideTitle:"Step-by-step guides",
+guideText:"Simple information to review each process.",
+requirements:"REQUIREMENTS",
+steps:"STEPS",
+checklist:"REVIEW CHECKLIST",
+important:"IMPORTANT",
+sources:"SOURCES",
+flightSearch:"SEARCH FLIGHTS",
+airport:"DEPARTURE",
+destination:"DESTINATION",
+providers:"FLIGHT OPTIONS",
+charters:"CHARTERS",
+legal:"NOTICE",
+legalText:"CUBA AUTO TRAVEL 2026 is an independent informational guide. It is not part of the Cuban Government, Cuba eVisa, D'Viajeros or any airline. Always verify current information with official sources.",
+practice:"PRACTICE",
+practiceVisa:"PRACTICE VISA",
+practiceD:"PRACTICE D'VIAJEROS",
+practiceText:"Practice reviewing your information before completing a real form.",
+first:"FIRST",
+answer:"ANSWER",
+correct:"CORRECT",
+review:"REVIEW AGAIN",
+done:"DONE",
+homeButton:"START",
+noData:"The information could not be loaded.",
+officialVisa:"OPEN OFFICIAL VISA",
+officialD:"OPEN D'VIAJEROS",
+officialCuba:"VIEW OFFICIAL INFORMATION",
+visaStep1:"Check your passport",
+visaStep2:"Prepare your information",
+visaStep3:"Open the official website",
+visaStep4:"Complete the application",
+visaStep5:"Review before submitting",
+visaStep6:"Keep your visa information",
+dStep1:"Open D'Viajeros",
+dStep2:"Choose your language",
+dStep3:"Enter your information",
+dStep4:"Enter trip information",
+dStep5:"Review everything",
+dStep6:"Finish the form",
+dStep7:"Save the QR",
+}
+};
 
-function saveAccess(token,seconds,kind){
- const s=Math.max(0,Math.min(Number(seconds)||1080,1080));
- if(!token||s<=0)return false;
- state.token=token;state.expiresAt=Date.now()+s*1000;state.access=true;state.accessType=kind||"paid";
- try{sessionStorage.setItem("cat_access_token",token);sessionStorage.setItem("cat_access_expires",String(state.expiresAt));sessionStorage.setItem("cat_access_type",state.accessType)}catch(e){}
- startAccessTimer();
- return true
-}
-function clearAccess(){
- state.token="";state.expiresAt=0;state.access=false;state.accessType="";
- if(state.timer)clearInterval(state.timer);
- state.timer=null;
- try{sessionStorage.removeItem("cat_access_token");sessionStorage.removeItem("cat_access_expires");sessionStorage.removeItem("cat_access_type")}catch(e){}
-}
-function startAccessTimer(){
- if(state.timer)clearInterval(state.timer);
- state.timer=setInterval(()=>{
-  const left=Math.max(0,state.expiresAt-Date.now());
-  const el=qs("#catTimer");
-  if(el){const s=Math.ceil(left/1000),m=Math.floor(s/60),x=s%60;el.textContent=`${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}`}
-  if(left<=0){clearAccess();showAccessGate(true)}
- },1000)
-}
-function showAccessGate(expired=false){
- const g=qs("#catAccessGate"),app=qs("#app"),pages=qsa(".page");
- if(g)g.hidden=false;
- if(app)app.hidden=true;
- pages.forEach(p=>p.style.pointerEvents="none");
- if(expired)setAccessMessage(T[state.lang].expired,true)
-}
-function hideAccessGate(){
- const g=qs("#catAccessGate"),app=qs("#app");
- if(g)g.hidden=true;
- if(app)app.hidden=false;
- qsa(".page").forEach(p=>p.style.pointerEvents="");
- state.access=true
-}
-function setAccessMessage(message,error=false){
- const e=qs("#catAccessMessage");
- if(e){e.textContent=message||"";e.classList.toggle("error",!!error)}
-}
-function createGate(){
- if(qs("#catAccessGate"))return;
- const g=document.createElement("section");
- g.id="catAccessGate";
- g.className="access-gate";
- g.innerHTML=`<div class="access-card"><div class="access-brand">${T[state.lang].accessTitle}</div><h1>${T[state.lang].payTitle}</h1><p>${T[state.lang].accessText}</p><p>${T[state.lang].payText}</p><button id="catPayBtn" class="primary" type="button">${T[state.lang].payButton}</button><div id="catAccessMessage" aria-live="polite"></div><div id="catAdminPanel" hidden><h2>${T[state.lang].adminTitle}</h2><input id="catUsername" type="text" autocomplete="username" placeholder="${T[state.lang].username}"><input id="catPassword" type="password" autocomplete="current-password" placeholder="${T[state.lang].password}"><button id="catLoginBtn" class="secondary" type="button">${T[state.lang].login}</button><button id="catCloseAdmin" class="secondary" type="button">${T[state.lang].close}</button></div><div id="catTimerWrap" hidden><span>${T[state.lang].remaining}</span> <strong id="catTimer">18:00</strong></div></div>`;
- document.body.prepend(g);
- qs("#catPayBtn")?.addEventListener("click",startCheckout);
- qs("#catLoginBtn")?.addEventListener("click",adminLogin);
- qs("#catCloseAdmin")?.addEventListener("click",()=>{const p=qs("#catAdminPanel");if(p)p.hidden=true});
- let taps=0,last=0;
- g.addEventListener("pointerup",e=>{
-  if(e.target.closest("button,input,a,select,textarea"))return;
-  const now=Date.now();
-  if(now-last>850)taps=0;
-  taps++;last=now;
-  if(taps>=3){taps=0;openAdmin()}
- })
-}
-function openAdmin(){
- const p=qs("#catAdminPanel");
- if(p){p.hidden=false;qs("#catUsername")?.focus()}
-}
-async function getAuthConfig(){
- try{
-  const r=await fetch("/api/auth/config",{cache:"no-store"});
-  const d=await r.json().catch(()=>({}));
-  if(r.ok)state.config=d
- }catch(e){console.warn("Auth config:",e)}
-}
-async function startCheckout(){
- const b=qs("#catPayBtn");
- if(b)b.disabled=true;
- setAccessMessage(T[state.lang].paymentChecking);
- try{
-  const r=await fetch("/api/auth/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok||!d.url)throw new Error(d.detail||T[state.lang].paymentError);
-  window.location.href=d.url
- }catch(e){
-  console.warn("Stripe checkout:",e);
-  setAccessMessage(e.message||T[state.lang].paymentError,true);
-  if(b)b.disabled=false
- }
-}
-async function verifyStripeReturn(){
- const params=new URLSearchParams(window.location.search),sid=params.get("stripe_session_id");
- if(!sid)return false;
- setAccessMessage(T[state.lang].paymentChecking);
- try{
-  const r=await fetch("/api/auth/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:sid})});
-  const d=await r.json().catch(()=>({}));
-  const token=d.access_token||d.token||"";
-  if(!r.ok||!token)throw new Error(d.detail||T[state.lang].paymentError);
-  if(!saveAccess(token,Number(d.expires_in||d.remaining_seconds||1080),d.kind||"paid"))throw new Error(T[state.lang].paymentError);
-  setAccessMessage(T[state.lang].paymentApproved);
-  window.history.replaceState({},document.title,window.location.pathname);
-  hideAccessGate();
-  await loadData();
-  return true
- }catch(e){
-  console.warn("Stripe verify:",e);
-  setAccessMessage(e.message||T[state.lang].paymentError,true);
-  return false
- }
-}
-async function adminLogin(){
- const u=qs("#catUsername"),p=qs("#catPassword"),b=qs("#catLoginBtn");
- const username=u?.value?.trim()||"",password=p?.value||"";
- if(!username||!password){setAccessMessage(T[state.lang].wrongLogin,true);return}
- if(b)b.disabled=true;
- try{
-  const r=await fetch("/api/auth/admin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password})});
-  const d=await r.json().catch(()=>({}));
-  const token=d.access_token||d.token||"";
-  if(!r.ok||!token){
-   console.warn("Admin login:",r.status,d);
-   setAccessMessage(d.detail||T[state.lang].wrongLogin,true);
-   return
-  }
-  if(!saveAccess(token,Number(d.expires_in||d.remaining_seconds||1080),d.kind||"admin")){
-   setAccessMessage(T[state.lang].wrongLogin,true);
-   return
-  }
-  hideAccessGate();
-  await loadData()
- }catch(e){
-  console.warn("Admin login:",e);
-  setAccessMessage(T[state.lang].wrongLogin,true)
- }finally{
-  if(b)b.disabled=false
- }
-}
-async function validateStoredAccess(){
- let token="",expires=0;
- try{
-  token=sessionStorage.getItem("cat_access_token")||"";
-  expires=Number(sessionStorage.getItem("cat_access_expires")||0)
- }catch(e){}
- if(!token||!expires||expires<=Date.now())return false;
- try{
-  const r=await fetch("/api/auth/check",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
-  if(!r.ok)return false;
-  const d=await r.json();
-  if(!d.valid||Number(d.remaining_seconds)<=0)return false;
-  return saveAccess(token,Number(d.remaining_seconds),d.kind||sessionStorage.getItem("cat_access_type")||"paid")
- }catch(e){return false}
-}
-async function authorizedFetch(url,options={}){
- const headers={...(options.headers||{})};
- if(state.token)headers.Authorization=`Bearer ${state.token}`;
- const r=await fetch(url,{...options,headers});
- if(r.status===401||r.status===403){
-  clearAccess();
-  showAccessGate(true)
- }
- return r
+const visaSim=[
+{q:{es:"¿Qué debes revisar primero?",en:"What should you check first?"},a:{es:"Tu pasaporte",en:"Your passport"}},
+{q:{es:"¿Dónde debes comenzar la solicitud?",en:"Where should you begin the application?"},a:{es:"En el sitio oficial",en:"On the official website"}},
+{q:{es:"¿Cómo debes escribir tus datos?",en:"How should you enter your information?"},a:{es:"Exactamente como aparecen en tu pasaporte",en:"Exactly as they appear on your passport"}}
+];
+
+const dSim=[
+{q:{es:"¿Dónde debes completar D'Viajeros?",en:"Where should you complete D'Viajeros?"},a:{es:"En el sitio oficial",en:"On the official website"}},
+{q:{es:"¿Qué debes revisar antes de finalizar?",en:"What should you review before finishing?"},a:{es:"Todos los datos",en:"All information"}},
+{q:{es:"¿Qué debes conservar al terminar?",en:"What should you keep after finishing?"},a:{es:"El comprobante y código QR",en:"The confirmation and QR code"}}
+];
+
+const qs=s=>document.querySelector(s);
+const qsa=s=>Array.from(document.querySelectorAll(s));
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&","<":"<",">":">",'"':""","'":"'"}[m]));
+
+function t(k){return T[state.lang][k]||T.es[k]||k}
+
+function applyLanguage(){
+document.documentElement.lang=state.lang;
+qsa("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+qsa("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
+const btn=qs("#languageBtn");
+if(btn)btn.textContent=t("language");
+render();
 }
 
-function applyLanguage(){document.documentElement.lang=state.lang;const t=T[state.lang];qsa("[data-i18n]").forEach(e=>{const k=e.dataset.i18n;if(t[k]!==undefined)e.textContent=t[k]});const lb=qs("#languageBtn");if(lb)lb.textContent=state.lang==="es"?"ENGLISH":"ESPAÑOL";renderSim("visa");renderSim("d")}
-function showPage(id){qsa(".page").forEach(p=>p.classList.toggle("active",p.id===id));state.page=id;window.scrollTo({top:0,behavior:"smooth"});if(id==="visa")renderGuide("visa");if(id==="dviajeros")renderGuide("dviajeros");if(id==="visaPractice")renderSim("visa");if(id==="dPractice")renderSim("d")}
-function bind(){qsa("[data-go]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.go)));const languageBtn=qs("#languageBtn");if(languageBtn)languageBtn.addEventListener("click",()=>{state.lang=state.lang==="es"?"en":"es";applyLanguage();renderAll()});qs("#visaPrev")?.addEventListener("click",()=>moveGuide("visa",-1));qs("#visaNext")?.addEventListener("click",()=>moveGuide("visa",1));qs("#dviajerosPrev")?.addEventListener("click",()=>moveGuide("dviajeros",-1));qs("#dviajerosNext")?.addEventListener("click",()=>moveGuide("dviajeros",1));qs("#visaSimPrev")?.addEventListener("click",()=>moveSim("visa",-1));qs("#visaSimNext")?.addEventListener("click",()=>moveSim("visa",1));qs("#dSimPrev")?.addEventListener("click",()=>moveSim("d",-1));qs("#dSimNext")?.addEventListener("click",()=>moveSim("d",1));qs("#saveVisaPractice")?.addEventListener("click",()=>savePractice("visa"));qs("#clearVisaPractice")?.addEventListener("click",()=>clearPractice("visa"));qs("#saveDPractice")?.addEventListener("click",()=>savePractice("d"));qs("#clearDPractice")?.addEventListener("click",()=>clearPractice("d"))}
+function showPage(page){
+state.page=page;
+qsa(".page").forEach(p=>p.classList.toggle("active",p.id===`page-${page}`));
+qsa("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+window.scrollTo({top:0,behavior:"smooth"});
+render();
+}
+
+function bind(){
+qsa("[data-page]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.page)));
+const languageBtn=qs("#languageBtn");
+if(languageBtn)languageBtn.addEventListener("click",()=>{
+state.lang=state.lang==="es"?"en":"es";
+try{localStorage.setItem("cat_lang",state.lang)}catch(e){}
+applyLanguage();
+});
+qsa("[data-back]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.back||"home")));
+qsa("[data-official]").forEach(el=>el.addEventListener("click",()=>{
+const url=el.dataset.official;
+if(url)window.open(url,"_blank","noopener,noreferrer");
+}));
+document.addEventListener("click",e=>{
+const el=e.target.closest("[data-open]");
+if(!el)return;
+const url=el.dataset.open;
+if(url)window.open(url,"_blank","noopener,noreferrer");
+});
+}
+
+async function getJSON(url){
+const r=await fetch(url,{cache:"no-store"});
+if(!r.ok)throw new Error(`${r.status} ${r.statusText}`);
+return r.json();
+}
 
 async function loadData(){
- if(!state.access||!state.token)return;
- try{
-  const r=await authorizedFetch("/api/data",{cache:"no-store"});
-  if(r.ok)state.data=await r.json()
- }catch(e){console.warn("Datos no disponibles:",e)}
- try{
-  const r=await authorizedFetch("/api/flights",{cache:"no-store"});
-  if(r.ok)state.data.flights=await r.json()
- }catch(e){console.warn("Vuelos no disponibles:",e)}
- renderAll()
+try{
+const data=await getJSON("/api/data");
+state.data=data||{};
+}catch(e){
+console.error("Data:",e);
+state.data={};
 }
-function renderAll(){renderGuide("visa");renderGuide("dviajeros");renderFlights();renderSim("visa");renderSim("d")}
-function renderGuide(type){const key=type==="visa"?"cuba_visa":"dviajeros",d=state.data[key]||{},lang=state.lang,intro=qs("#"+type+"Intro");if(intro)intro.textContent=d["intro_"+lang]||"";const steps=d.steps?.[lang]||[],i=type==="visa"?state.visaStep:state.dviajerosStep,box=qs("#"+type+"Steps");if(!box)return;if(!steps.length){box.innerHTML='<div class="step"><div class="step-number">✓</div><div><h3>Información disponible</h3><p>Abre el portal oficial para continuar.</p></div></div>';return}const s=steps[Math.min(i,steps.length-1)];box.innerHTML=`<div class="step"><div class="step-number">${esc(s.number)}</div><div><div class="step-label">${state.lang==="es"?"PASO":"STEP"} ${esc(s.number)}</div><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div></div>`;const counter=qs("#"+type+"Counter");if(counter)counter.textContent=`${i+1} / ${steps.length}`;const prev=qs("#"+type+"Prev"),next=qs("#"+type+"Next");if(prev)prev.disabled=i===0;if(next)next.disabled=i===steps.length-1;const list=d.check_before_submit?.[lang]||d.checklist?.[lang]||[],cl=qs("#"+type+"Checklist");if(cl)cl.innerHTML=list.map(x=>`<div>✓ ${esc(x)}</div>`).join("")}
-function moveGuide(type,n){if(type==="visa"){const max=(state.data.cuba_visa?.steps?.[state.lang]||[]).length;state.visaStep=Math.max(0,Math.min(state.visaStep+n,Math.max(0,max-1)));renderGuide(type)}else{const max=(state.data.dviajeros?.steps?.[state.lang]||[]).length;state.dviajerosStep=Math.max(0,Math.min(state.dviajerosStep+n,Math.max(0,max-1)));renderGuide(type)}}
-function renderFlights(){const f=state.data.flights;if(!f)return;const providers=Object.values(f.providers||{}),box=qs("#flightProviders");if(box)box.innerHTML=providers.map(p=>`<div class="flight-card"><span class="flight-icon">✈️</span><h3>${esc(p.name||p.name_es||"Flight provider")}</h3><p>${esc(p[state.lang==="es"?"description_es":"description_en"]||"")}</p><a class="primary" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${state.lang==="es"?"ABRIR":"OPEN"}</a></div>`).join("");const ab=qs("#airportButtons"),db=qs("#destinationButtons");if(ab)ab.innerHTML=(f.airports||[]).map(a=>`<button class="airport ${state.airport===a.code?"selected":""}" data-air="${esc(a.code)}" type="button">${esc(a.code)} · ${esc(state.lang==="es"?a.name:a.name_en)}</button>`).join("");if(db)db.innerHTML=(f.destinations||[]).map(d=>`<button class="destination ${state.destination===d.code?"selected":""}" data-dest="${esc(d.code)}" type="button">${esc(d.code)} · ${esc(state.lang==="es"?d.name:d.name_en)}</button>`).join("");qsa("[data-air]").forEach(b=>b.onclick=()=>{state.airport=b.dataset.air;renderFlights()});qsa("[data-dest]").forEach(b=>b.onclick=()=>{state.destination=b.dataset.dest;renderFlights()});const cb=qs("#charterList");if(cb)cb.innerHTML=(f.charters||[]).map(c=>`<div class="charter-item"><div><strong>${esc(c.name)}</strong><span>${esc(c.type)}</span><p>${esc(c[state.lang==="es"?"note_es":"note_en"]||"")}</p></div><a href="${esc(c.source)}" target="_blank" rel="noopener noreferrer">↗</a></div>`).join("");const g=qs("#googleRoute");if(g)g.onclick=()=>window.open(`https://www.google.com/travel/flights?hl=${state.lang}&curr=USD#flt=${encodeURIComponent(state.airport)}.${encodeURIComponent(state.destination)}.${encodeURIComponent(state.airport)}`,"_blank")}
-function getPracticeKey(type){return type==="visa"?"cuba_auto_travel_visa_practice":"cuba_auto_travel_d_practice"}
-function loadPractice(type){try{const raw=localStorage.getItem(getPracticeKey(type)),data=raw?JSON.parse(raw):{};if(data&&typeof data==="object"&&!Array.isArray(data))state.sim[type]=data;else state.sim[type]={};return state.sim[type]}catch(e){state.sim[type]={};return state.sim[type]}}
-function captureCurrent(type){const fields=type==="visa"?visaSim[state.lang]:dSim,box=qs(type==="visa"?"#visaSimFields":"#dSimFields");if(!box)return;const step=type==="visa"?state.visaSimStep:state.dSimStep,f=fields[step];if(!f||f[3]==="review")return;const input=box.querySelector("[data-practice-field]");if(input)state.sim[type][f[0]]=input.value}
-function savePractice(type){captureCurrent(type);try{localStorage.setItem(getPracticeKey(type),JSON.stringify(state.sim[type]||{}));showPracticeMessage(type,T[state.lang].savedPractice)}catch(e){console.warn("No se pudo guardar la práctica:",e)}}
-function clearPractice(type){try{localStorage.removeItem(getPracticeKey(type));state.sim[type]={};if(type==="visa")state.visaSimStep=0;else state.dSimStep=0;renderSim(type);showPracticeMessage(type,T[state.lang].clearedPractice)}catch(e){console.warn("No se pudo borrar la práctica:",e)}}
-function showPracticeMessage(type,message){const id=type==="visa"?"#visaPracticeMessage":"#dPracticeMessage",el=qs(id);if(!el)return;el.textContent=message;el.style.display="block";clearTimeout(el._timer);el._timer=setTimeout(()=>{el.style.display="none"},3000)}
-function renderSim(type){const data=type==="visa"?visaSim[state.lang]:dSim,step=type==="visa"?state.visaSimStep:state.dSimStep,box=qs(type==="visa"?"#visaSimFields":"#dSimFields");if(!box)return;const saved=loadPractice(type),f=data[step];if(!f)return;if(f[3]==="review"){box.innerHTML=`<div class="sim-fields"><div class="sim-field active"><label>${esc(f[1])}</label><div class="practice-tip">✓ ${esc(f[2])}</div><p class="field-help">${esc(T[state.lang].simulationText)}</p></div></div>`}else{const required=f[4]==="required",marker=required?` <span aria-hidden="true">*</span>`:` <small>${esc(T[state.lang].optional)}</small>`,value=saved[f[0]]??"";let field="";if(f[3]==="select")field=`<select data-practice-field="${esc(f[0])}" autocomplete="off"><option value="">${esc(f[2])}</option><option value="${state.lang==="es"?"Ejemplo A":"Example A"}">${state.lang==="es"?"Ejemplo A":"Example A"}</option><option value="${state.lang==="es"?"Ejemplo B":"Example B"}">${state.lang==="es"?"Ejemplo B":"Example B"}</option></select>`;else field=`<input data-practice-field="${esc(f[0])}" type="${esc(f[3])}" value="${esc(value)}" placeholder="${esc(f[2])}" autocomplete="off" autocapitalize="characters" spellcheck="false">`;box.innerHTML=`<div class="sim-fields"><div class="sim-field active"><label>${esc(f[1])}${marker}</label>${field}<p class="field-help">${esc(T[state.lang].simulationText)}</p></div></div>`;const input=box.querySelector("[data-practice-field]");if(input){input.value=value;input.addEventListener("input",()=>{state.sim[type][f[0]]=input.value});input.addEventListener("change",()=>{state.sim[type][f[0]]=input.value})}}const total=data.length;if(type==="visa"){const n=qs("#visaSimNumber"),tt=qs("#visaSimTotal"),c=qs("#visaSimCounter"),p=qs("#visaSimPrev"),nx=qs("#visaSimNext");if(n)n.textContent=step+1;if(tt)tt.textContent=total;if(c)c.textContent=`${step+1} / ${total}`;if(p)p.disabled=step===0;if(nx)nx.disabled=step===total-1}else{const n=qs("#dSimNumber"),tt=qs("#dSimTotal"),c=qs("#dSimCounter"),p=qs("#dSimPrev"),nx=qs("#dSimNext");if(n)n.textContent=step+1;if(tt)tt.textContent=total;if(c)c.textContent=`${step+1} / ${total}`;if(p)p.disabled=step===0;if(nx)nx.disabled=step===total-1}const msg=qs(type==="visa"?"#visaPracticeMessage":"#dPracticeMessage");if(msg&&msg.textContent)msg.style.display="block"}
-function moveSim(type,n){const arr=type==="visa"?visaSim[state.lang]:dSim;if(!arr.length)return;captureCurrent(type);if(type==="visa"){state.visaSimStep=Math.max(0,Math.min(state.visaSimStep+n,arr.length-1));renderSim(type)}else{state.dSimStep=Math.max(0,Math.min(state.dSimStep+n,arr.length-1));renderSim(type)}}
+try{
+const flights=await getJSON("/api/flights");
+state.data.flights=flights||{};
+}catch(e){
+console.error("Flights:",e);
+}
+render();
+}
 
-async function initializeAccess(){
- createGate();
- showAccessGate(false);
- await getAuthConfig();
- if(await verifyStripeReturn())return;
- if(await validateStoredAccess()){
-  hideAccessGate();
-  await loadData();
-  return
- }
- clearAccess();
- showAccessGate(false)
+function render(){
+renderHome();
+renderVisa();
+renderDViajeros();
+renderPassport();
+renderFlights();
+renderGuides();
+renderPractice();
 }
-async function start(){
- createGate();
- bind();
- applyLanguage();
- await initializeAccess()
+
+function renderHome(){
+const root=qs("#homeContent");
+if(!root)return;
+root.innerHTML=`
+
+ <section class="hero-card">
+  <div class="hero-copy">
+   <span class="eyebrow">CUBA AUTO TRAVEL 2026</span>
+   <h1>${esc(t("homeTitle"))}</h1>
+   <h2>${esc(t("homeSubtitle"))}</h2>
+   <p>${esc(t("homeText"))}</p>
+   <div class="hero-actions">
+    <button class="primary" data-page="visa">${esc(t("visa"))}</button>
+    <button class="secondary" data-page="dviajeros">${esc(t("dviajeros"))}</button>
+   </div>
+  </div>
+ </section>
+ <section class="training-grid">
+  <article class="info-card">
+   <span class="card-icon">🛂</span>
+   <h3>${esc(t("visa"))}</h3>
+   <p>${esc(t("visaText"))}</p>
+   <button class="primary" data-page="visa">${esc(t("open"))}</button>
+  </article>
+  <article class="info-card">
+   <span class="card-icon">📋</span>
+   <h3>${esc(t("dviajeros"))}</h3>
+   <p>${esc(t("dviajerosText"))}</p>
+   <button class="primary" data-page="dviajeros">${esc(t("open"))}</button>
+  </article>
+  <article class="info-card">
+   <span class="card-icon">📕</span>
+   <h3>${esc(t("passport"))}</h3>
+   <p>${esc(t("passportText"))}</p>
+   <button class="primary" data-page="passport">${esc(t("open"))}</button>
+  </article>
+  <article class="info-card">
+   <span class="card-icon">✈️</span>
+   <h3>${esc(t("flights"))}</h3>
+   <p>${esc(t("flightText"))}</p>
+   <button class="primary" data-page="flights">${esc(t("open"))}</button>
+  </article>
+ </section>
+ <section class="notice-card">
+  <h3>${esc(t("legal"))}</h3>
+  <p>${esc(t("legalText"))}</p>
+ </section>`;
+ qsa("#homeContent [data-page]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.page)));
 }
+
+function renderVisa(){
+const root=qs("#visaContent");
+if(!root)return;
+const d=state.data.cuba_visa||{};
+const lang=state.lang;
+const req=d.requirements?.[lang]||[];
+const steps=d.steps?.[lang]||[];
+const checks=d.check_before_submit?.[lang]||[];
+const official=d.official?.form_url||d.official?.url||"https://evisacuba.cu/";
+const current=steps[state.visaStep]||{};
+root.innerHTML=`
+
+ <section class="page-header">
+  <span class="eyebrow">${esc(t("visa"))}</span>
+  <h1>${esc(d[`title_${lang}`]||t("visaTitle"))}</h1>
+  <p>${esc(d[`intro_${lang}`]||t("visaText"))}</p>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("requirements"))}</h2>
+  <ul class="check-list">${req.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("steps"))}</h2>
+  <div class="step-box">
+   <div class="step-number">${Number(current.number||state.visaStep+1)}</div>
+   <div>
+    <h3>${esc(current.title||"")}</h3>
+    <p>${esc(current.text||"")}</p>
+   </div>
+  </div>
+  <div class="step-progress">${steps.length?state.visaStep+1:0} / ${steps.length}</div>
+  <div class="button-row">
+   <button class="secondary" id="visaPrev" ${state.visaStep<=0?"disabled":""}>${esc(t("previous"))}</button>
+   <button class="primary" id="visaNext">${state.visaStep>=steps.length-1?esc(t("finish")):esc(t("next"))}</button>
+  </div>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("checklist"))}</h2>
+  <ul class="check-list">${checks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </section>
+ <section class="action-card">
+  <h2>${esc(t("how"))}</h2>
+  <p>${esc(d[`intro_${lang}`]||"")}</p>
+  <div class="button-row">
+   <button class="primary" data-open="${esc(official)}">${esc(d.buttons?.[lang]?.official||t("officialVisa"))}</button>
+  </div>
+ </section>
+ ${d.notice?.[lang]?`<section class="notice-card"><p>${esc(d.notice[lang])}</p></section>`:""}
+ ${renderSources(d.sources)}`;
+ const prev=qs("#visaPrev"),next=qs("#visaNext");
+ if(prev)prev.onclick=()=>{if(state.visaStep>0){state.visaStep--;renderVisa()}};
+ if(next)next.onclick=()=>{
+  if(state.visaStep<steps.length-1){state.visaStep++;renderVisa()}
+  else{state.visaStep=0;window.scrollTo({top:0,behavior:"smooth"})}
+ };
+ qsa("#visaContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
+}
+
+function renderDViajeros(){
+const root=qs("#dviajerosContent");
+if(!root)return;
+const d=state.data.dviajeros||{};
+const lang=state.lang;
+const important=d[`important_${lang}`]||[];
+const steps=d.steps?.[lang]||[];
+const checks=d.check_before_submit?.[lang]||[];
+const official=d.official?.url||"https://www.dviajeros.mitrans.gob.cu/";
+const current=steps[state.dviajerosStep]||{};
+root.innerHTML=`
+
+ <section class="page-header">
+  <span class="eyebrow">${esc(t("dviajeros"))}</span>
+  <h1>${esc(d[`title_${lang}`]||t("dviajerosTitle"))}</h1>
+  <p>${esc(d[`intro_${lang}`]||t("dviajerosText"))}</p>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("important"))}</h2>
+  <ul class="check-list">${important.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("steps"))}</h2>
+  <div class="step-box">
+   <div class="step-number">${Number(current.number||state.dviajerosStep+1)}</div>
+   <div>
+    <h3>${esc(current.title||"")}</h3>
+    <p>${esc(current.text||"")}</p>
+   </div>
+  </div>
+  <div class="step-progress">${steps.length?state.dviajerosStep+1:0} / ${steps.length}</div>
+  <div class="button-row">
+   <button class="secondary" id="dPrev" ${state.dviajerosStep<=0?"disabled":""}>${esc(t("previous"))}</button>
+   <button class="primary" id="dNext">${state.dviajerosStep>=steps.length-1?esc(t("finish")):esc(t("next"))}</button>
+  </div>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("checklist"))}</h2>
+  <ul class="check-list">${checks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </section>
+ <section class="action-card">
+  <h2>${esc(t("how"))}</h2>
+  <p>${esc(d[`intro_${lang}`]||"")}</p>
+  <div class="button-row">
+   <button class="primary" data-open="${esc(official)}">${esc(d.buttons?.[lang]?.official||t("officialD"))}</button>
+  </div>
+ </section>
+ ${d.notice?.[lang]?`<section class="notice-card"><p>${esc(d.notice[lang])}</p></section>`:""}
+ ${renderSources(d.sources)}`;
+ const prev=qs("#dPrev"),next=qs("#dNext");
+ if(prev)prev.onclick=()=>{if(state.dviajerosStep>0){state.dviajerosStep--;renderDViajeros()}};
+ if(next)next.onclick=()=>{
+  if(state.dviajerosStep<steps.length-1){state.dviajerosStep++;renderDViajeros()}
+  else{state.dviajerosStep=0;window.scrollTo({top:0,behavior:"smooth"})}
+ };
+ qsa("#dviajerosContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
+}
+
+function renderPassport(){
+const root=qs("#passportContent");
+if(!root)return;
+const d=state.data.passports||{};
+const lang=state.lang;
+const req=d.requirements?.[lang]||[];
+const steps=d.steps?.[lang]||[];
+const checks=d.checklist?.[lang]||[];
+root.innerHTML=`
+
+ <section class="page-header">
+  <span class="eyebrow">${esc(t("passport"))}</span>
+  <h1>${esc(d[`title_${lang}`]||t("passportTitle"))}</h1>
+  <p>${esc(d[`intro_${lang}`]||t("passportText"))}</p>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("requirements"))}</h2>
+  <ul class="check-list">${req.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("steps"))}</h2>
+  <div class="passport-steps">${steps.map((x,i)=>`
+   <article class="step-card">
+    <div class="step-number">${Number(x.number||i+1)}</div>
+    <div><h3>${esc(x.title||"")}</h3><p>${esc(x.text||"")}</p></div>
+   </article>`).join("")}</div>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("checklist"))}</h2>
+  <ul class="check-list">${checks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </section>
+ <section class="action-card">
+  <div class="button-row">
+   <button class="primary" data-open="${esc(state.data.cuba_visa?.official?.url||"https://evisacuba.cu/")}">${esc(d.buttons?.[lang]?.visa||"IR A LA VISA")}</button>
+   <button class="secondary" data-open="${esc(state.data.dviajeros?.official?.url||"https://www.dviajeros.mitrans.gob.cu/")}">${esc(d.buttons?.[lang]?.dviajeros||"IR A D'VIAJEROS")}</button>
+  </div>
+ </section>
+ ${d.notice?.[lang]?`<section class="notice-card"><p>${esc(d.notice[lang])}</p></section>`:""}
+ ${renderSources(d.sources)}`;
+ qsa("#passportContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
+}
+
+function renderFlights(){
+const root=qs("#flightsContent");
+if(!root)return;
+const f=state.data.flights||{};
+const providers=f.providers||{};
+const airports=f.airports||[];
+const destinations=f.destinations||[];
+const charters=f.charters||[];
+root.innerHTML=`
+
+ <section class="page-header">
+  <span class="eyebrow">${esc(t("flights"))}</span>
+  <h1>${esc(t("flightTitle"))}</h1>
+  <p>${esc(t("flightText"))}</p>
+ </section>
+ <section class="content-card">
+  <div class="flight-form">
+   <label>${esc(t("airport"))}
+    <select id="airportSelect">${airports.map(a=>`<option value="${esc(a.code)}" ${a.code===state.airport?"selected":""}>${esc(a.name)}${a.name_en&&state.lang==="en"?` — ${esc(a.name_en)}`:""}</option>`).join("")}</select>
+   </label>
+   <label>${esc(t("destination"))}
+    <select id="destinationSelect">${destinations.map(d=>`<option value="${esc(d.code)}" ${d.code===state.destination?"selected":""}>${esc(state.lang==="en"?d.name_en:d.name)}</option>`).join("")}</select>
+   </label>
+  </div>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("providers"))}</h2>
+  <div class="video-grid">
+   ${Object.entries(providers).map(([key,p])=>`
+    <article class="info-card flight-card">
+     <h3>${esc(p.name||p.name_es||key)}</h3>
+     <p>${esc(p[`description_${state.lang}`]||p.description_es||"")}</p>
+     <button class="primary" data-open="${esc(p.url||"")}">${esc(t("open"))}</button>
+    </article>`).join("")}
+  </div>
+ </section>
+ <section class="content-card">
+  <h2>${esc(t("charters"))}</h2>
+  <div class="video-grid">
+   ${charters.map(c=>`
+    <article class="info-card flight-card">
+     <h3>${esc(c.name||"")}</h3>
+     <p>${esc(c[`note_${state.lang}`]||c.note_es||"")}</p>
+     <button class="secondary" data-open="${esc(c.source||"")}">${esc(t("open"))}</button>
+    </article>`).join("")}
+  </div>
+ </section>`;
+ const a=qs("#airportSelect"),d=qs("#destinationSelect");
+ if(a)a.onchange=()=>{state.airport=a.value};
+ if(d)d.onchange=()=>{state.destination=d.value};
+ qsa("#flightsContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
+}
+
+function renderGuides(){
+const root=qs("#guidesContent");
+if(!root)return;
+const visa=state.data.cuba_visa||{},d=state.data.dviajeros||{};
+const lang=state.lang;
+root.innerHTML=`
+
+ <section class="page-header">
+  <span class="eyebrow">${esc(t("guides"))}</span>
+  <h1>${esc(t("guideTitle"))}</h1>
+  <p>${esc(t("guideText"))}</p>
+ </section>
+ <section class="training-grid">
+  <article class="info-card">
+   <span class="card-icon">🛂</span>
+   <h2>${esc(visa[`title_${lang}`]||t("visaTitle"))}</h2>
+   <p>${esc(visa[`intro_${lang}`]||"")}</p>
+   <button class="primary" data-page="visa">${esc(t("how"))}</button>
+  </article>
+  <article class="info-card">
+   <span class="card-icon">📋</span>
+   <h2>${esc(d[`title_${lang}`]||t("dviajerosTitle"))}</h2>
+   <p>${esc(d[`intro_${lang}`]||"")}</p>
+   <button class="primary" data-page="dviajeros">${esc(t("how"))}</button>
+  </article>
+  <article class="info-card">
+   <span class="card-icon">📕</span>
+   <h2>${esc(t("passportTitle"))}</h2>
+   <p>${esc(t("passportText"))}</p>
+   <button class="primary" data-page="passport">${esc(t("how"))}</button>
+  </article>
+ </section>`;
+ qsa("#guidesContent [data-page]").forEach(el=>el.onclick=()=>showPage(el.dataset.page));
+}
+
+function renderPractice(){
+const root=qs("#practiceContent");
+if(!root)return;
+const v=visaSim[state.visaSimStep%visaSim.length],d=dSim[state.dSimStep%dSim.length];
+root.innerHTML=`
+
+ <section class="page-header">
+  <span class="eyebrow">${esc(t("practice"))}</span>
+  <h1>${esc(t("practice"))}</h1>
+  <p>${esc(t("practiceText"))}</p>
+ </section>
+ <section class="training-grid">
+  <article class="info-card practice-card">
+   <h2>${esc(t("practiceVisa"))}</h2>
+   <span class="practice-label">${esc(t("first"))}</span>
+   <h3>${esc(v.q[state.lang])}</h3>
+   <p class="answer-box">${esc(v.a[state.lang])}</p>
+   <button class="primary" id="visaPracticeNext">${esc(t("next"))}</button>
+  </article>
+  <article class="info-card practice-card">
+   <h2>${esc(t("practiceD"))}</h2>
+   <span class="practice-label">${esc(t("first"))}</span>
+   <h3>${esc(d.q[state.lang])}</h3>
+   <p class="answer-box">${esc(d.a[state.lang])}</p>
+   <button class="primary" id="dPracticeNext">${esc(t("next"))}</button>
+  </article>
+ </section>`;
+ const vn=qs("#visaPracticeNext"),dn=qs("#dPracticeNext");
+ if(vn)vn.onclick=()=>{state.visaSimStep=(state.visaSimStep+1)%visaSim.length;renderPractice()};
+ if(dn)dn.onclick=()=>{state.dSimStep=(state.dSimStep+1)%dSim.length;renderPractice()};
+}
+
+function renderSources(sources){
+if(!Array.isArray(sources)||!sources.length)return "";
+return `<section class="content-card sources-card"><h2>${esc(t("sources"))}</h2><div class="source-list">${sources.map(s=>`<a href="${esc(s.url||"#")}" target="_blank" rel="noopener noreferrer">${esc(s.name||s.url||"")}</a>`).join("")}</div></section>`;
+}
+
+function restoreLanguage(){
+try{
+const saved=localStorage.getItem("cat_lang");
+if(saved==="en"||saved==="es")state.lang=saved;
+}catch(e){}
+}
+
+function start(){
+restoreLanguage();
+bind();
+applyLanguage();
+loadData();
+}
+
 document.addEventListener("DOMContentLoaded",start);
