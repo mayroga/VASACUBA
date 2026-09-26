@@ -1,119 +1,218 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#075985">
-<meta name="description" content="CUBA AUTO TRAVEL 2026 - Guía práctica para viajar a Cuba.">
 <title>CUBA AUTO TRAVEL 2026</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<header class="topbar">
-<div class="brand">
-<span class="brand-mark">✈️</span>
-<div>
-<strong>CUBA AUTO TRAVEL 2026</strong>
-<small>Guía práctica para viajar a Cuba</small>
-</div>
-</div>
-<div class="top-actions">
-<button id="languageBtn" class="language-btn" type="button">ENGLISH</button>
+<header class="header">
+<div class="container">
+<h1>🇨🇺 CUBA AUTO TRAVEL 2026</h1>
+<p>Practica antes de realizar tu trámite oficial</p>
 </div>
 </header>
 
-<nav class="main-nav" aria-label="Navegación principal">
-<button data-page="home" class="nav-btn active" type="button">INICIO</button>
-<button data-page="visa" class="nav-btn" type="button" data-i18n="visa">VISA</button>
-<button data-page="dviajeros" class="nav-btn" type="button" data-i18n="dviajeros">D'VIAJEROS</button>
-<button data-page="passport" class="nav-btn" type="button" data-i18n="passport">PASAPORTE</button>
-<button data-page="flights" class="nav-btn" type="button" data-i18n="flights">VUELOS</button>
-<button data-page="guides" class="nav-btn" type="button" data-i18n="guides">GUÍAS</button>
-<button data-page="practice" class="nav-btn" type="button" data-i18n="practice">PRACTICAR</button>
-</nav>
+<main class="container">
 
-<main class="app-main">
+<section id="home-section" class="home-section">
+<div class="intro">
+<h2>¿Qué necesitas preparar?</h2>
+<p>Practica paso a paso, mira ejemplos y revisa tus respuestas antes de entrar al portal oficial.</p>
+<div class="practice-notice">
+<strong>🟢 ESTO ES UNA PRÁCTICA</strong>
+<span>No enviamos tus respuestas al Gobierno de Cuba.</span>
+<span>Al terminar podrás revisarlas y utilizarlas como guía para completar el trámite oficial.</span>
+</div>
+</div>
 
-<section id="page-home" class="page active">
-<div id="homeContent"></div>
-</section>
+<div class="modules">
+<button type="button" id="visa-button" class="module-card">
+<span class="module-icon">🛂</span>
+<strong>Visa Cubana / eVisa</strong>
+<span>Practica las preguntas y pasos del proceso antes de entrar al portal oficial.</span>
+<small>Practicar Visa →</small>
+</button>
 
-<section id="page-visa" class="page">
-<div class="page-shell">
-<div class="back-row">
-<button class="secondary back-button" data-back="home" type="button">← <span data-i18n="back">VOLVER</span></button>
+<button type="button" id="dviajeros-button" class="module-card">
+<span class="module-icon">🛬</span>
+<strong>D'Viajeros</strong>
+<span>Practica la información de Inmigración, Aduana y Salud antes de completar el formulario oficial.</span>
+<small>Practicar D'Viajeros →</small>
+</button>
 </div>
-<div id="visaContent"></div>
-</div>
-</section>
 
-<section id="page-dviajeros" class="page">
-<div class="page-shell">
-<div class="back-row">
-<button class="secondary back-button" data-back="home" type="button">← <span data-i18n="back">VOLVER</span></button>
+<div class="how-it-works">
+<h2>¿Cómo funciona?</h2>
+<div class="how-grid">
+<div><b>1</b><strong>Mira</strong><span>Te mostramos qué información aparece en cada etapa.</span></div>
+<div><b>2</b><strong>Practica</strong><span>Selecciona o completa tus respuestas sin presión.</span></div>
+<div><b>3</b><strong>Revisa</strong><span>Vuelve atrás y comprueba lo que hiciste.</span></div>
+<div><b>4</b><strong>Transcribe</strong><span>Usa tu práctica como guía en el portal oficial.</span></div>
 </div>
-<div id="dviajerosContent"></div>
-</div>
-</section>
-
-<section id="page-passport" class="page">
-<div class="page-shell">
-<div class="back-row">
-<button class="secondary back-button" data-back="home" type="button">← <span data-i18n="back">VOLVER</span></button>
-</div>
-<div id="passportContent"></div>
 </div>
 </section>
 
-<section id="page-flights" class="page">
-<div class="page-shell">
-<div class="back-row">
-<button class="secondary back-button" data-back="home" type="button">← <span data-i18n="back">VOLVER</span></button>
+<section id="visa-section" class="panel hidden">
+<button type="button" class="back-button" id="visa-back">← Volver</button>
+
+<div class="section-heading">
+<span class="large-icon">🛂</span>
+<div>
+<h2>Visa Cubana / eVisa</h2>
+<p>Práctica guiada del proceso. Esta pantalla no es la solicitud oficial.</p>
 </div>
-<div id="flightsContent"></div>
+</div>
+
+<div class="simulation-banner">
+<strong>SIMULACIÓN — NO ES EL FORMULARIO OFICIAL</strong>
+<span>Practica primero. Después podrás revisar lo que respondiste.</span>
+</div>
+
+<div class="progress-area">
+<div class="progress-text"><span id="visa-step-label">Paso 1</span><span id="visa-progress-text">0%</span></div>
+<div class="progress"><div id="visa-progress" class="progress-bar"></div></div>
+</div>
+
+<div id="visa-practice" class="practice-card">
+<div id="visa-example" class="example-box hidden"></div>
+<div id="visa-question"></div>
+<div id="visa-options" class="practice-options"></div>
+<div id="visa-input-area" class="practice-input-area"></div>
+<div class="practice-actions">
+<button type="button" id="visa-prev" class="secondary-button">← Anterior</button>
+<button type="button" id="visa-next" class="primary-button">Siguiente →</button>
+</div>
+</div>
+
+<div id="visa-review" class="review-card hidden">
+<h3>✅ Revisa tu práctica de Visa</h3>
+<p>Comprueba tus respuestas antes de entrar al proceso oficial.</p>
+<div id="visa-review-content"></div>
+<div class="review-actions">
+<button type="button" id="visa-restart" class="secondary-button">Practicar nuevamente</button>
+<a href="https://evisacuba.cu/" target="_blank" rel="noopener noreferrer" class="primary-button official-button">Abrir eVisa oficial →</a>
+</div>
+</div>
+
+<div class="official-box">
+<strong>Portal oficial</strong>
+<p>Cuando estés preparado, realiza la solicitud directamente en el portal oficial.</p>
+<a href="https://evisacuba.cu/" target="_blank" rel="noopener noreferrer">Ir a eVisa Cuba →</a>
 </div>
 </section>
 
-<section id="page-guides" class="page">
-<div class="page-shell">
-<div class="back-row">
-<button class="secondary back-button" data-back="home" type="button">← <span data-i18n="back">VOLVER</span></button>
+<section id="dviajeros-section" class="panel hidden">
+<button type="button" class="back-button" id="dviajeros-back">← Volver</button>
+
+<div class="section-heading">
+<span class="large-icon">🛬</span>
+<div>
+<h2>D'Viajeros</h2>
+<p>Practica antes de completar el formulario oficial.</p>
 </div>
-<div id="guidesContent"></div>
+</div>
+
+<div class="simulation-banner">
+<strong>SIMULACIÓN — NO ES EL FORMULARIO OFICIAL</strong>
+<span>Aprende qué información debes preparar y practica sin miedo a equivocarte.</span>
+</div>
+
+<div class="traveler-guide">
+<div class="guide-item active" data-guide="personal">
+<span>1</span>
+<strong>Información personal</strong>
+<small>Datos del viajero</small>
+</div>
+<div class="guide-item" data-guide="migration">
+<span>2</span>
+<strong>Inmigración</strong>
+<small>Entrada a Cuba</small>
+</div>
+<div class="guide-item" data-guide="health">
+<span>3</span>
+<strong>Salud</strong>
+<small>Información sanitaria</small>
+</div>
+<div class="guide-item" data-guide="customs">
+<span>4</span>
+<strong>Aduana</strong>
+<small>Declaración aduanal</small>
+</div>
+<div class="guide-item" data-guide="review">
+<span>5</span>
+<strong>Revisión</strong>
+<small>Comprueba todo</small>
+</div>
+</div>
+
+<div class="progress-area">
+<div class="progress-text"><span id="dviajeros-step-label">Información personal</span><span id="dviajeros-progress-text">20%</span></div>
+<div class="progress"><div id="dviajeros-progress" class="progress-bar"></div></div>
+</div>
+
+<div id="dviajeros-practice" class="practice-card">
+
+<div id="dviajeros-example" class="example-box">
+<strong>👀 Antes de responder</strong>
+<p>Observa el ejemplo y después selecciona la respuesta que corresponda a tu situación.</p>
+</div>
+
+<div id="dviajeros-question"></div>
+<div id="dviajeros-options" class="practice-options"></div>
+<div id="dviajeros-input-area" class="practice-input-area"></div>
+
+<div class="practice-actions">
+<button type="button" id="dviajeros-prev" class="secondary-button">← Anterior</button>
+<button type="button" id="dviajeros-next" class="primary-button">Siguiente →</button>
+</div>
+</div>
+
+<div id="dviajeros-review" class="review-card hidden">
+<h3>✅ Revisa tu práctica de D'Viajeros</h3>
+<p>Aquí puedes comprobar la información que preparaste antes de abrir el formulario oficial.</p>
+<div id="dviajeros-review-content"></div>
+
+<div class="review-actions">
+<button type="button" id="dviajeros-restart" class="secondary-button">Practicar nuevamente</button>
+<a href="https://dviajeros.mitrans.gob.cu/" target="_blank" rel="noopener noreferrer" class="primary-button official-button">Abrir D'Viajeros oficial →</a>
+</div>
+</div>
+
+<div class="official-box">
+<strong>Portal oficial D'Viajeros</strong>
+<p>La práctica no genera un formulario oficial ni sustituye la declaración oficial.</p>
+<a href="https://dviajeros.mitrans.gob.cu/" target="_blank" rel="noopener noreferrer">Ir a D'Viajeros →</a>
 </div>
 </section>
 
-<section id="page-practice" class="page">
-<div class="page-shell">
-<div class="back-row">
-<button class="secondary back-button" data-back="home" type="button">← <span data-i18n="back">VOLVER</span></button>
+<section class="final-check hidden" id="final-check">
+<h2>🧳 Antes de viajar</h2>
+<p>Comprueba que tienes preparados tus documentos e información.</p>
+<div class="check-grid">
+<label><input type="checkbox"> Pasaporte</label>
+<label><input type="checkbox"> Visa, si corresponde</label>
+<label><input type="checkbox"> Seguro médico</label>
+<label><input type="checkbox"> Información del vuelo</label>
+<label><input type="checkbox"> Información del alojamiento</label>
+<label><input type="checkbox"> D'Viajeros / QR oficial</label>
 </div>
-<div id="practiceContent"></div>
-</div>
+</section>
+
+<section class="disclaimer">
+<strong>Importante</strong>
+<p>CUBA AUTO TRAVEL 2026 es una aplicación independiente de preparación e información. No pertenece al Gobierno de Cuba, MINREX, MININT, MITRANS, Aduana General de la República ni al Ministerio de Salud Pública. No emite visas, no aprueba solicitudes, no presenta formularios oficiales y no genera códigos QR oficiales. Las prácticas realizadas aquí son orientativas y deben transcribirse o verificarse en los portales oficiales correspondientes.</p>
 </section>
 
 </main>
 
-<footer class="site-footer">
-<div class="footer-inner">
-<div>
-<strong>CUBA AUTO TRAVEL 2026</strong>
-<p>Guía informativa independiente para pasajeros que viajan a Cuba.</p>
-</div>
-<div class="footer-links">
-<button data-page="visa" type="button">VISA</button>
-<button data-page="dviajeros" type="button">D'VIAJEROS</button>
-<button data-page="passport" type="button">PASAPORTE</button>
-<button data-page="flights" type="button">VUELOS</button>
-</div>
-</div>
-<div class="footer-legal">
-CUBA AUTO TRAVEL 2026 no pertenece al Gobierno de Cuba, eVisa Cuba, D'Viajeros ni a ninguna aerolínea. Verifica siempre los requisitos y condiciones vigentes en las fuentes oficiales.
+<footer class="footer">
+<div class="container">
+<p>CUBA AUTO TRAVEL 2026 · Herramienta independiente de preparación</p>
 </div>
 </footer>
 
-<script src="/static/app.js" defer></script>
-
+<script src="/static/app.js"></script>
 </body>
 </html>
