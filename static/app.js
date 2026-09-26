@@ -1,578 +1,176 @@
-const state={lang:"es",page:"home",visaStep:0,dviajerosStep:0,visaSimStep:0,dSimStep:0,airport:"MIA",destination:"HAV",data:{},sim:{visa:{},d:{}}};
+"use strict";
+document.addEventListener("DOMContentLoaded",()=>{
 
-const T={
-es:{
-homeTitle:"CUBA AUTO TRAVEL 2026",
-homeSubtitle:"Guía práctica para viajar a Cuba",
-homeText:"Revisa tu pasaporte, visa y D'Viajeros paso a paso. También puedes consultar vuelos y opciones de viaje.",
-visa:"VISA",
-dviajeros:"D'VIAJEROS",
-passport:"PASAPORTE",
-flights:"VUELOS",
-guides:"GUÍAS",
-official:"SITIO OFICIAL",
-how:"¿CÓMO SE HACE?",
-back:"VOLVER",
-next:"SIGUIENTE",
-previous:"ANTERIOR",
-finish:"TERMINAR",
-check:"REVISAR",
-open:"ABRIR",
-language:"ENGLISH",
-visaTitle:"Visa para viajar a Cuba",
-visaText:"Revisa los pasos antes de entrar al formulario oficial.",
-dviajerosTitle:"D'Viajeros paso a paso",
-dviajerosText:"Completa el formulario digital y conserva tu comprobante y código QR.",
-passportTitle:"Pasaporte para viajar a Cuba",
-passportText:"Revisa tus datos y la vigencia antes de comenzar.",
-flightTitle:"Vuelos a Cuba",
-flightText:"Consulta vuelos regulares, opciones charter y destinos.",
-guideTitle:"Guías paso a paso",
-guideText:"Información sencilla para revisar cada proceso.",
-requirements:"REQUISITOS",
-steps:"PASOS",
-checklist:"LISTA DE REVISIÓN",
-important:"IMPORTANTE",
-sources:"FUENTES",
-flightSearch:"BUSCAR VUELOS",
-airport:"SALIDA",
-destination:"DESTINO",
-providers:"OPCIONES DE VUELO",
-charters:"CHARTERS",
-legal:"AVISO",
-legalText:"CUBA AUTO TRAVEL 2026 es una guía informativa independiente. No pertenece al Gobierno de Cuba, a eVisa Cuba, a D'Viajeros ni a ninguna aerolínea. Verifica siempre la información vigente en las fuentes oficiales.",
-practice:"PRACTICAR",
-practiceVisa:"PRACTICAR VISA",
-practiceD:"PRACTICAR D'VIAJEROS",
-practiceText:"Practica la revisión de los datos antes de completar un formulario real.",
-first:"PRIMERO",
-answer:"RESPUESTA",
-correct:"CORRECTO",
-review:"REVISA DE NUEVO",
-done:"LISTO",
-homeButton:"EMPEZAR",
-noData:"No se pudo cargar la información.",
-officialVisa:"ABRIR VISA OFICIAL",
-officialD:"ABRIR D'VIAJEROS",
-officialCuba:"VER INFORMACIÓN OFICIAL",
-visaStep1:"Revisa tu pasaporte",
-visaStep2:"Prepara tus datos",
-visaStep3:"Entra al sitio oficial",
-visaStep4:"Completa la solicitud",
-visaStep5:"Revisa antes de enviar",
-visaStep6:"Conserva la información",
-dStep1:"Entra a D'Viajeros",
-dStep2:"Selecciona el idioma",
-dStep3:"Completa tus datos",
-dStep4:"Completa los datos del viaje",
-dStep5:"Revisa todo",
-dStep6:"Finaliza el formulario",
-dStep7:"Guarda el QR",
-},
-en:{
-homeTitle:"CUBA AUTO TRAVEL 2026",
-homeSubtitle:"Practical guide for traveling to Cuba",
-homeText:"Review your passport, visa and D'Viajeros step by step. You can also check flights and travel options.",
-visa:"VISA",
-dviajeros:"D'VIAJEROS",
-passport:"PASSPORT",
-flights:"FLIGHTS",
-guides:"GUIDES",
-official:"OFFICIAL WEBSITE",
-how:"HOW DO I DO IT?",
-back:"BACK",
-next:"NEXT",
-previous:"PREVIOUS",
-finish:"FINISH",
-check:"REVIEW",
-open:"OPEN",
-language:"ESPAÑOL",
-visaTitle:"Visa to travel to Cuba",
-visaText:"Review the steps before opening the official form.",
-dviajerosTitle:"D'Viajeros step by step",
-dviajerosText:"Complete the digital form and keep your confirmation and QR code.",
-passportTitle:"Passport for travel to Cuba",
-passportText:"Check your information and validity before starting.",
-flightTitle:"Flights to Cuba",
-flightText:"Check regular flights, charter options and destinations.",
-guideTitle:"Step-by-step guides",
-guideText:"Simple information to review each process.",
-requirements:"REQUIREMENTS",
-steps:"STEPS",
-checklist:"REVIEW CHECKLIST",
-important:"IMPORTANT",
-sources:"SOURCES",
-flightSearch:"SEARCH FLIGHTS",
-airport:"DEPARTURE",
-destination:"DESTINATION",
-providers:"FLIGHT OPTIONS",
-charters:"CHARTERS",
-legal:"NOTICE",
-legalText:"CUBA AUTO TRAVEL 2026 is an independent informational guide. It is not part of the Cuban Government, Cuba eVisa, D'Viajeros or any airline. Always verify current information with official sources.",
-practice:"PRACTICE",
-practiceVisa:"PRACTICE VISA",
-practiceD:"PRACTICE D'VIAJEROS",
-practiceText:"Practice reviewing your information before completing a real form.",
-first:"FIRST",
-answer:"ANSWER",
-correct:"CORRECT",
-review:"REVIEW AGAIN",
-done:"DONE",
-homeButton:"START",
-noData:"The information could not be loaded.",
-officialVisa:"OPEN OFFICIAL VISA",
-officialD:"OPEN D'VIAJEROS",
-officialCuba:"VIEW OFFICIAL INFORMATION",
-visaStep1:"Check your passport",
-visaStep2:"Prepare your information",
-visaStep3:"Open the official website",
-visaStep4:"Complete the application",
-visaStep5:"Review before submitting",
-visaStep6:"Keep your visa information",
-dStep1:"Open D'Viajeros",
-dStep2:"Choose your language",
-dStep3:"Enter your information",
-dStep4:"Enter trip information",
-dStep5:"Review everything",
-dStep6:"Finish the form",
-dStep7:"Save the QR",
-}
+const $=id=>document.getElementById(id),STORE="cuba_auto_travel_2026_practice",API={visa:"/api/visa/practice",dviajeros:"/api/dviajeros/practice"};
+let db=(()=>{try{return JSON.parse(localStorage.getItem(STORE)||"{}")}catch{return{}}})(),moduleName="",practice=null,screen=0;
+
+const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+const attr=v=>esc(v).replace(/`/g,"&#096;");
+const clean=v=>String(v??"").trim();
+const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(db))}catch{}};
+const saveCurrent=()=>{if(!moduleName||!practice)return;db[moduleName]={answers:practice.answers||{},screen,completed:!!practice.completed};save()};
+const hide=()=>document.querySelectorAll(".app-section").forEach(e=>e.classList.add("hidden"));
+const home=()=>{hide();$("intro")?.classList.remove("hidden");$("modules")?.classList.remove("hidden");scrollTo({top:0,behavior:"smooth"})};
+const section=()=>{hide();ensure().classList.remove("hidden");scrollTo({top:0,behavior:"smooth"})};
+const ensure=()=>{let e=$("practice-section");if(e)return e;e=document.createElement("section");e.id="practice-section";e.className="app-section hidden";(document.querySelector("main")||document.body).appendChild(e);return e};
+const value=n=>practice?.answers?.[n]??"";
+const answer=(n,v)=>{practice.answers||(practice.answers={});practice.answers[n]=v;saveCurrent()};
+
+const get=async url=>{
+ const r=await fetch(url,{headers:{Accept:"application/json"}});
+ let j={};try{j=await r.json()}catch{}
+ if(!r.ok)throw Error(j.detail||j.message||"No se pudo cargar la práctica.");
+ return j
 };
 
-const visaSim=[
-{q:{es:"¿Qué debes revisar primero?",en:"What should you check first?"},a:{es:"Tu pasaporte",en:"Your passport"}},
-{q:{es:"¿Dónde debes comenzar la solicitud?",en:"Where should you begin the application?"},a:{es:"En el sitio oficial",en:"On the official website"}},
-{q:{es:"¿Cómo debes escribir tus datos?",en:"How should you enter your information?"},a:{es:"Exactamente como aparecen en tu pasaporte",en:"Exactly as they appear on your passport"}}
-];
+const image=s=>{
+ const src=s?.image||s?.image_url||s?.illustration||s?.screenshot||"";
+ return src?`<div class="practice-visual"><img src="${attr(src)}" alt="${attr(s.image_alt||s.title||"Ejemplo de práctica")}" loading="lazy" onerror="this.closest('.practice-visual')?.remove()"><div class="visual-label">PRÁCTICA · CUBA AUTO TRAVEL 2026</div></div>`:""
+};
 
-const dSim=[
-{q:{es:"¿Dónde debes completar D'Viajeros?",en:"Where should you complete D'Viajeros?"},a:{es:"En el sitio oficial",en:"On the official website"}},
-{q:{es:"¿Qué debes revisar antes de finalizar?",en:"What should you review before finishing?"},a:{es:"Todos los datos",en:"All information"}},
-{q:{es:"¿Qué debes conservar al terminar?",en:"What should you keep after finishing?"},a:{es:"El comprobante y código QR",en:"The confirmation and QR code"}}
-];
+const gallery=s=>{
+ const a=Array.isArray(s?.images)?s.images:[];
+ if(!a.length)return"";
+ return`<div class="practice-gallery">${a.map((x,i)=>{
+  const src=typeof x==="string"?x:(x?.url||x?.image||x?.image_url||"");
+  if(!src)return"";
+  const alt=typeof x==="object"?(x.alt||s.title||`Ejemplo ${i+1}`):(s.title||`Ejemplo ${i+1}`);
+  const cap=typeof x==="object"?(x.caption||`Ejemplo ${i+1}`):`Ejemplo ${i+1}`;
+  return`<figure><img src="${attr(src)}" alt="${attr(alt)}" loading="lazy" onerror="this.closest('figure')?.remove()"><figcaption>${esc(cap)}</figcaption></figure>`
+ }).join("")}</div>`
+};
 
-const qs=s=>document.querySelector(s);
-const qsa=s=>Array.from(document.querySelectorAll(s));
-const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&","<":"<",">":">",'"':""","'":"'"}[m]));
+const choices=f=>{
+ const a=f.options||f.choices||f.values||[];
+ if(!Array.isArray(a)||!a.length)return"";
+ const cur=String(value(f.name));
+ return`<div class="choice-grid" data-choice="${attr(f.name)}">${a.map(x=>{
+  const o=typeof x==="string"?{value:x,label:x}:x||{};
+  const v=o.value??o.id??o.code??o.label??"",label=o.label??o.name??v,desc=o.description||"",img=o.image||o.image_url||"";
+  const sel=String(v)===cur;
+  return`<button type="button" class="choice-card ${sel?"selected":""}" data-field="${attr(f.name)}" data-value="${attr(v)}">${img?`<span class="choice-image"><img src="${attr(img)}" alt="${attr(label)}" loading="lazy" onerror="this.closest('.choice-image')?.remove()"></span>`:""}<strong>${esc(label)}</strong>${desc?`<span>${esc(desc)}</span>`:""}<span class="choice-check">${sel?"✓":"○"}</span></button>`
+ }).join("")}</div>`
+};
 
-function t(k){return T[state.lang][k]||T.es[k]||k}
+const field=f=>{
+ const type=String(f.type||f.input_type||"text").toLowerCase();
+ if(type==="choice"||type==="select"||type==="radio"||type==="boolean"||Array.isArray(f.options)||Array.isArray(f.choices))
+  return`<div class="practice-field choice-field ${f.required?"required":""}"><div class="field-label">${esc(f.label||f.question||f.name)}${f.required?" *":""}</div>${f.help?`<div class="field-help">${esc(f.help)}</div>`:""}${choices(f)}${f.example?`<div class="practice-example"><strong>Ejemplo:</strong> ${esc(f.example)}</div>`:""}</div>`;
+ const multi=type==="textarea"||f.multiline===true;
+ return`<div class="practice-field ${f.required?"required":""}"><label for="practice-${attr(f.name)}">${esc(f.label||f.question||f.name)}${f.required?" *":""}</label>${f.help?`<div class="field-help">${esc(f.help)}</div>`:""}${multi?`<textarea id="practice-${attr(f.name)}" name="${attr(f.name)}" rows="3" placeholder="${attr(f.placeholder||"Escribe solamente lo necesario")}">${esc(value(f.name))}</textarea>`:`<input id="practice-${attr(f.name)}" name="${attr(f.name)}" type="${type==="date"?"date":"text"}" value="${attr(value(f.name))}" placeholder="${attr(f.placeholder||"")}" autocomplete="off">`}${f.example?`<div class="practice-example"><strong>Ejemplo:</strong> ${esc(f.example)}</div>`:""}</div>`
+};
 
-function applyLanguage(){
-document.documentElement.lang=state.lang;
-qsa("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
-qsa("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
-const btn=qs("#languageBtn");
-if(btn)btn.textContent=t("language");
-render();
-}
+const prepare=a=>Array.isArray(a)&&a.length?`<div class="prepare-box"><strong>Antes de continuar</strong><ul>${a.map(x=>`<li>${esc(typeof x==="string"?x:(x.text||x.label||""))}</li>`).join("")}</ul></div>`:"";
 
-function showPage(page){
-state.page=page;
-qsa(".page").forEach(p=>p.classList.toggle("active",p.id===`page-${page}`));
-qsa("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
-window.scrollTo({top:0,behavior:"smooth"});
-render();
-}
+const notice=(text,type="info")=>text?`<div class="practice-notice ${type}"><strong>${type==="warning"?"Importante":"Recuerda"}</strong><p>${esc(text)}</p></div>`:"";
 
-function bind(){
-qsa("[data-page]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.page)));
-const languageBtn=qs("#languageBtn");
-if(languageBtn)languageBtn.addEventListener("click",()=>{
-state.lang=state.lang==="es"?"en":"es";
-try{localStorage.setItem("cat_lang",state.lang)}catch(e){}
-applyLanguage();
+const review=()=>{
+ const rows=[];
+ (practice?.screens||[]).forEach(s=>(s.fields||[]).forEach(f=>{
+  const v=value(f.name);
+  if(v!==undefined&&v!==null&&clean(v))rows.push(`<div class="review-row"><div><strong>${esc(f.label||f.name)}</strong>${f.help?`<small>${esc(f.help)}</small>`:""}</div><span>${esc(v)}</span></div>`)
+ }));
+ return rows.length?`<div class="practice-review">${rows.join("")}</div>`:`<div class="practice-notice info"><strong>Aún no hay respuestas</strong><p>Comienza la práctica y tus respuestas quedarán guardadas en este dispositivo.</p></div>`
+};
+
+const bindChoices=()=>document.querySelectorAll(".choice-card").forEach(b=>b.onclick=()=>{
+ const f=b.dataset.field,v=b.dataset.value;
+ answer(f,v);
+ document.querySelectorAll(`.choice-card[data-field="${CSS.escape(f)}"]`).forEach(x=>{x.classList.remove("selected");const c=x.querySelector(".choice-check");if(c)c.textContent="○"});
+ b.classList.add("selected");const c=b.querySelector(".choice-check");if(c)c.textContent="✓";
 });
-qsa("[data-back]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.back||"home")));
-qsa("[data-official]").forEach(el=>el.addEventListener("click",()=>{
-const url=el.dataset.official;
-if(url)window.open(url,"_blank","noopener,noreferrer");
+
+const collect=()=>{
+ const s=practice?.screens?.[screen];if(!s)return true;
+ const box=ensure();let ok=true,first=null;
+ (s.fields||[]).forEach(f=>{
+  const cs=box.querySelectorAll(`.choice-card[data-field="${CSS.escape(f.name)}"]`);
+  if(cs.length){if(f.required&&!clean(value(f.name))){ok=false;first=first||cs[0]}return}
+  const el=box.querySelector(`[name="${CSS.escape(f.name)}"]`);
+  if(!el)return;
+  const v=clean(el.value);
+  if(f.required&&!v){ok=false;first=first||el;el.classList.add("field-error")}else{el.classList.remove("field-error");answer(f.name,v)}
+ });
+ if(!ok){
+  let e=box.querySelector(".practice-error");
+  if(!e){e=document.createElement("div");e.className="practice-error";e.innerHTML="<strong>Falta una respuesta</strong><p>Selecciona o completa los datos obligatorios para continuar.</p>";box.querySelector(".practice-card")?.prepend(e)}
+  first?.focus();return false
+ }
+ return true
+};
+
+const render=()=>{
+ const ss=practice?.screens||[];
+ if(!ss.length)return error("El módulo no contiene pasos de práctica.");
+ screen=Math.max(0,Math.min(screen,ss.length-1));
+ const s=ss[screen],last=screen===ss.length-1,p=Math.round((screen+1)/ss.length*100),box=ensure();
+ box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button><div class="practice-card"><div class="practice-progress"><div class="progress-title"><span>PRÁCTICA</span><span>PASO ${screen+1} DE ${ss.length}</span></div><div class="progress"><i style="width:${p}%"></i></div></div>${s.badge?`<div class="practice-badge">${esc(s.badge)}</div>`:""}<h2>${esc(s.title||"Paso de práctica")}</h2>${s.question?`<div class="practice-question">${esc(s.question)}</div>`:""}${s.explanation?`<p class="practice-explanation">${esc(s.explanation)}</p>`:""}${image(s)}${gallery(s)}${prepare(s.prepare)}${s.fields?.length?`<div class="practice-fields">${s.fields.map(field).join("")}</div>`:""}${s.review===true||s.id==="review"?review():""}${notice(s.warning,"warning")}${notice(s.important,"info")}${s.portal_note?`<div class="portal-note"><strong>En el portal oficial</strong><p>${esc(s.portal_note)}</p></div>`:""}<div class="practice-actions"><button type="button" class="back-button" id="practice-back" ${screen===0?"disabled":""}>← Anterior</button><button type="button" class="primary-button" id="practice-next">${last?"Terminar práctica":"Guardar y continuar →"}</button></div></div>`;
+ section();bindChoices();
+ $("practice-home")?.addEventListener("click",home);
+ $("practice-back")?.addEventListener("click",()=>{if(screen>0){collect();screen--;saveCurrent();render()}});
+ $("practice-next")?.addEventListener("click",()=>{if(!collect())return;if(!last){screen++;saveCurrent();render()}else finish()});
+};
+
+const finish=()=>{
+ practice.completed=true;saveCurrent();
+ const official=moduleName==="visa"?"https://evisacuba.cu/":"https://dviajeros.mitrans.gob.cu/";
+ const title=moduleName==="visa"?"Práctica de Visa completada":"Práctica de D'Viajeros completada";
+ const box=ensure();
+ box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button><div class="practice-card practice-complete"><div class="practice-badge">PRÁCTICA COMPLETADA</div><h2>${esc(title)}</h2><p class="practice-explanation">Ahora puedes revisar lo que practicaste y utilizarlo como referencia al completar el proceso oficial.</p><div class="practice-notice info"><strong>Importante</strong><p>Esta práctica no fue enviada a las autoridades. No realiza pagos, no solicita ni aprueba una visa, no presenta D'Viajeros y no genera un QR oficial.</p></div><h3>Lo que practicaste</h3>${review()}<div class="practice-actions"><button type="button" class="back-button" id="practice-edit">← Volver a practicar</button><a class="primary-button official-link-button" href="${official}" target="_blank" rel="noopener noreferrer">Ir al portal oficial →</a></div><div class="portal-note"><strong>Ahora sí</strong><p>Usa esta práctica como referencia y completa directamente el trámite oficial.</p></div></div>`;
+ section();
+ $("practice-home")?.addEventListener("click",home);
+ $("practice-edit")?.addEventListener("click",()=>{practice.completed=false;screen=0;saveCurrent();render()});
+};
+
+const error=m=>{
+ const box=ensure();
+ box.innerHTML=`<button type="button" class="back-button" id="practice-home">← Volver al inicio</button><div class="practice-card"><div class="practice-error"><strong>No se pudo abrir la práctica</strong><p>${esc(m)}</p></div></div>`;
+ section();$("practice-home")?.addEventListener("click",home)
+};
+
+const start=async type=>{
+ moduleName=type;
+ try{
+  practice=await get(API[type])||{};
+  practice.answers={...(db[type]?.answers||{})};
+  practice.completed=false;
+  screen=Number(db[type]?.completed?0:db[type]?.screen||0);
+  render()
+ }catch(e){error(e.message||"No se pudo cargar el módulo.")}
+};
+
+$("visa-button")?.addEventListener("click",()=>start("visa"));
+$("dviajeros-button")?.addEventListener("click",()=>start("dviajeros"));
+
+document.querySelectorAll("[data-module]").forEach(b=>b.addEventListener("click",()=>{
+ const t=b.dataset.module;if(t==="visa"||t==="dviajeros")start(t)
 }));
-document.addEventListener("click",e=>{
-const el=e.target.closest("[data-open]");
-if(!el)return;
-const url=el.dataset.open;
-if(url)window.open(url,"_blank","noopener,noreferrer");
+
+$("clear-all")?.addEventListener("click",()=>{
+ if(moduleName)delete db[moduleName];
+ save();practice=null;screen=0;home()
 });
+
+if(!document.getElementById("cuba-practice-style")){
+ const st=document.createElement("style");
+ st.id="cuba-practice-style";
+ st.textContent=`
+.practice-card{background:#fff;border:1px solid #dce4ec;border-radius:18px;padding:24px;margin:20px 0 35px;box-shadow:0 5px 20px rgba(0,0,0,.07)}
+.practice-progress{margin-bottom:22px}.progress-title{display:flex;justify-content:space-between;color:#586779;font-size:12px;font-weight:800}.progress{height:7px;background:#e8edf2;border-radius:10px;overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:#123c69;border-radius:10px;transition:width .25s}
+.practice-badge{display:inline-block;background:#eef4f9;color:#123c69;border-radius:20px;padding:7px 12px;font-size:12px;font-weight:800;margin-bottom:12px}
+.practice-question{font-size:21px;font-weight:700;line-height:1.35;margin:15px 0}.practice-explanation{color:#526173;font-size:16px;line-height:1.6}
+.practice-visual{margin:20px 0;border:1px solid #dbe3eb;border-radius:14px;overflow:hidden;background:#f7f9fb}.practice-visual img{display:block;width:100%;max-height:560px;object-fit:contain;background:#f7f9fb}.visual-label{padding:8px 12px;background:#eef3f7;color:#526173;font-size:11px;font-weight:800}
+.practice-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0}.practice-gallery figure{margin:0;border:1px solid #dce4ec;border-radius:12px;overflow:hidden;background:#fafbfd}.practice-gallery img{display:block;width:100%;height:220px;object-fit:contain;background:#f4f7fa}.practice-gallery figcaption{padding:9px;font-size:13px;color:#566475}
+.prepare-box,.practice-notice,.portal-note{margin:18px 0;padding:15px 17px;border-radius:11px;background:#f3f7fa;border:1px solid #dce5ec;color:#384858;line-height:1.55}.prepare-box ul{margin:9px 0 0;padding-left:20px}.practice-notice.warning{background:#fff8e7;border-color:#ead9a5}.practice-notice p,.portal-note p{margin:6px 0 0}
+.practice-fields{display:flex;flex-direction:column;gap:18px;margin-top:20px}.practice-field label,.field-label{display:block;font-weight:700;margin-bottom:7px}.field-help{color:#657384;font-size:14px;margin-bottom:8px}
+.practice-field input,.practice-field textarea{width:100%;border:1px solid #cbd5df;border-radius:9px;padding:12px;font-size:16px;font-family:inherit;background:#fff}.practice-field input:focus,.practice-field textarea:focus{outline:2px solid #a9c8e5;border-color:#4c89c7}.field-error{border-color:#b3261e!important;background:#fff8f7!important}
+.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.choice-card{position:relative;border:2px solid #d7e0e8;border-radius:13px;background:#fff;padding:16px;min-height:100px;cursor:pointer;text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;font-family:inherit;transition:.15s}.choice-card:hover{border-color:#7ca7cb;transform:translateY(-1px)}.choice-card.selected{border-color:#123c69;background:#f2f7fb}.choice-card strong{font-size:16px;color:#172033}.choice-card>span:not(.choice-image):not(.choice-check){color:#617082;font-size:13px;line-height:1.35}.choice-image{width:100%;height:90px;display:flex;align-items:center;justify-content:center}.choice-image img{max-width:100%;max-height:90px;object-fit:contain}.choice-check{position:absolute;top:9px;right:10px;font-weight:900;color:#123c69}
+.practice-example{margin-top:7px;padding:8px 10px;border-radius:7px;background:#f6f8fa;color:#5e6c7c;font-size:13px}.practice-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:25px}.practice-actions a{text-decoration:none}
+.practice-review{border:1px solid #dce4ec;border-radius:11px;overflow:hidden;margin:18px 0}.review-row{display:grid;grid-template-columns:minmax(150px,32%) 1fr;gap:15px;padding:12px 14px;border-bottom:1px solid #e5eaf0}.review-row:last-child{border-bottom:0}.review-row strong{display:block}.review-row small{display:block;color:#6a7786;margin-top:3px}.review-row span{overflow-wrap:anywhere}
+.practice-error{margin-bottom:18px;padding:15px 17px;border-radius:11px;border:1px solid #e2b6b3;background:#fff5f4;color:#7c211c}.practice-error p{margin:5px 0 0}
+@media(max-width:650px){.practice-card{padding:17px}.practice-question{font-size:18px}.choice-grid{grid-template-columns:1fr}.review-row{grid-template-columns:1fr;gap:4px}.practice-actions{flex-direction:column;align-items:stretch}.practice-actions button,.practice-actions a{width:100%;text-align:center}}
+`;
+ document.head.appendChild(st)
 }
 
-async function getJSON(url){
-const r=await fetch(url,{cache:"no-store"});
-if(!r.ok)throw new Error(`${r.status} ${r.statusText}`);
-return r.json();
-}
-
-async function loadData(){
-try{
-const data=await getJSON("/api/data");
-state.data=data||{};
-}catch(e){
-console.error("Data:",e);
-state.data={};
-}
-try{
-const flights=await getJSON("/api/flights");
-state.data.flights=flights||{};
-}catch(e){
-console.error("Flights:",e);
-}
-render();
-}
-
-function render(){
-renderHome();
-renderVisa();
-renderDViajeros();
-renderPassport();
-renderFlights();
-renderGuides();
-renderPractice();
-}
-
-function renderHome(){
-const root=qs("#homeContent");
-if(!root)return;
-root.innerHTML=`
-
- <section class="hero-card">
-  <div class="hero-copy">
-   <span class="eyebrow">CUBA AUTO TRAVEL 2026</span>
-   <h1>${esc(t("homeTitle"))}</h1>
-   <h2>${esc(t("homeSubtitle"))}</h2>
-   <p>${esc(t("homeText"))}</p>
-   <div class="hero-actions">
-    <button class="primary" data-page="visa">${esc(t("visa"))}</button>
-    <button class="secondary" data-page="dviajeros">${esc(t("dviajeros"))}</button>
-   </div>
-  </div>
- </section>
- <section class="training-grid">
-  <article class="info-card">
-   <span class="card-icon">🛂</span>
-   <h3>${esc(t("visa"))}</h3>
-   <p>${esc(t("visaText"))}</p>
-   <button class="primary" data-page="visa">${esc(t("open"))}</button>
-  </article>
-  <article class="info-card">
-   <span class="card-icon">📋</span>
-   <h3>${esc(t("dviajeros"))}</h3>
-   <p>${esc(t("dviajerosText"))}</p>
-   <button class="primary" data-page="dviajeros">${esc(t("open"))}</button>
-  </article>
-  <article class="info-card">
-   <span class="card-icon">📕</span>
-   <h3>${esc(t("passport"))}</h3>
-   <p>${esc(t("passportText"))}</p>
-   <button class="primary" data-page="passport">${esc(t("open"))}</button>
-  </article>
-  <article class="info-card">
-   <span class="card-icon">✈️</span>
-   <h3>${esc(t("flights"))}</h3>
-   <p>${esc(t("flightText"))}</p>
-   <button class="primary" data-page="flights">${esc(t("open"))}</button>
-  </article>
- </section>
- <section class="notice-card">
-  <h3>${esc(t("legal"))}</h3>
-  <p>${esc(t("legalText"))}</p>
- </section>`;
- qsa("#homeContent [data-page]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.page)));
-}
-
-function renderVisa(){
-const root=qs("#visaContent");
-if(!root)return;
-const d=state.data.cuba_visa||{};
-const lang=state.lang;
-const req=d.requirements?.[lang]||[];
-const steps=d.steps?.[lang]||[];
-const checks=d.check_before_submit?.[lang]||[];
-const official=d.official?.form_url||d.official?.url||"https://evisacuba.cu/";
-const current=steps[state.visaStep]||{};
-root.innerHTML=`
-
- <section class="page-header">
-  <span class="eyebrow">${esc(t("visa"))}</span>
-  <h1>${esc(d[`title_${lang}`]||t("visaTitle"))}</h1>
-  <p>${esc(d[`intro_${lang}`]||t("visaText"))}</p>
- </section>
- <section class="content-card">
-  <h2>${esc(t("requirements"))}</h2>
-  <ul class="check-list">${req.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
- </section>
- <section class="content-card">
-  <h2>${esc(t("steps"))}</h2>
-  <div class="step-box">
-   <div class="step-number">${Number(current.number||state.visaStep+1)}</div>
-   <div>
-    <h3>${esc(current.title||"")}</h3>
-    <p>${esc(current.text||"")}</p>
-   </div>
-  </div>
-  <div class="step-progress">${steps.length?state.visaStep+1:0} / ${steps.length}</div>
-  <div class="button-row">
-   <button class="secondary" id="visaPrev" ${state.visaStep<=0?"disabled":""}>${esc(t("previous"))}</button>
-   <button class="primary" id="visaNext">${state.visaStep>=steps.length-1?esc(t("finish")):esc(t("next"))}</button>
-  </div>
- </section>
- <section class="content-card">
-  <h2>${esc(t("checklist"))}</h2>
-  <ul class="check-list">${checks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
- </section>
- <section class="action-card">
-  <h2>${esc(t("how"))}</h2>
-  <p>${esc(d[`intro_${lang}`]||"")}</p>
-  <div class="button-row">
-   <button class="primary" data-open="${esc(official)}">${esc(d.buttons?.[lang]?.official||t("officialVisa"))}</button>
-  </div>
- </section>
- ${d.notice?.[lang]?`<section class="notice-card"><p>${esc(d.notice[lang])}</p></section>`:""}
- ${renderSources(d.sources)}`;
- const prev=qs("#visaPrev"),next=qs("#visaNext");
- if(prev)prev.onclick=()=>{if(state.visaStep>0){state.visaStep--;renderVisa()}};
- if(next)next.onclick=()=>{
-  if(state.visaStep<steps.length-1){state.visaStep++;renderVisa()}
-  else{state.visaStep=0;window.scrollTo({top:0,behavior:"smooth"})}
- };
- qsa("#visaContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
-}
-
-function renderDViajeros(){
-const root=qs("#dviajerosContent");
-if(!root)return;
-const d=state.data.dviajeros||{};
-const lang=state.lang;
-const important=d[`important_${lang}`]||[];
-const steps=d.steps?.[lang]||[];
-const checks=d.check_before_submit?.[lang]||[];
-const official=d.official?.url||"https://www.dviajeros.mitrans.gob.cu/";
-const current=steps[state.dviajerosStep]||{};
-root.innerHTML=`
-
- <section class="page-header">
-  <span class="eyebrow">${esc(t("dviajeros"))}</span>
-  <h1>${esc(d[`title_${lang}`]||t("dviajerosTitle"))}</h1>
-  <p>${esc(d[`intro_${lang}`]||t("dviajerosText"))}</p>
- </section>
- <section class="content-card">
-  <h2>${esc(t("important"))}</h2>
-  <ul class="check-list">${important.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
- </section>
- <section class="content-card">
-  <h2>${esc(t("steps"))}</h2>
-  <div class="step-box">
-   <div class="step-number">${Number(current.number||state.dviajerosStep+1)}</div>
-   <div>
-    <h3>${esc(current.title||"")}</h3>
-    <p>${esc(current.text||"")}</p>
-   </div>
-  </div>
-  <div class="step-progress">${steps.length?state.dviajerosStep+1:0} / ${steps.length}</div>
-  <div class="button-row">
-   <button class="secondary" id="dPrev" ${state.dviajerosStep<=0?"disabled":""}>${esc(t("previous"))}</button>
-   <button class="primary" id="dNext">${state.dviajerosStep>=steps.length-1?esc(t("finish")):esc(t("next"))}</button>
-  </div>
- </section>
- <section class="content-card">
-  <h2>${esc(t("checklist"))}</h2>
-  <ul class="check-list">${checks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
- </section>
- <section class="action-card">
-  <h2>${esc(t("how"))}</h2>
-  <p>${esc(d[`intro_${lang}`]||"")}</p>
-  <div class="button-row">
-   <button class="primary" data-open="${esc(official)}">${esc(d.buttons?.[lang]?.official||t("officialD"))}</button>
-  </div>
- </section>
- ${d.notice?.[lang]?`<section class="notice-card"><p>${esc(d.notice[lang])}</p></section>`:""}
- ${renderSources(d.sources)}`;
- const prev=qs("#dPrev"),next=qs("#dNext");
- if(prev)prev.onclick=()=>{if(state.dviajerosStep>0){state.dviajerosStep--;renderDViajeros()}};
- if(next)next.onclick=()=>{
-  if(state.dviajerosStep<steps.length-1){state.dviajerosStep++;renderDViajeros()}
-  else{state.dviajerosStep=0;window.scrollTo({top:0,behavior:"smooth"})}
- };
- qsa("#dviajerosContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
-}
-
-function renderPassport(){
-const root=qs("#passportContent");
-if(!root)return;
-const d=state.data.passports||{};
-const lang=state.lang;
-const req=d.requirements?.[lang]||[];
-const steps=d.steps?.[lang]||[];
-const checks=d.checklist?.[lang]||[];
-root.innerHTML=`
-
- <section class="page-header">
-  <span class="eyebrow">${esc(t("passport"))}</span>
-  <h1>${esc(d[`title_${lang}`]||t("passportTitle"))}</h1>
-  <p>${esc(d[`intro_${lang}`]||t("passportText"))}</p>
- </section>
- <section class="content-card">
-  <h2>${esc(t("requirements"))}</h2>
-  <ul class="check-list">${req.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
- </section>
- <section class="content-card">
-  <h2>${esc(t("steps"))}</h2>
-  <div class="passport-steps">${steps.map((x,i)=>`
-   <article class="step-card">
-    <div class="step-number">${Number(x.number||i+1)}</div>
-    <div><h3>${esc(x.title||"")}</h3><p>${esc(x.text||"")}</p></div>
-   </article>`).join("")}</div>
- </section>
- <section class="content-card">
-  <h2>${esc(t("checklist"))}</h2>
-  <ul class="check-list">${checks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
- </section>
- <section class="action-card">
-  <div class="button-row">
-   <button class="primary" data-open="${esc(state.data.cuba_visa?.official?.url||"https://evisacuba.cu/")}">${esc(d.buttons?.[lang]?.visa||"IR A LA VISA")}</button>
-   <button class="secondary" data-open="${esc(state.data.dviajeros?.official?.url||"https://www.dviajeros.mitrans.gob.cu/")}">${esc(d.buttons?.[lang]?.dviajeros||"IR A D'VIAJEROS")}</button>
-  </div>
- </section>
- ${d.notice?.[lang]?`<section class="notice-card"><p>${esc(d.notice[lang])}</p></section>`:""}
- ${renderSources(d.sources)}`;
- qsa("#passportContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
-}
-
-function renderFlights(){
-const root=qs("#flightsContent");
-if(!root)return;
-const f=state.data.flights||{};
-const providers=f.providers||{};
-const airports=f.airports||[];
-const destinations=f.destinations||[];
-const charters=f.charters||[];
-root.innerHTML=`
-
- <section class="page-header">
-  <span class="eyebrow">${esc(t("flights"))}</span>
-  <h1>${esc(t("flightTitle"))}</h1>
-  <p>${esc(t("flightText"))}</p>
- </section>
- <section class="content-card">
-  <div class="flight-form">
-   <label>${esc(t("airport"))}
-    <select id="airportSelect">${airports.map(a=>`<option value="${esc(a.code)}" ${a.code===state.airport?"selected":""}>${esc(a.name)}${a.name_en&&state.lang==="en"?` — ${esc(a.name_en)}`:""}</option>`).join("")}</select>
-   </label>
-   <label>${esc(t("destination"))}
-    <select id="destinationSelect">${destinations.map(d=>`<option value="${esc(d.code)}" ${d.code===state.destination?"selected":""}>${esc(state.lang==="en"?d.name_en:d.name)}</option>`).join("")}</select>
-   </label>
-  </div>
- </section>
- <section class="content-card">
-  <h2>${esc(t("providers"))}</h2>
-  <div class="video-grid">
-   ${Object.entries(providers).map(([key,p])=>`
-    <article class="info-card flight-card">
-     <h3>${esc(p.name||p.name_es||key)}</h3>
-     <p>${esc(p[`description_${state.lang}`]||p.description_es||"")}</p>
-     <button class="primary" data-open="${esc(p.url||"")}">${esc(t("open"))}</button>
-    </article>`).join("")}
-  </div>
- </section>
- <section class="content-card">
-  <h2>${esc(t("charters"))}</h2>
-  <div class="video-grid">
-   ${charters.map(c=>`
-    <article class="info-card flight-card">
-     <h3>${esc(c.name||"")}</h3>
-     <p>${esc(c[`note_${state.lang}`]||c.note_es||"")}</p>
-     <button class="secondary" data-open="${esc(c.source||"")}">${esc(t("open"))}</button>
-    </article>`).join("")}
-  </div>
- </section>`;
- const a=qs("#airportSelect"),d=qs("#destinationSelect");
- if(a)a.onchange=()=>{state.airport=a.value};
- if(d)d.onchange=()=>{state.destination=d.value};
- qsa("#flightsContent [data-open]").forEach(el=>el.onclick=()=>window.open(el.dataset.open,"_blank","noopener,noreferrer"));
-}
-
-function renderGuides(){
-const root=qs("#guidesContent");
-if(!root)return;
-const visa=state.data.cuba_visa||{},d=state.data.dviajeros||{};
-const lang=state.lang;
-root.innerHTML=`
-
- <section class="page-header">
-  <span class="eyebrow">${esc(t("guides"))}</span>
-  <h1>${esc(t("guideTitle"))}</h1>
-  <p>${esc(t("guideText"))}</p>
- </section>
- <section class="training-grid">
-  <article class="info-card">
-   <span class="card-icon">🛂</span>
-   <h2>${esc(visa[`title_${lang}`]||t("visaTitle"))}</h2>
-   <p>${esc(visa[`intro_${lang}`]||"")}</p>
-   <button class="primary" data-page="visa">${esc(t("how"))}</button>
-  </article>
-  <article class="info-card">
-   <span class="card-icon">📋</span>
-   <h2>${esc(d[`title_${lang}`]||t("dviajerosTitle"))}</h2>
-   <p>${esc(d[`intro_${lang}`]||"")}</p>
-   <button class="primary" data-page="dviajeros">${esc(t("how"))}</button>
-  </article>
-  <article class="info-card">
-   <span class="card-icon">📕</span>
-   <h2>${esc(t("passportTitle"))}</h2>
-   <p>${esc(t("passportText"))}</p>
-   <button class="primary" data-page="passport">${esc(t("how"))}</button>
-  </article>
- </section>`;
- qsa("#guidesContent [data-page]").forEach(el=>el.onclick=()=>showPage(el.dataset.page));
-}
-
-function renderPractice(){
-const root=qs("#practiceContent");
-if(!root)return;
-const v=visaSim[state.visaSimStep%visaSim.length],d=dSim[state.dSimStep%dSim.length];
-root.innerHTML=`
-
- <section class="page-header">
-  <span class="eyebrow">${esc(t("practice"))}</span>
-  <h1>${esc(t("practice"))}</h1>
-  <p>${esc(t("practiceText"))}</p>
- </section>
- <section class="training-grid">
-  <article class="info-card practice-card">
-   <h2>${esc(t("practiceVisa"))}</h2>
-   <span class="practice-label">${esc(t("first"))}</span>
-   <h3>${esc(v.q[state.lang])}</h3>
-   <p class="answer-box">${esc(v.a[state.lang])}</p>
-   <button class="primary" id="visaPracticeNext">${esc(t("next"))}</button>
-  </article>
-  <article class="info-card practice-card">
-   <h2>${esc(t("practiceD"))}</h2>
-   <span class="practice-label">${esc(t("first"))}</span>
-   <h3>${esc(d.q[state.lang])}</h3>
-   <p class="answer-box">${esc(d.a[state.lang])}</p>
-   <button class="primary" id="dPracticeNext">${esc(t("next"))}</button>
-  </article>
- </section>`;
- const vn=qs("#visaPracticeNext"),dn=qs("#dPracticeNext");
- if(vn)vn.onclick=()=>{state.visaSimStep=(state.visaSimStep+1)%visaSim.length;renderPractice()};
- if(dn)dn.onclick=()=>{state.dSimStep=(state.dSimStep+1)%dSim.length;renderPractice()};
-}
-
-function renderSources(sources){
-if(!Array.isArray(sources)||!sources.length)return "";
-return `<section class="content-card sources-card"><h2>${esc(t("sources"))}</h2><div class="source-list">${sources.map(s=>`<a href="${esc(s.url||"#")}" target="_blank" rel="noopener noreferrer">${esc(s.name||s.url||"")}</a>`).join("")}</div></section>`;
-}
-
-function restoreLanguage(){
-try{
-const saved=localStorage.getItem("cat_lang");
-if(saved==="en"||saved==="es")state.lang=saved;
-}catch(e){}
-}
-
-function start(){
-restoreLanguage();
-bind();
-applyLanguage();
-loadData();
-}
-
-document.addEventListener("DOMContentLoaded",start);
+});
