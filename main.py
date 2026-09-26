@@ -10,13 +10,9 @@ BASE_DIR=Path(__file__).resolve().parent
 DATA_DIR=BASE_DIR/"data"
 STATIC_DIR=BASE_DIR/"static"
 
-def read_json(filename):
-with open(DATA_DIR/filename,"r",encoding="utf-8") as f:
-return json.load(f)
-
-CUBA_VISA=read_json("cuba_visa.json")
-D_VIAJEROS=read_json("dviajeros.json")
-PASSPORTS=read_json("passports.json")
+CUBA_VISA=json.load(open(DATA_DIR/"cuba_visa.json","r",encoding="utf-8"))
+D_VIAJEROS=json.load(open(DATA_DIR/"dviajeros.json","r",encoding="utf-8"))
+PASSPORTS=json.load(open(DATA_DIR/"passports.json","r",encoding="utf-8"))
 
 app=FastAPI(title="CUBA AUTO TRAVEL 2026",description="Guía práctica para pasajeros que viajan a Cuba.",version="1.0.0")
 
