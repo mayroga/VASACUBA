@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from schemas import VisaRequest,DViajerosRequest,PassportRequest
 
-BASE_DIR=Path(__file__).resolve().parent
+BASE_DIR=Path(**file**).resolve().parent
 DATA_DIR=BASE_DIR/"data"
 STATIC_DIR=BASE_DIR/"static"
 
@@ -138,7 +138,7 @@ DESTINATIONS=[
 {"code":"VRA","name":"Varadero","name_en":"Varadero"},
 {"code":"SNU","name":"Santa Clara","name_en":"Santa Clara"},
 {"code":"CMW","name":"Camagüey","name_en":"Camagüey"},
-{"code":"HOG","name":"Holguín","name_en":"Holguín"},
+{"code":"HOG","name":"Holguín","name_en":"Holguin"},
 {"code":"SCU","name":"Santiago de Cuba","name_en":"Santiago de Cuba"}
 ]
 
@@ -299,8 +299,4 @@ raise HTTPException(status_code=404,detail="Aplicación no encontrada")
 
 if **name**=="**main**":
 import uvicorn
-uvicorn.run(
-"main:app",
-host="0.0.0.0",
-port=int(os.environ.get("PORT","8000"))
-)
+uvicorn.run("main:app",host="0.0.0.0",port=int(os.environ.get("PORT","8000")))
