@@ -24,17 +24,17 @@ STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET","").strip()
 ACCESS_TOKEN_SECRET=os.environ.get("ACCESS_TOKEN_SECRET","").strip() or STRIPE_SECRET_KEY
 
 if STRIPE_SECRET_KEY:
-stripe.api_key=STRIPE_SECRET_KEY
+    stripe.api_key=STRIPE_SECRET_KEY
 
 def load_json(filename:str,default:Any=None)->Any:
-p=DATA_DIR/filename
-try:
-with p.open("r",encoding="utf-8") as f:return json.load(f)
-except FileNotFoundError:
-if default is not None:return default
-raise
-except json.JSONDecodeError as e:
-raise RuntimeError(f"JSON inválido: {filename}: {e}")
+    p=DATA_DIR/filename
+    try:
+        with p.open("r",encoding="utf-8") as f:return json.load(f)
+    except FileNotFoundError:
+        if default is not None:return default
+        raise
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"JSON inválido: {filename}: {e}")
 
 CUBA_VISA=load_json("cuba_visa.json",{})
 D_VIAJEROS=load_json("dviajeros.json",{})
