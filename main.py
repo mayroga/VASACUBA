@@ -12,16 +12,16 @@ DATA_DIR=BASE_DIR/"data"
 STATIC_DIR=BASE_DIR/"static"
 
 def load_json(filename:str,default:Any=None)->Any:
-    p=DATA_DIR/filename
-    try:
-        with p.open("r",encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        if default is not None:
-            return default
-        raise
-    except json.JSONDecodeError as e:
-        raise RuntimeError(f"JSON inválido: {filename}: {e}")
+p=DATA_DIR/filename
+try:
+with p.open("r",encoding="utf-8") as f:
+return json.load(f)
+except FileNotFoundError:
+if default is not None:
+return default
+raise
+except json.JSONDecodeError as e:
+raise RuntimeError(f"JSON inválido: {filename}: {e}")
 
 CUBA_VISA=load_json("cuba_visa.json",{})
 D_VIAJEROS=load_json("dviajeros.json",{})
